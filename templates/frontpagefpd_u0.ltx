@@ -1,0 +1,58 @@
+\raggedbottom
+\begin{document}
+\thispagestyle{empty}
+\ThisCenterWallPaper{1}{media/@IOC_BACKGROUND_FILENAME@.pdf}
+%FrontPage
+\hyphenpenalty=100000
+\begin{textblock*}{150mm}(0cm,6cm)
+    \begin{spacing}{0.8}
+        \raggedright\noindent
+        \textcolor{fpd1}{\fontsize{24}{28.8}{\fcofamily\fontdimen2\font=0.6em @IOC_EXPORT_CREDIT_F@}}\\
+        \vspace{2mm}
+        \textcolor{fpd2}{\fontfamily{phv}\fontsize{14}{16.8}\selectfont\textmd{@IOC_EXPORT_CICLENOM@}}\\
+        \vspace{2mm}
+        \normalsize
+        \textcolor{fpd1}{\fontfamily{phv}\fontsize{10}{12}\selectfont @IOC_EXPORT_FAMILIA@}\\
+        \vspace{20mm}
+        \noindent
+        \textcolor{fpd3}{\fontfamily{phv}\fontsize{17}{20.4}\selectfont\textmd{@IOC_EXPORT_AUTOR@}}\\
+        \vspace{7mm}
+        \fontfamily{phv}\selectfont\bfseries{Coordinació de continguts}\\
+        \vspace{1mm}
+        \normalfont
+        \begin{spacing}{1}
+            \textcolor{fpd4}{\fontfamily{phv}\selectfont\fontsize{10}{11.2}\textmd{@IOC_EXPORT_COORDINACIO@}}\\
+        \end{spacing}
+    \end{spacing}
+    \textcolor{fpd5}{\rule{\textwidth}{0.1pt}}
+    \normalsize
+    \vspace{3mm}
+    \Large
+    \textcolor{ioc}{\fontfamily{phv}\fontsize{11}{13.2}\selectfont\textmd{@IOC_EXPORT_CREDIT@}}
+\end{textblock*}
+\hyphenpenalty=1000
+\newpage
+\headingnonumbers
+%Header plain pages
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CICLENOM@}
+    \fancyhead[CO]{\fontfamily{phv}\selectfont\tiny\thepage}
+    \fancyhead[RO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
+    \fancyfoot[RO]{}
+}
+
+%Header fancy pages
+\pagestyle{fancy}
+\lhead{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CICLENOM@}
+\chead{}%no page number in toc page
+\rhead{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+\chead{\fontfamily{phv}\selectfont\tiny\thepage}
+\newgeometry{top=20mm, bottom=20mm, right=60mm, left=20mm}
+\cleardoublepage
+\creditspacingline
+\thispagestyle{empty}
+\chead{\fontfamily{phv}\selectfont{\tiny{\thepage}}}

@@ -1,0 +1,489 @@
+\documentclass[twoside,a4paper,11pt,svgnames]{book}
+% ***************** PACKAGES *****************
+\usepackage[mathletters]{ucs}%Extended characters
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}%Extended characters
+\usepackage[@IOCLANGUAGE@]{babel}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{tabu}
+\usepackage[table]{xcolor}%Color inside tables
+\usepackage{hyperref}%Create hyperlinks
+\usepackage{fancyhdr}%Customized headers
+\usepackage[top=20mm, bottom=20mm, right=60mm, left=20mm]{geometry}
+\usepackage{eso-pic}%Add images inside document
+\usepackage{textpos}%Set text in a position 
+\usepackage{titlesec}%Customize sections
+\usepackage{wallpaper}%Used in frontpage
+\usepackage{tgtermes}%Gyre Termes font
+\usepackage{marginnote}%Notes on margins
+\usepackage{ulem}
+\usepackage[font={scriptsize,bf},labelfont={scriptsize,sc},textfont={scriptsize,sf},justification=justified,singlelinecheck=false,labelsep=period]{caption}
+\usepackage{grffile}%Accept dots on filenames
+\usepackage{fixltx2e}%subscript, superscript
+\usepackage{setspace}%Control over line spacing
+\usepackage{listings}%Code environment
+\usepackage{dashrule}%Customized rules
+\usepackage{paralist}%Used to show quiz solutions
+\usepackage{marginfix}%Used to avoid marginpars overlapping
+\usepackage{lscape}%Landscape mode
+\usepackage{emptypage}%Remove headers from blank pages
+\usepackage[morefloats=10]{morefloats}%Allow more floats in document
+\usepackage{ifthen}%Enable alternatives
+\usepackage[strict]{changepage}%Used to know in which page we are
+\usepackage[safe]{tipa}%Used fonetical symbols
+\usepackage{amsmath}%Used for matrix environment
+\usepackage[leftcaption]{sidecap}
+\usepackage[gen]{eurosym}%Euro currency symbol
+\usepackage[encapsulated]{CJK}% use one of bsmi(trad Chinese), gbsn(simp Chinese), min(Japanese), mj(Korean);
+\usepackage{amssymb}%mathfrak symbols
+\usepackage{wasysym}%permil symbol
+\usepackage{xlop}%automatic arithmetic operations
+\usepackage{comfortaa}%comfortaa font
+@IOCQRCODE@ %qrcodes
+
+\PrerenderUnicode{àáèéíòóúïüñçÀÁÈÉÍÒÓÚÏÜÑÇ}
+
+% ***************** CUSTOMIZED COMMANDS *****************
+\newcommand{\fonttable}{\fontsize{7}{8.4}\fontfamily{phv}\selectfont}
+\newcommand{\foottable}[1]{\fontsize{6}{7.2}\fontfamily{phv}\selectfont #1\fonttable}
+\newcommand{\codeblock}{\renewcommand{\ttdefault}{fvm}\scriptsize}%beramono
+\newcommand{\codeinline}{\renewcommand{\ttdefault}{fi4}}%inconsolata
+\newenvironment{textltitle}{\begin{spacing}{1.2}\ioctextfont\bfseries}{\end{spacing}\normalfont}
+\newenvironment{textlbody}{\begin{spacing}{1.2}\defaultspacingpar\ioctextfont}{\end{spacing}\normalfont}
+\newenvironment{quotebody}{\defaultspacingpar\ioctextfont}{\normalfont}
+\newenvironment{exampletitle}{\begin{spacing}{1.2}\ioctextfont\bfseries}{\end{spacing}\normalfont}
+\newenvironment{examplebody}{\begin{spacing}{1.2}\defaultspacingpar\ioctextfont}{\end{spacing}\normalfont}
+\newcommand{\iocalignment}{\checkoddpage\ifthenelse{\boolean{oddpage}}{\raggedright}{\raggedleft}}
+\newcommand{\tablelargecaption}{\captionsetup{font={scriptsize,bf},labelfont={scriptsize,sc},justification=raggedright,singlelinecheck=false,labelsep=period, margin=-62mm}}
+\newcommand{\tableiocelemcaption}{\captionsetup{font={scriptsize,bf},labelfont={scriptsize,sc},justification=raggedright,singlelinecheck=false,labelsep=period, margin=6mm}}
+\newcommand{\tablecaption}{\captionsetup{labelsep=period}}
+\newcommand{\tablesmallcaption}[1]{\captionsetup{labelsep=period, margin=(.5\linewidth-((\the\tabucolX+4mm) * #1)/2)}}
+\newcommand{\tablecaptioncontinue}{\captionsetup{labelsep=space}}
+\newcommand{\ioclangcontinue}{@IOCLANGCONTINUE@}
+\newcommand{\tableiocelemsize}{.9\textwidth}
+
+\newcommand{\iocimportant}[1]{
+    \begin{flushleft}
+        \colorbox{colorimportant}{
+            \begin{minipage}{0.98\textwidth}
+                \vspace{2mm}
+                \centering
+                \parbox[c]{0.95\textwidth}{#1}
+                \vspace{2mm}
+            \end{minipage}
+        }
+    \end{flushleft}
+}
+\newcommand{\ioctext}[3][0mm]{
+    \marginpar{
+            \vspace{#1}
+            \begin{minipage}{\marginparwidth-4mm}
+                \centering
+                \parbox[c]{\marginparwidth}{
+                    \marginspacingline
+                    \defaultspacingpar
+                    \fontfamily{phv}
+                    \selectfont
+                    \small
+                    \iocalignment
+                    \bfseries{#2}
+                    \vspace{1ex}
+                    \\
+                    \normalfont
+                    \small
+                    #3
+                }
+            \end{minipage}
+    }
+}
+\newcommand{\ioctextl}[2]{
+\begingroup
+    \leftskip\textboxsize%4em
+    \rightskip\leftskip
+    \par
+    \vspace{1ex}
+    \begin{textltitle}
+        #1
+    \end{textltitle}
+    \begin{textlbody}
+        #2
+    \end{textlbody}
+    \normalfont
+    \vspace{1ex}
+    \par
+\endgroup
+}
+\newcommand{\iocquote}[1]{
+    \begingroup
+        \leftskip\textboxsize%4em
+        \rightskip\leftskip
+        \par
+        \vspace{1ex}
+        \begin{quotebody}
+            #1
+        \end{quotebody}
+        \normalfont
+        \vspace{1ex}
+        \par
+    \endgroup
+}
+\newcommand{\iocexample}[2]{
+\begingroup
+    \leftskip\textboxsize%4em
+    \rightskip\leftskip
+    \par
+    \vspace{1ex}
+    \begin{exampletitle}
+        #1
+    \end{exampletitle}
+    \begin{examplebody}
+        #2
+    \end{examplebody}
+    \normalfont
+    \vspace{1ex}
+    \par
+\endgroup
+}
+
+\newcommand{\iocnote}[2][0mm]{
+    \marginpar{
+        \vspace{#1}
+        \parbox[c]{\marginparwidth}{
+            \hrule
+            \centering
+            \begin{minipage}{.95\marginparwidth}
+                \iocalignment
+                \marginspacingline
+                \fontfamily{phv}
+                \selectfont
+                \vspace{1mm}
+                \small{#2}
+                \vspace{1mm}
+                \defaultspacingline
+            \end{minipage}
+            \hrule
+        }
+    }
+}
+
+\newcommand{\iocreference}[2][0mm]{
+    \marginpar{
+        \vspace{#1}
+        \parbox[c]{\marginparwidth}{
+            \hrule
+            \colorbox{colorreference}{
+                \begin{minipage}{\marginparwidth-4mm}
+                    \iocalignment
+                    \marginspacingline
+                    \fontfamily{phv}
+                    \selectfont
+                    \vspace{1mm}
+                    \small{#2}
+                    \defaultspacingline
+                \end{minipage}
+            }
+            \hrule
+        }
+    }
+}
+
+\newcommand{\imgB}[2][0mm]{
+    \marginnote{#2}[#1]
+}
+
+\newcommand{\draft}[1]{
+    \usepackage{draftwatermark}
+    \SetWatermarkScale{0.8}
+    \SetWatermarkText{\fontfamily{phv}\selectfont #1}
+    \SetWatermarkLightness{0.9}
+}
+
+\newcommand{\defaultspacingpar}{
+\setlength{\parskip}{2ex}%2 lines
+}
+
+\newcommand{\defaultspacingline}{
+\renewcommand{\baselinestretch}{1.15}
+}
+
+\newcommand{\creditspacingpar}{
+\setlength{\parskip}{0pt}
+}
+
+\newcommand{\creditspacingline}{
+\renewcommand{\baselinestretch}{1}
+}
+
+\newcommand{\marginspacingline}{
+\renewcommand{\baselinestretch}{.9}
+}
+
+\newcommand{\headerspacingline}{
+\renewcommand{\baselinestretch}{.2}
+}
+
+\newcommand{\frontpageparskip}{
+\setlength{\parskip}{2ex}
+}
+
+\newcommand{\footerspacingline}{
+\renewcommand{\baselinestretch}{.5}
+}
+
+\newcommand{\numold}[1]{\fontfamily{pcr}\selectfont\tiny{#1}}
+\lstnewenvironment{csource}[1]
+    {\small
+     \lstset{basicstyle=\fontfamily{fvm}\selectfont,%beramono
+            keywordstyle=\bfseries,
+            numbers=left,
+            inputencoding=utf8x,
+            extendedchars=false,
+            numberstyle=\numold,
+            breaklines=true,
+            frame=lines,
+            framexleftmargin=0.5em,
+            framexrightmargin=0.5em,
+            backgroundcolor=\color[rgb]{0.97,0.97,0.97},
+            showstringspaces=false,
+            tabsize=2,
+            #1,
+            literate={á}{{\'a}}1
+                     {é}{{\'e}}1
+                     {í}{{\'i}}1
+                     {ó}{{\'o}}1
+                     {ú}{{\'u}}1
+                     {à}{{\`a}}1
+                     {è}{{\`e}}1
+                     {ò}{{\`o}}1
+                     {ï}{{\"i}}1
+                     {ü}{{\"u}}1
+                     {ñ}{{\~{n}}}1
+                     {’}{{\textquotesingle}}1
+                     {ç}{{\c{c}}}1
+                     {Á}{{\'A}}1
+                     {É}{{\'E}}1
+                     {Í}{{\'I}}1
+                     {Ó}{{\'O}}1
+                     {Ú}{{\'U}}1
+                     {À}{{\`A}}1
+                     {È}{{\`E}}1
+                     {Ò}{{\`O}}1
+                     {Ï}{{\"I}}1
+                     {Ü}{{\"U}}1
+                     {Ñ}{{\~{N}}}1
+                     {Ç}{{\c{C}}}1
+                     {·}{{$\cdot$}}1
+        }
+    }
+    {}
+\newcommand{\tableheadrule}{
+    \hdashrule{.5\textwidth}{0.3mm}{0.3mm 3mm}
+}
+
+\newcommand{\tablesmallheadrule}{
+    \hdashrule{\the\tabucolX}{0.3mm}{0.3mm 3mm}
+}
+
+\newcommand{\quizrule}[1]{
+    \parbox[b]{#1}{
+        \hdashrule{#1}{0.2mm}{0.2mm 0mm}
+    }
+}
+
+\newcommand{\tablefooter}[1]{
+    \parbox[c]{\linewidth}{\textsf{\tiny #1}}
+}
+
+\newcommand{\tablefooterlarge}[2][\linewidth]{
+    \parbox[t]{#1}{\textsf{\tiny\begin{flushright}\vspace{-3\baselineskip}#2\end{flushright}}}
+}
+
+\newcommand{\twotitles}{
+    \break\par\vspace{-.4\marginparsep}
+}
+
+\newcommand{\frontpagefamily}[1]{
+    \textcolor{colorfrontfamily}{#1}
+}
+
+\newenvironment{mediaurl}[1]
+    {
+        \qrcode{
+             \begin{pspicture}(10mm,10mm)
+                \psbarcode{#1}{}{qrcode}
+             \end{pspicture}
+        }
+        \begin{minipage}[c][30mm]{\textwidth}
+        \begin{tabular}[h]{m{32px}m{\textwidth}}
+    }
+    {
+        \end{tabular}\\
+        \end{minipage}
+    }
+
+\newcommand{\qrcode}[1]{
+    \par
+    \marginpar{
+        \vspace{4mm}
+        \resizebox{30mm}{!}{#1}
+    }
+}
+
+\newcommand{\optrelations}[1]{
+    \begin{center}
+    \begin{minipage}{0.9\textwidth}
+        \centering
+        \framebox[0.95\textwidth][c]{
+            \vspace{2mm}
+            \parbox[c]{0.85\textwidth}{
+                \centering
+                \begin{inparaenum}[\bfseries a) ]
+                    \quizoptions
+                    #1
+                    \normalfont
+                \end{inparaenum}
+            }
+            \vspace{2mm}
+        }
+    \end{minipage}
+    \end{center}
+}
+%Size textl and iocexample
+\newcommand{\textboxsize}{.05\textwidth}
+
+%Fonts size
+\renewcommand{\footnotesize}{\fontsize{7.5}{9}\selectfont}
+\renewcommand{\tiny}{\fontsize{6}{7.2}\selectfont}
+\renewcommand{\small}{\fontsize{7.5}{9}\selectfont}
+\renewcommand{\scriptsize}{\fontsize{8.5}{10.2}\selectfont}
+\renewcommand{\normalsize}{\fontsize{11}{13.2}\selectfont}
+\renewcommand{\large}{\bfseries\fontsize{11}{13.2}\selectfont}
+\renewcommand{\Large}{\fontsize{13}{15.6}\selectfont}
+\renewcommand{\LARGE}{\fontsize{14}{16.8}\selectfont}
+\renewcommand{\huge}{\fontsize{17}{20.4}\selectfont}
+\renewcommand{\Huge}{\fontsize{30}{36}\selectfont}
+\newcommand{\fonttwofamilies}{\fontsize{20.4}{24.48}\selectfont}
+\newcommand{\subsub}{\fontsize{10}{11.2}\selectfont}
+\newcommand{\quizoptions}{\fontsize{9}{10.8}\selectfont}
+\normalsize
+
+%Customized fonts
+\renewcommand{\textsf}{\fontfamily{phv}\selectfont}
+\newcommand{\ioctextfont}{\fontfamily{phv}\fontsize{8}{9.6}\selectfont}
+
+%Customize headings
+\newcommand{\headingnonumbers}{
+    \titleformat{\chapter}[display]
+    {\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\large}
+    \titlespacing*{\chapter}{0pt}{-20pt}{60pt}
+    \titleformat{\section}[display]
+    {\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\normalsize\bfseries }
+    \titleformat{\subsection}[display]
+    {\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\normalsize\bfseries }
+%   \titleformat{\paragraph}[display]
+%   {\normalfont\bfseries}{}{0pt}{\normalfont\normalsize\bfseries }
+%   \titlespacing*{\paragraph}{0pt}{*1}{3ex}
+}
+
+\newcommand{\headingnumbers}{
+    \titleformat{\chapter}[display]
+    {\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\large \thechapter.\ }
+    \titlespacing*{\chapter}{0pt}{-45pt}{60pt}
+    \titleformat{\section}[display]
+    {\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\normalsize\bfseries \thesection\ }
+    \titleformat{\subsection}[display]
+    {\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\normalsize\bfseries \thesubsection\ }
+    \titleformat{\subsubsection}[display]
+    {\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\subsub\bfseries }
+%   \titleformat{\paragraph}[display]
+%   {\normalfont\bfseries}{}{0pt}{\normalfont\normalsize\bfseries }
+%   \titlespacing*{\paragraph}{0pt}{*1}{3ex}
+}
+
+%Customize links style 
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,pdfborder={0 0 0},}
+
+%Customize figure and table labels
+\renewcommand{\captiontextfont}{\normalfont\fontfamily{phv}\selectfont\small}
+
+%Set head width
+\setlength{\headwidth}{170mm}
+
+%Header fancy pages
+\pagestyle{fancy}
+\lhead{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
+\chead{}%no page number in toc page
+\rhead{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+%\headrulewidth 0.4pt
+
+%Header plain pages
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
+    \fancyhead[CO]{}%no page number in toc page
+    \fancyhead[RO]{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
+    \fancyfoot[RO]{}
+%   \headrulewidth 0.4pt
+}
+
+%Header height
+\setlength{\headheight}{15.04pt}
+
+%\definecolor{colorimportant}{gray}{0.8}
+\definecolor{colorimportant}{RGB}{209,209,209}
+\definecolor{colorreference}{RGB}{209,209,209}
+\definecolor{coloraccounting}{RGB}{209,209,209}
+\definecolor{colorfrontfamily}{gray}{0.7}
+\definecolor{fpd1}{RGB}{137,41,104}
+\definecolor{fpd2}{RGB}{75,75,72}
+\definecolor{fpd3}{RGB}{95,95,95}
+\definecolor{fpd4}{RGB}{48,48,48}
+\definecolor{fpd5}{RGB}{130,130,130}
+\definecolor{fpd6}{RGB}{15,15,15}
+\definecolor{fpd7}{RGB}{59,59,57}
+\definecolor{ioc}{RGB}{0,155,218}
+
+%margins
+\marginparwidth = 35mm
+\marginparsep = 10mm
+\textwidth = 12,5cm
+
+%separation line
+\defaultspacingline
+\sloppy
+
+%remove indenting
+\setlength{\parindent}{0in}
+
+%table row height
+\renewcommand{\arraystretch}{1.5}
+\setlength{\tabulinesep}{0.5mm}
+
+%change characters
+%\DeclareUnicodeCharacter{2022}{·}%•
+
+%Avoid adjust text at the bottom page
+%\raggedbottom
+
+%space left on top and bottom of an in-text float.
+\setlength{\intextsep}{3ex}
+%space above caption
+\setlength{\abovecaptionskip}{-0.5mm}
+%space below caption
+\setlength{\belowcaptionskip}{-0.5mm}
+%space before maths
+\setlength{\abovedisplayskip}{1ex}
+%space after maths
+\setlength{\belowdisplayskip}{1ex}
+%space between first item and preceding paragraph.
+\setlength{\topsep}{0mm}
+%extra space added to \topsep when environment starts a new paragraph.
+\setlength{\partopsep}{0mm}
+%space between successive items.
+\setlength{\itemsep}{0pt}

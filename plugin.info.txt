@@ -1,0 +1,7 @@
+base   iocexportl
+author Marc Català
+email  mcatala@ioc.cat
+date   2011-01-18
+name   Export Latex plugin
+desc   Creates an export form to create latex document and counts wiki page characters
+url    http://ioc.gencat.cat

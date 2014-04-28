@@ -1,0 +1,341 @@
+/* Export form
+-------------------------------------------------------------------------------*/
+.iocexport{
+border: 1px dotted #A7D7F9;
+padding:3px;
+}
+
+div.dokuwiki .iocexport img{
+  vertical-align: middle;
+}
+
+div.dokuwiki .iocexport span{
+  vertical-align: middle;
+}
+
+div.dokuwiki .iocexport form input{
+  vertical-align: middle;
+}
+
+.missing_header{
+ color:red;
+}
+
+/* Toolbar
+-------------------------------------------------------------------------------*/
+.ioctoolbar{
+width:auto !important;
+}
+
+
+/* Quizes
+-------------------------------------------------------------------------------*/
+.quiz td p {
+  display: inline;
+}
+.quiz td {
+  padding: 1em;
+}
+
+p.ok, p.ko{
+  height:0.5em;
+}
+
+td.ok{
+  background: none repeat scroll 0 0 #BFFF80;
+}
+
+td.ko{
+  background: none repeat scroll 0 0 #FF9F81;
+}
+
+select.ok{
+  background: none repeat scroll 0 0 rgba(0, 255, 0, 0.5);
+  vertical-align:baseline;
+}
+
+select.ko{
+  background: none repeat scroll 0 0 rgba(255, 0, 0, 0.5);
+  vertical-align:baseline;
+}
+
+div.solution{
+  background: none repeat scroll 0 0 #F2F6FA;
+  border: 2px solid #D9E4F0;
+  display: none;
+  margin: 1em 0;
+  padding: 0.4em 1em;
+  max-width:73%;
+}
+
+.quiz_result {
+  background: none repeat scroll 0 0 #F2F6FA;
+  border: 2px solid #D9E4F0;
+  display: none;
+  margin: 1em 0;
+  padding: 0.4em 1em;
+  width:40%;
+}
+
+
+/* html styles
+-------------------------------------------------------------------------------*/
+
+.dokuwiki h1, .dokuwiki h2, .dokuwiki h3, .dokuwiki h4, .dokuwiki h5{
+  clear:left;
+  width:73%;
+}
+.ioctextl, .iocexample, .iocimportant, .iocquote, .iocfigure, .ioctable, .iocaccounting{
+  width:73% !important;
+}
+
+div.level1, div.level2, div.level3, div.level4{
+  float:none !important;
+}
+
+.level1 p, .level2 p, .level3 p, .level4 p, .level5 p, .level1 ol, .level2 ol, .level3 ol, .level4 ol, .level5 ol, .level1 ul, .level2 ul, .level3 ul, .level4 ul, .level5 ul{
+  width:73% !important;
+}
+
+.dokuwiki #toc__inside .toc{
+  width:auto !important;
+}
+
+div.dokuwiki #toc__inside{
+  float:right;
+  min-width:99%;
+}
+
+div.dokuwiki #toc__inside ul{
+  float:none;
+}
+
+.dokuwiki .secedit {
+  float:none !important;
+  padding-left:93%;
+}
+
+.ioccontent ul, .ioccontent ol{
+  float:none;
+}
+
+.dokuwiki pre{
+  width:73%;
+}
+
+.dokuwiki .ioccontent pre{
+  width:98%;
+}
+
+.iocfigure .iocinfo{
+  margin:2em auto 0;
+}
+
+.iocfigure .iocinfo img{
+  margin-bottom:0 !important;
+}
+
+.iocfigure p{
+  width:100%!important;
+}
+
+.iocfigure img{
+  display:block;
+  margin:0 auto 2em auto;
+  max-width:100%;
+}
+
+.solution p{
+  width:100% !important;
+}
+
+.solution img{
+  max-width:100%;
+}
+
+.imgb{
+  position: relative;
+  clear: right;
+  float:right;
+  margin-bottom: 1em;
+  width:235px !important;
+}
+.imgb img{
+  max-width:225px;
+  float:left !important;
+}
+
+.imgb a{
+  float:left !important;
+
+}
+
+.imgb .title{
+  clear: right;
+  float: left !important;
+  font-size: 0.85em;
+  line-height: 1.2em;
+  padding: 0.3em 0 1em;
+  text-align: left;
+  width: 175px;
+}
+
+.newcontent{
+  display: block;
+  margin-left: -9px;
+  padding-left: 6px;
+  border-left: 3px solid #66CD00;
+}
+
+/* TABLE */
+.ioctable,.iocaccounting{
+/*  width:100%;*/
+}
+
+.iocaccounting table{
+  border:1px solid !important;
+}
+
+.iocaccounting table td,.iocaccounting table th{
+  border:1px solid !important;
+}
+
+.iocaccounting table th{
+  background-color:#ccc!important;
+}
+
+.iocaccounting table td[colspan="3"]{
+  background-color:#ccc!important;
+}
+
+.ioctable .iocinfo, .iocaccounting .iocinfo{
+  margin:2em auto 0 auto;
+}
+
+/* COLUMN B */
+
+.ioctext{
+  position: relative;
+  clear: right;
+  float:right;
+  width:235px !important;
+  margin-bottom:1em;
+  padding: 0;
+  font-size:0.85em;
+}
+
+.ioctext .ioccontent {
+  width: 178px;
+  float: left;
+}
+
+
+
+.iocreference{
+  position: relative;
+  clear: right;
+  float:right;
+  width:175px !important;
+  margin-bottom:1em;
+  background: url("img/iocreference.png") no-repeat scroll left 0.2em #efefef;
+  padding:1em 0.5em 1em 5em;
+  font-size:0.85em;
+}
+
+.iocnote{
+  position: relative;
+  clear: right;
+  float:right;
+  width:175px !important;
+  margin-bottom:1em;
+  background: url("img/iocnote.png") no-repeat scroll left 0.2em #efefef;
+  padding:1em 0.5em 1em 5em;
+  font-size:0.85em;
+}
+
+/* COLUMN A */
+
+.ioctextl, .iocexample, .iocimportant, .iocquote{
+  overflow: hidden;
+}
+
+.ioctextl .ioccontent{
+  clear:both!important;
+  width:80%;
+  background-color: #efefef;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 1.5em 1.5em 2.5em;
+  margin:1em auto;
+}
+
+.ioctextl .ioccontent p.ioctitle{
+  margin-bottom: 2em !important;
+}
+
+.iocexample .ioccontent{
+  clear:both!important;
+  width:80%;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding:1.5em 1.5em 2.5em;
+  margin:1em auto;
+  font-size:85%;
+}
+
+.iocexample .ioccontent p.ioctitle{
+  margin-bottom: 2em !important;
+  font-size:120%;
+}
+
+.iocquote .ioccontent{
+  clear:both!important;
+  font-size:85%;
+  width:80%;
+  color: #2c2c2c;
+  background: url("img/iocquote.png") no-repeat scroll 98% 1em #efefef;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 1.5em 4.5em 2.5em 1.5em;
+  margin:1em auto;
+}
+
+.iocimportant .ioccontent{
+  clear:both!important;
+  width:80%;
+  background-color: #ccc;
+  padding:1.5em;
+  margin:1em auto;
+}
+
+.iocexample .iocaccounting, .iocexample .ioctable, .ioctextl .iocaccounting, .ioctextl .ioctable{
+  width:100%!important;
+}
+
+.iocexample .iocfigure, .ioctextl .iocfigure{
+  margin:0 auto;
+}
+ 
+
+.ioctext p, .ioctextl p, .iocquote p, .iocexample p, .iocimportant p, .iocreference p, .iocnote p{
+  margin-bottom:0px !important;
+  width:100% !important;
+  float:none;
+}
+
+.ioctextl img, .iocexample img{
+  max-width:100%;
+}
+
+.ioctext pre, .ioctextl pre, .iocquote pre, .iocexemple pre{
+  margin-bottom:0px !important;
+}
+
+.ioctitle{
+  font-weight:bold;
+}
+
+img.latex_displayed{
+  margin:1em auto!important;
+  display:block;
+}
