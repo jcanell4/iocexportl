@@ -1,0 +1,43 @@
+% ********* COVER FEATURES *************
+\thispagestyle{empty}
+\ThisCenterWallPaper{1}{@IOC_BACKGROUND_FILENAME@.pdf}
+\hyphenpenalty=100000
+%************ Page elements *************
+\begin{textblock*}{\paperwidth}(-20mm, -25mm)
+\includegraphics[width=\paperwidth]{media/coverImage.png}
+\end{textblock*}
+
+\begin{textblock*}{\textwidth}(-7mm,195mm)
+\SetTracking{ encoding = mnf }{100}
+\fontfamily{mnf}
+\fontseries{m}
+\fontsize{32}{33}
+\selectfont
+\textcolor[RGB]{55, 52, 165}{%
+\makebox[\textwidth][s]{\textls{@IOC_EXPORT_CREDIT@}}
+}%
+\end{textblock*}
+\begin{textblock*}{\textwidth}(-7mm,208mm)
+%\fontfamily{qhv}
+\fontfamily{hln}
+\fontseries{m}
+\fontsize{19}{23}
+\selectfont
+\textcolor[RGB]{113, 116, 223}{%
+\makebox[\textwidth][s]{%
+@IOC_EXPORT_CICLENOM@
+}%
+}%
+\end{textblock*}
+\begin{textblock*}{\textwidth}(-7mm,217mm)
+%\fontfamily{qhv}
+\fontfamily{hln}
+\fontseries{m}
+\fontsize{14}{16}
+\selectfont
+\textcolor[RGB]{179, 40, 48}{%
+@IOC_EXPORT_FAMILIA@  %Mòdul genèric / Mòdul específic
+}%
+\end{textblock*}
+\newpage
+

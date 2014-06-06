@@ -52,6 +52,8 @@ class generate_latex{
     private $user;
     private $groups;
     private $fpd;
+    private $bCoverPage;
+    private $coverImage;
 
 
 /**
@@ -78,7 +80,7 @@ class generate_latex{
         $this->ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
         $this->log = isset($params['log']);
         $this->media_path = 'lib/exe/fetch.php?media=';
-        $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia', 'coordinacio');
+        $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia', 'coordinacio', 'coverimage');
         $this->meta_option = 'opcions';
         $this->mode = $params['mode'];
         $this->tmp_dir = '';
@@ -236,6 +238,17 @@ class generate_latex{
             return $result;
         }
     }
+    
+    private function renderCoverPage($frontCover, $bacground='', $extraData=NULL){
+        $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES . $frontCover);
+        $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $bacground, $latex);
+        $latex = preg_replace('/@IOC_COVER_IMAGE@/', $this->coverImage, $latex);
+        if(isset($extraData)){
+            foreach ($extraData as $key => $value) {
+                $latex = preg_replace($key, $value, $latex);
+            }            
+        }
+    }
 
     /**
      *
@@ -248,6 +261,11 @@ class generate_latex{
          if ($this->fpd) {
             $filename = 'backgroundfpd';
             if ($this->unitzero) {
+                if($this->bCoverPage){
+                    $this->renderCoverPage('frontCoverFpd.ltx', 'backgroundcfpd');
+                }else{
+                    $this->renderCoverPage('frontNoCover.ltx');
+                }
                 $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES . 'frontpagefpd_u0.ltx');
                 $latex = preg_replace('/@IOC_EXPORT_FAMILIA@/', trim($data[1]['familia']), $latex);
                 $coordinacio = explode(',', $data[1]['coordinacio']);
@@ -269,6 +287,11 @@ class generate_latex{
             $header_nomcomplert = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($header_nomcomplert,77,'\break ')), $latex);
         } else if ($this->unitzero){
+            if($this->bCoverPage){
+                $this->renderCoverPage('frontCoverFp.ltx', 'backgroundcfp');
+            }else{
+                $this->renderCoverPage('frontNoCover.ltx');                
+            }
             $filename = 'backgroundu0';
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage_u0.ltx');
             if ($_SESSION['double_cicle']){
@@ -704,11 +727,27 @@ class generate_latex{
             //get page names
             if (key_exists('familia', $data[1])){
                 $this->unitzero = TRUE;
+                if(key_exists('coverimage', $data[1])){
+                    $this->bCoverPage=TRUE;
+                    $image = $this->getPathImage($data[1]['coverimage']);
+                    $this->coverImage = 'media'.substr(strrchr($image, '/'),0);
+                    $this->copyImageToTmp($image, $this->coverImage);
+                }
             }else{
                 $this->getPageNames($data[0]);
             }
             return $data;
         }
         return FALSE;
+    }
+    
+    private function getPathImage($wikiLink){
+        preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$wikiLink, $matches);
+        resolve_mediaid(getNS($matches[1]),$matches[1],$exists);
+        return mediaFN($matches[1], 'img/portada.png');
+    }
+    
+    private function copyImageToTmp($image, $targetName){        
+        copy($image, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/'.$targetName);
     }
 }

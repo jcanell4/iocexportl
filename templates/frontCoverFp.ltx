@@ -1,29 +1,32 @@
+% ********* COVER FEATURES *************
+\newcommand{\credits}{\fontfamily{phv}\selectfont}
+\begin{document}
 \thispagestyle{empty}
-\ThisCenterWallPaper{1}{media/@IOC_BACKGROUND_FILENAME@.pdf}
+\ThisCenterWallPaper{1}{media/backgroundcfpd.pdf} %@IOC_BACKGROUND_FILENAME@.pdf}
 %FrontPage
 \hyphenpenalty=100000
 \begin{spacing}{0.8}
 \begin{textblock*}{140mm}(1.35cm,-0.75cm)
 	\raggedleft\noindent\fontfamily{phv}\selectfont
 	\LARGE\bfseries
-	@IOC_EXPORT_FAMILIA@
+	IOC EXPORT FAMILIA  %@IOC_EXPORT_FAMILIA@
 \end{textblock*}
 \begin{textblock*}{20mm}(16.19cm,-1.39cm)
-	\includegraphics[height=21mm,width=21mm]{@IOC_EXPORT_IMGFAMILIA@}
+	\includegraphics[height=21mm,width=21mm]{media/familyicon_informatica.png} %@IOC_EXPORT_IMGFAMILIA@}
 \end{textblock*}
 \begin{textblock*}{145mm}(1cm,11cm)
 	\raggedright\noindent\fontfamily{phv}\selectfont
 	\Huge
-	@IOC_EXPORT_NOMCOMPLERT@\\
+	IOC EXPORT NOMCOMPLERT  %@IOC_EXPORT_NOMCOMPLERT@\\
 	\vspace{10mm}
 	\Large 
-	@IOC_EXPORT_CREDIT@
+	IOC EXPORT CREDIT  %@IOC_EXPORT_CREDIT@
 \end{textblock*}
 \begin{textblock*}{145mm}(10mm,214mm)
-	\parbox[c][@IOC_HEIGHT_CICLENOM@mm]{145mm}{
+	\parbox[c][10mm]{145mm}{     %@IOC_HEIGHT_CICLENOM@mm]{145mm}{
 		\raggedright\noindent\fontfamily{phv}\selectfont
 		\huge\bfseries
-		\textcolor{white}{@IOC_EXPORT_CICLENOM@}
+		\textcolor{white}{IOC EXPORT CICLENOM} %@IOC_EXPORT_CICLENOM@}
 	}
 \end{textblock*}
 \end{spacing}
@@ -33,17 +36,17 @@
 %Header plain pages
 \fancypagestyle{plain}{
 	\fancyhf{}
-	\fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CICLENOM@}
+	\fancyhead[LO]{\fontfamily{phv}\selectfont\tiny IOC EXPORT CICLENOM} %@IOC_EXPORT_CICLENOM@}
 	\fancyhead[CO]{\fontfamily{phv}\selectfont\tiny\thepage}
-	\fancyhead[RO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
+	\fancyhead[RO]{\fontfamily{phv}\selectfont\tiny IOC EXPORT NOMCOMPLERT H}  %@IOC_EXPORT_NOMCOMPLERT_H@}
 	\fancyfoot[RO]{}
 }
 
 %Header fancy pages
 \pagestyle{fancy}
-\lhead{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CICLENOM@}
+\lhead{\fontfamily{phv}\selectfont\tiny IOC EXPORT CICLENOM} %@IOC_EXPORT_CICLENOM@}
 \chead{}%no page number in toc page
-\rhead{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
+\rhead{\headerspacingline\fontfamily{phv}\selectfont\tiny IOC EXPORT NOMCOMPLERT H} %@IOC_EXPORT_NOMCOMPLERT_H@}
 \lfoot{}
 \cfoot{}
 \rfoot{}
@@ -52,3 +55,5 @@
 \cleardoublepage
 \creditspacingline
 \thispagestyle{empty}
+\newpage
+

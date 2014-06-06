@@ -1,0 +1,48 @@
+\raggedbottom
+\begin{document}
+\thispagestyle{empty}
+\ThisCenterWallPaper{1}{media/@IOC_BACKGROUND_FILENAME@.pdf}
+%FrontPage
+\hyphenpenalty=100000
+\begin{spacing}{0.8}
+\begin{textblock*}{145mm}(1cm,7,6cm)
+	\raggedright\noindent\fontfamily{phv}\selectfont
+	\Huge 
+	@IOC_EXPORT_NOMCOMPLERT@\\
+	\vspace{10mm}
+	\begin{spacing}{1}
+	\Large
+	@IOC_EXPORT_AUTOR@
+	\end{spacing}
+	\vspace{.6em}
+	\normalsize
+	@IOC_EXPORT_EXTRA@
+\end{textblock*}
+\begin{textblock*}{145mm}(10mm,219mm)
+	\parbox[c][@IOC_HEIGHT_CICLENOM@mm]{145mm}{
+	\raggedright\noindent\fontfamily{phv}\selectfont
+	\huge\bfseries
+	\textcolor{white}{@IOC_EXPORT_CREDIT@}
+	}
+\end{textblock*}
+\end{spacing}
+\hyphenpenalty=1000
+%Empty page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+%TOC
+\newgeometry{top=20mm, bottom=20mm, right=20mm, left=20mm}
+\headingnonumbers
+\tableofcontents
+\restoregeometry
+\newpage
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
+	\fancyhead[CO]{\fontfamily{phv}\selectfont\tiny\thepage}
+	\fancyhead[RO]{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
+	\fancyfoot[RO]{}
+}
+\chead{\fontfamily{phv}\selectfont{\tiny{\thepage}}}
