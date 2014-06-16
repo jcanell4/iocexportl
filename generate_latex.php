@@ -234,7 +234,7 @@ class generate_latex{
             $result = array();
             $this->createLatex($output_filename, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, $latex, $result);
         }
-//        $this->removeDir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir);
+        $this->removeDir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir);
         if($this->log){
             return $result;
         }
