@@ -1,10 +1,12 @@
+\raggedbottom
+\begin{document}
 % ********* COVER FEATURES *************
 \thispagestyle{empty}
 \ThisCenterWallPaper{1}{@IOC_BACKGROUND_FILENAME@.pdf}
 \hyphenpenalty=100000
 %************ Page elements *************
 \begin{textblock*}{\paperwidth}(-20mm, -25mm)
-\includegraphics[width=\paperwidth]{media/coverImage.png}
+\includegraphics[width=\paperwidth]{@IOC_COVER_IMAGE@}
 \end{textblock*}
 
 \begin{textblock*}{\textwidth}(-7mm,195mm)
@@ -14,7 +16,7 @@
 \fontsize{32}{33}
 \selectfont
 \textcolor[RGB]{55, 52, 165}{%
-\makebox[\textwidth][s]{\textls{@IOC_EXPORT_CREDIT@}}
+\makebox[\textwidth][s]{\textls{@IOC_EXPORT_CREDIT_F@}}
 }%
 \end{textblock*}
 \begin{textblock*}{\textwidth}(-7mm,208mm)
