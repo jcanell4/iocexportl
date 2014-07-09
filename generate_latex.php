@@ -73,7 +73,7 @@ class generate_latex{
         $this->export_ok = ($params['mode'] === 'pdf' || $params['mode'] === 'zip' );
         $this->id = $params['id'];
         $this->img_pref = 'familyicon_';
-        $this->img_src = array('administracio.png', 'electronica.png', 'infantil.png', 'informatica.png', 'transversal.png');
+        $this->img_src = array('administracio.png', 'electronica.png', 'infantil.png', 'informatica.png', 'seguretat.png', 'transversal.png');
         //Due listings problems whith header it's necessary to replace extended characters
         $this->ini_characters = array('á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ò', 'ï', 'ü', 'ñ', 'ç','Á', 'É', 'Í', 'Ó', 'Ú', 'À', 'È', 'Ò', 'Ï', 'Ü', 'Ñ', 'Ç','\\\\');
         $this->ioclang = (empty($params['ioclanguage']))?'CA':strtoupper($params['ioclanguage']);
@@ -81,7 +81,7 @@ class generate_latex{
         $this->ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
         $this->log = isset($params['log']);
         $this->media_path = 'lib/exe/fetch.php?media=';
-        $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia', 'coordinacio', 'coverimage');
+        $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia', 'coordinacio', 'coverimage', 'backcovertext');
         $this->meta_option = 'opcions';
         $this->mode = $params['mode'];
         $this->tmp_dir = '';
@@ -242,7 +242,7 @@ class generate_latex{
     
     private function renderCoverPage(&$latex, $frontCover, $bacground='', $extraData=NULL){
         $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES . $frontCover);
-         $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', "media/".$bacground, $latex);
+        $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', "media/".$bacground, $latex);
         $latex = preg_replace('/@IOC_COVER_IMAGE@/', $this->coverImage, $latex);
         if(isset($extraData)){
             foreach ($extraData as $key => $value) {
@@ -266,7 +266,11 @@ class generate_latex{
             $filename = 'backgroundfpd';
             if ($this->unitzero) {
                 if($this->bCoverPage){
-                    $this->renderCoverPage($latex, 'frontCoverFpd.ltx', 'backgroundcfpd');
+                    $this->renderCoverPage($latex, 
+                                    'frontCoverFpd.ltx', 
+                                    'backgroundcfpd',
+                                    array("@BACK_COVER_TEXT@" 
+                                            => trim($data[1]["backcovertext"])));
                 }else{
                     $this->renderCoverPage($latex, 'frontNoCover.ltx');
                 }
@@ -314,8 +318,10 @@ class generate_latex{
                 $family = 2;
             }elseif (preg_match('/comunicacions/i', $data[1]['familia'])){
                 $family = 3;
-            }else{
+            }elseif (preg_match('/Seguretat i medi ambient/i', $data[1]['familia'])){
                 $family = 4;
+            }else{
+                $family = 5;
             }
             copy(DOKU_PLUGIN.'iocexportl/templates/'.$this->img_pref.$this->img_src[$family], DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/'.$this->img_pref.$this->img_src[$family]);
             $latex = preg_replace('/@IOC_EXPORT_IMGFAMILIA@/', 'media/'.$this->img_pref.$this->img_src[$family], $latex);
