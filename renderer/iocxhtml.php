@@ -1302,5 +1302,4 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             return $highlighted_code;
         }
     }
-    
-  }
+}
