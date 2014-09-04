@@ -269,7 +269,7 @@ class generate_latex{
                     $this->renderCoverPage($latex, 
                                     'frontCoverFpd.ltx', 
                                     'backgroundcfpd',
-                                    array("@BACK_COVER_TEXT@" 
+                                    array("/@BACK_COVER_TEXT@/" 
                                             => trim($data[1]["backcovertext"])));
                 }else{
                     $this->renderCoverPage($latex, 'frontNoCover.ltx');
