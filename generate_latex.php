@@ -269,7 +269,7 @@ class generate_latex{
                     $this->renderCoverPage($latex, 
                                     'frontCoverFpd.ltx', 
                                     'backgroundcfpd',
-                                    array("@BACK_COVER_TEXT@" 
+                                    array("/@BACK_COVER_TEXT@/" 
                                             => trim($data[1]["backcovertext"])));
                 }else{
                     $this->renderCoverPage($latex, 'frontNoCover.ltx');
@@ -318,7 +318,7 @@ class generate_latex{
                 $family = 2;
             }elseif (preg_match('/comunicacions/i', $data[1]['familia'])){
                 $family = 3;
-            }elseif (preg_match('/Seguretat i medi ambient/i', $data[1]['familia'])){
+            }elseif (preg_match('/seguretat/i', $data[1]['familia'])){
                 $family = 4;
             }else{
                 $family = 5;
