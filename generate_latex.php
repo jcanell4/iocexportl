@@ -585,9 +585,9 @@ class generate_latex{
     private function hasUserPermissionToExport($userWIthPermission){
         $return = auth_isadmin();
         if(!$return){
-            $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups);             
-            $selfGenerationAllowed = (preg_match('/'.$user.'(?:\b)/', 
-                                                          $userWIthPermission)===1);
+            $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups); 
+            $pattern = '/'.$this->user.'(?:\b)/';
+            $selfGenerationAllowed = (preg_match($pattern,$userWIthPermission)===1);
             $return = (($aclLevel >= AUTH_UPLOAD)&&($selfGenerationAllowed));
         }
         return $return;
