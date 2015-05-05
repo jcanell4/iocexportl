@@ -79,6 +79,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                 echo $this->getform_latex();
 	        }elseif (preg_match('/^(?!talk).*?:htmlindex$/', $this->id)){
 	            echo $this->getform_html();
+	        }elseif (preg_match('/^(?!talk).*?:material_paper$/', $this->id)){
+	            echo $this->getform_onepdf();
 	        }
         }
         return TRUE;
@@ -131,7 +133,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
     function isExportPage(){
         $this->id = getID();
-        return preg_match('/^(?!talk).*?:(htmlindex|pdfindex)$/', $this->id);
+        return preg_match('/^(?!talk).*?:(htmlindex|pdfindex|material_paper)$/', $this->id);
     }
 
     function getLanguage(){
@@ -145,6 +147,34 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $lang = strtoupper($lang[0]);
             $this->language = preg_replace('/~/', '', $lang);
         }
+    }
+    function getform_onepdf(){
+        global $conf;
+        $url = '';
+        $path_filename = str_replace(':','/',$this->id);
+        $filename = str_replace(':','_',basename($this->id)).'.pdf';
+        $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
+        if (file_exists($path_filename)){
+            $media_path = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
+            setlocale(LC_TIME, 'ca_ES.utf8');
+            $url = '<a class="media mediafile mf_pdf" href="'.$media_path.'">'.$filename.'</a> <strong>'.strftime("%e %B %Y %T", filemtime($path_filename)).'</strong>';
+        }
+        $ret  = "<br /><br />";
+        $ret .= "<div class=\"iocexport\">\n";
+        $ret .= "<strong>Exportació IOC: </strong>";
+        $ret .= " <form action=\"lib/plugins/iocexportl/onepdf.php\" id=\"export__form\" method=\"post\" >\n";
+	if(auth_isadmin()){
+            $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" /> Zip";
+	}
+        $ret .= "  <input type=\"radio\" name=\"mode\" value=\"pdf\" checked=\"checked\" /> PDF";
+        $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
+        $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
+        $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
+	    $ret .= " </form>\n";
+	    $ret .= "<span id=\"exportacio\">".$url."</span>";
+	    $ret .= "</div>";
+	    $ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+        return $ret;
     }
 
     function getform_latex(){

@@ -82,6 +82,7 @@ class generate_latex{
         $this->log = isset($params['log']);
         $this->media_path = 'lib/exe/fetch.php?media=';
         $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia', 'coordinacio', 'coverimage', 'backcovertext');
+        $this->hasLatexInstructions = array('autoria' => FALSE, 'ciclenom' => FALSE, 'creditcodi' => FALSE, 'creditnom' => FALSE, 'familia' => FALSE, 'coordinacio' => FALSE, 'coverimage' => FALSE, 'backcovertext' => TRUE);
         $this->meta_option = 'opcions';
         $this->mode = $params['mode'];
         $this->tmp_dir = '';
@@ -277,7 +278,7 @@ class generate_latex{
                 $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES . 'frontpagefpd_u0.ltx');
                 $latex = preg_replace('/@IOC_EXPORT_FAMILIA@/', trim($data[1]['familia']), $latex);
                 $coordinacio = explode(',', $data[1]['coordinacio']);
-                $latex = preg_replace('/@IOC_EXPORT_COORDINACIO@/', implode('\\\\\\\\', $coordinacio), $latex, 1);
+                $latex = preg_replace('/@IOC_EXPORT_COORDINACIO@/', implode('\\\\\\\\', $coordinacio), $latex);
                 $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', clean_reserved_symbols($data[1]['creditcodi']), $latex);
             } else {
                 $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES . 'frontpagefpd.ltx');
@@ -288,9 +289,9 @@ class generate_latex{
             $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
             $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', trim($data[1]['ciclenom']), $latex);
             $autoria = explode(',', $data[1]['autoria']);
-            $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', implode('\\\\\\\\', $autoria), $latex, 1);
+            $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', implode('\\\\\\\\', $autoria), $latex);
             $header_creditnom = str_replace($this->ini_characters, $this->end_characters, $data[1]['creditnom']);
-            $latex = preg_replace('/@IOC_EXPORT_CREDIT_F@/', strtoupper($header_creditnom), $latex, 2);
+            $latex = preg_replace('/@IOC_EXPORT_CREDIT_F@/', strtoupper($header_creditnom), $latex);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $header_creditnom, $latex);
             $header_nomcomplert = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($header_nomcomplert,77,'\break ')), $latex);
@@ -586,8 +587,8 @@ class generate_latex{
         $return = auth_isadmin();
         if(!$return){
             $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups);             
-            $selfGenerationAllowed = (preg_match('/'.$user.'(?:\b)/', 
-                                                          $userWIthPermission)===1);
+            $pattern = '/'.$this->user.'(?:\b)/';
+            $selfGenerationAllowed = (preg_match($pattern,$userWIthPermission)===1);
             $return = (($aclLevel >= AUTH_UPLOAD)&&($selfGenerationAllowed));
         }
         return $return;
@@ -726,7 +727,13 @@ class generate_latex{
                         continue;
                     }
                     if (in_array($key, $this->meta_params)){
-                        $data[1][$key] = trim($i[3]);
+                        if($this->hasLatexInstructions[$key]){
+                            $instructions = get_latex_instructions(trim($i[3]));
+                            $content = p_latex_render('iocexportl', $instructions, $inf);
+                        }else{
+                            $content = trim($i[3]);
+                        }
+                        $data[1][$key] = $content;
                     }else{
                         $instructions = get_latex_instructions(trim($i[1].$i[3]));
                         $latex = p_latex_render('iocexportl', $instructions, $inf);
