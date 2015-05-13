@@ -8,6 +8,7 @@
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
+if (!defined('DOKU_PLUGIN_LIB')) define('DOKU_PLUGIN_LIB',DOKU_PLUGIN.'iocexportl/lib/');
 if (!defined('DOKU_PLUGIN_TEMPLATES')) define('DOKU_PLUGIN_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
 if (!defined('DOKU_PLUGIN_LATEX_TMP')) define('DOKU_PLUGIN_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
 
@@ -28,8 +29,10 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'showform', array());
         }
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, 'ioctoolbar_buttons', array ());
+        $controller->register_hook('ADD_TPL_CONTROLS', "AFTER", $this, "addWikiIocButtons", array());
+        $controller->register_hook('ADD_TPL_CONTROL_SCRIPTS', "AFTER", $this, "addUpdateViewHandler", array());
     }
-
+    
     public function handle_dokuwiki_started(Doku_Event &$event, $param) {
         global $JSINFO;
 
@@ -68,7 +71,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     function showform(&$event){
 	    global $conf;
 
-		$this->id = getID();
+	$this->id = getID();
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$this->isExportPage()) return FALSE;
         if ($event->data != 'show') return FALSE;
@@ -338,5 +341,66 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         ),
             'block'  => TRUE,
         );
+    }
+    
+    function addUpdateViewHandler(Doku_Event &$event, $param) {
+        $event->data->addControlScript(DOKU_PLUGIN_LIB."UpdateViewHandler.js");
+    }
+    
+    function addWikiIocButtons(Doku_Event &$event, $param) {
+        $event->data->addWikiIocButton(
+                array(
+                    'DOM' => array (
+                      'id' => 'exportPdf',
+                      'label' => 'Exportar pdf', //TODO [Josep] etiqueta en diferents idiomes
+                      'class' => 'iocDisplayBlock',
+                    ),
+                    'DJO' => array (
+                        'query' => '\'do=edit\'',
+                        'autoSize' => true,
+                        'visible' => false,
+                        'standbyId' => '\'bodyContent\'',
+                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=edit\'',
+                        'getQuery' => 'function(){var _ret=null; _ret=\'\';if (this.dispatcher.getGlobalState().currentTabId) { var ns=this.dispatcher.getGlobalState().pages[ this.dispatcher.getGlobalState().currentTabId][\'ns\']; var rev = this.dispatcher.getGlobalState().getCurrentContent().rev; if(this.query){ _ret=this.query + \'&id=\' + ns; }else{ _ret=\'id=\' + ns; } if (rev) { _ret+=\'&rev=\' + rev; }}return _ret;}',
+                    ),
+                )
+        );
+        
+        $event->data->addWikiIocButton(
+                array(
+                    'DOM' => array (
+                      'id' => 'exportHtml',
+                      'label' => 'Exportar Html', //TODO [Josep] etiqueta en diferents idiomes
+                      'class' => 'iocDisplayBlock',
+                    ),
+                    'DJO' => array (
+                        'query' => '\'do=edit\'',
+                        'autoSize' => true,
+                        'visible' => false,
+                        'standbyId' => '\'bodyContent\'',
+                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=edit\'',
+                        'getQuery' => 'function(){var _ret=null; _ret=\'\';if (this.dispatcher.getGlobalState().currentTabId) { var ns=this.dispatcher.getGlobalState().pages[ this.dispatcher.getGlobalState().currentTabId][\'ns\']; var rev = this.dispatcher.getGlobalState().getCurrentContent().rev; if(this.query){ _ret=this.query + \'&id=\' + ns; }else{ _ret=\'id=\' + ns; } if (rev) { _ret+=\'&rev=\' + rev; }}return _ret;}',
+                    ),
+                )
+        );
+        
+        $event->data->addWikiIocButton(
+                array(
+                    'DOM' => array (
+                      'id' => 'exportOnePdf',
+                      'label' => 'PDF únic', //TODO [Josep] etiqueta en diferents idiomes
+                      'class' => 'iocDisplayBlock',
+                    ),
+                    'DJO' => array (
+                        'query' => '\'do=edit\'',
+                        'autoSize' => true,
+                        'visible' => false,
+                        'standbyId' => '\'bodyContent\'',
+                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=edit\'',
+                        'getQuery' => 'function(){var _ret=null; _ret=\'\';if (this.dispatcher.getGlobalState().currentTabId) { var ns=this.dispatcher.getGlobalState().pages[ this.dispatcher.getGlobalState().currentTabId][\'ns\']; var rev = this.dispatcher.getGlobalState().getCurrentContent().rev; if(this.query){ _ret=this.query + \'&id=\' + ns; }else{ _ret=\'id=\' + ns; } if (rev) { _ret+=\'&rev=\' + rev; }}return _ret;}',
+                    ),
+                )
+        );
+        
     }
 }
