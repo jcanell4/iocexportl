@@ -8,9 +8,8 @@
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-if (!defined('DOKU_PLUGIN_LIB')) define('DOKU_PLUGIN_LIB',DOKU_PLUGIN.'iocexportl/lib/');
-if (!defined('DOKU_PLUGIN_TEMPLATES')) define('DOKU_PLUGIN_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
-if (!defined('DOKU_PLUGIN_LATEX_TMP')) define('DOKU_PLUGIN_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
+if (!defined('DOKU_IOCEXPORTL_LIB')) define('DOKU_IOCEXPORTL_LIB',DOKU_PLUGIN.'iocexportl/lib/');
+if (!defined('DOKU_IOCEXPORTL_COMMANDS')) define('DOKU_IOCEXPORTL_COMMANDS',DOKU_PLUGIN.'iocexportl/commands/');
 
 require_once(DOKU_PLUGIN.'action.php');
 
@@ -30,7 +29,9 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, 'ioctoolbar_buttons', array ());
         $controller->register_hook('ADD_TPL_CONTROLS', "AFTER", $this, "addWikiIocButtons", array());
-        $controller->register_hook('ADD_TPL_CONTROL_SCRIPTS', "AFTER", $this, "addUpdateViewHandler", array());
+        $controller->register_hook('ADD_TPL_CONTROL_SCRIPTS', "AFTER", $this, "addControlScripts", array());
+        $controller->register_hook('WIOC_PROCESS_RESPONSE_page', "AFTER", $this, "setExtraState", array());
+        $controller->register_hook('CALLING_EXTRA_COMMANDS', "AFTER", $this, "addCommands", array());
     }
     
     public function handle_dokuwiki_started(Doku_Event &$event, $param) {
@@ -67,26 +68,85 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
 
     }
+    
+    function setExtraState(&$event, $param){
+        $ret=TRUE;
+        $formType = $this->getFormType("show");
+        if ($formType==1){
+            $strFromType = "exportPdf";
+            $strForm = $this->getform_latex(FALSE);
+        }elseif ($formType==2){
+            $strFromType = "exportHtml";
+            $strForm = $this->getform_html(FALSE);
+        }elseif ($formType==3){
+            $strFromType = "exportOnePdf";
+            $strForm = $this->getform_onepdf(FALSE);
+        }else{
+            $ret = FALSE;
+        }
+        if($ret){
+            $event->data["ajaxCmdResponseGenerator"]->addExtraContentStateResponse(
+                $event->data["responseData"]["id"],
+                "exportableType",
+                $strFromType
+                );
+            $event->data["ajaxCmdResponseGenerator"]->addExtraMetadata(
+                    $event->data["responseData"]["id"],
+                    $event->data["responseData"]["id"]."_iocexportl",
+                    "Propietats exportació",  //TODO [JOSEP] internacionalització
+                    $strForm
+                    );
+            $event->data["ajaxCmdResponseGenerator"]->addProcessDomFromFunction(
+                    $event->data["responseData"]["id"],
+                    TRUE,
+                    "ioc/dokuwiki/runChooser"
+                    );
+            $event->data["ajaxCmdResponseGenerator"]->addProcessDomFromFunction(
+                    $event->data["responseData"]["id"],
+                    TRUE,
+                    "ioc/dokuwiki/runCounter"
+                    );
+            
+        }
+        return $ret;
+    }
+
 
     function showform(&$event){
-	    global $conf;
+        $ret=TRUE;
+        $formType = $this->getFormType($event->data);
+        if ($formType==1){
+            echo $this->getform_latex();
+        }elseif ($formType==2){
+            echo $this->getform_html();
+        }elseif ($formType==3){
+            echo $this->getform_onepdf();
+        }else{
+            $ret = FALSE;
+        }
+        return $ret;
+    }
+    
+    function getFormType($data){
+        global $conf;
+        $ret = 0;
 
 	$this->id = getID();
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
-        if (!$this->isExportPage()) return FALSE;
-        if ($event->data != 'show') return FALSE;
-        if (!$this->checkPerms()) return FALSE;
+        if (!$this->isExportPage()) return $ret;
+        if ($data != 'show') return $ret;
+        if (!$this->checkPerms()) return $ret;
         //Always admin can export
         if ($this->exportallowed || auth_isadmin()){
 	        if (preg_match('/^(?!talk).*?:pdfindex$/', $this->id)){
-                echo $this->getform_latex();
+                    $ret = 1;
 	        }elseif (preg_match('/^(?!talk).*?:htmlindex$/', $this->id)){
-	            echo $this->getform_html();
+                    $ret = 2;
 	        }elseif (preg_match('/^(?!talk).*?:material_paper$/', $this->id)){
-	            echo $this->getform_onepdf();
+                    $ret = 3;
 	        }
         }
-        return TRUE;
+        return $ret;        
     }
 
     public function has_jquery() {
@@ -151,8 +211,10 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $this->language = preg_replace('/~/', '', $lang);
         }
     }
-    function getform_onepdf(){
+    
+    function getform_onepdf($inputButton=TRUE){
         global $conf;
+        $formId = str_replace(":", "_", $this->id); //Id del node que conté la pàgina
         $url = '';
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.pdf';
@@ -164,24 +226,32 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
         $ret  = "<br /><br />";
         $ret .= "<div class=\"iocexport\">\n";
-        $ret .= "<strong>Exportació IOC: </strong>";
-        $ret .= " <form action=\"lib/plugins/iocexportl/onepdf.php\" id=\"export__form\" method=\"post\" >\n";
+        if($inputButton){
+            $ret .= "<strong>Exportació IOC: </strong>";
+        }
+        $ret .= " <form action=\"lib/plugins/iocexportl/onepdf.php\" id=\"export__form_$formId\" method=\"post\" >\n";
 	if(auth_isadmin()){
             $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" /> Zip";
 	}
         $ret .= "  <input type=\"radio\" name=\"mode\" value=\"pdf\" checked=\"checked\" /> PDF";
         $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
         $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
-        $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
-	    $ret .= " </form>\n";
-	    $ret .= "<span id=\"exportacio\">".$url."</span>";
-	    $ret .= "</div>";
-	    $ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+        if($inputButton){
+            $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
+        }
+        $ret .= " </form>\n";
+        $ret .= "<span id=\"exportacio\">".$url."</span>";
+        $ret .= "</div>";        
+        if($inputButton){
+          //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+            $ret .= $this->getFormScript();
+        }
         return $ret;
     }
 
-    function getform_latex(){
+    function getform_latex($inputButton=TRUE){
         global $conf;
+        $formId = str_replace(":", "_", $this->id); //Id del node que conté la pàgina
         $url = '';
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.pdf';
@@ -193,24 +263,32 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
         $ret  = "<br /><br />";
         $ret .= "<div class=\"iocexport\">\n";
-        $ret .= "<strong>Exportació IOC: </strong>";
-	    $ret .= " <form action=\"lib/plugins/iocexportl/generate_latex.php\" id=\"export__form\" method=\"post\" >\n";
-	    if(auth_isadmin()){
-	        $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" /> Zip";
-	    }
+                if($inputButton){
+            $ret .= "<strong>Exportació IOC: </strong>";
+        }
+        $ret .= " <form action=\"lib/plugins/iocexportl/generate_latex.php\" id=\"export__form_$formId\" method=\"post\" >\n";
+        if(auth_isadmin()){
+            $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" /> Zip";
+        }
         $ret .= "  <input type=\"radio\" name=\"mode\" value=\"pdf\" checked=\"checked\" /> PDF";
         $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
         $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
-        $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
-	    $ret .= " </form>\n";
-	    $ret .= "<span id=\"exportacio\">".$url."</span>";
-	    $ret .= "</div>";
-	    $ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+        if($inputButton){
+            $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
+        }
+        $ret .= " </form>\n";
+        $ret .= "<span id=\"exportacio\">".$url."</span>";
+        $ret .= "</div>";
+        if($inputButton){
+          //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+            $ret .= $this->getFormScript();            
+        }
         return $ret;
     }
 
-    function getform_html(){
+    function getform_html($inputButton=TRUE){
         global $conf;
+        $formId = str_replace(":", "_", $this->id); //Id del node que conté la pàgina
         $url = '';
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.zip';
@@ -222,17 +300,38 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
         $ret  = "<br /><br />";
         $ret .= "<div class=\"iocexport\">\n";
-        $ret .= "<strong>Exportació IOC: </strong>";
-	    $ret .= " <form action=\"lib/plugins/iocexportl/generate_html.php\" id=\"export__form\" method=\"post\" >\n";
-        $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" checked=\"checked\" /> zip";
+        if($inputButton){
+            $ret .= "<strong>Exportació IOC: </strong>";
+        }
+        $ret .= " <form action=\"lib/plugins/iocexportl/generate_html.php\" id=\"export__form_$formId\" method=\"post\" >\n";
+        if($inputButton){
+            $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" checked=\"checked\" /> zip";
+        }else{
+            $ret .= "  <input type=\"hidden\" name=\"mode\" value=\"zip\"/>";
+        }
         $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
         $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
-        $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
-	    $ret .= " </form>\n";
-	    $ret .= "<span id=\"exportacio\">".$url."</span>";
-	    $ret .= "</div>";
-	    $ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+        if($inputButton){
+            $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
+        }
+        $ret .= " </form>\n";
+        $ret .= "<span id=\"exportacio\">".$url."</span>";
+        $ret .= "</div>";
+        if($inputButton){
+        	    //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+            $ret .= $this->getFormScript();
+        }
         return $ret;
+    }
+    
+    private function getFormScript(){
+        $id = getID();
+        $id = str_replace(":", "_", $id); //Id del node que conté la pàgina
+        $script = "<script type=\"text/javascript\">\n";
+        $script .= file_get_contents(DOKU_IOCEXPORTL_LIB."forms.js");
+        $script = str_replace("export__form", "export__form_$id", $script);
+        $script .= "</script>";
+        return $script;
     }
 
     /**
@@ -343,16 +442,28 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         );
     }
     
-    function addUpdateViewHandler(Doku_Event &$event, $param) {
-        $event->data->addControlScript(DOKU_PLUGIN_LIB."UpdateViewHandler.js");
+    function addCommands(Doku_Event &$event, $param) {
+        $event->data["export_html"] = array(
+            "callFile" => DOKU_IOCEXPORTL_COMMANDS."export_html_command.php"
+        );
+        $event->data["export_pdf"] = array(
+            "callFile" =>  DOKU_IOCEXPORTL_COMMANDS."export_pdf_command.php"
+        );
+        $event->data["export_onepdf"] = array(
+            "callFile" =>  DOKU_IOCEXPORTL_COMMANDS."export_onepdf_command.php"
+        );
+    }
+    
+    function addControlScripts(Doku_Event &$event, $param) {
+        $event->data->addControlScript(DOKU_IOCEXPORTL_LIB."ExportButtonGetQuery.js");
+        $event->data->addControlScript(DOKU_IOCEXPORTL_LIB."UpdateViewHandler.js");
     }
     
     function addWikiIocButtons(Doku_Event &$event, $param) {
-        $event->data->addWikiIocButton(
-                array(
+        $control1 = array(
                     'DOM' => array (
                       'id' => 'exportPdf',
-                      'label' => 'Exportar pdf', //TODO [Josep] etiqueta en diferents idiomes
+                      'label' => 'Exportar', //TODO [Josep] etiqueta en diferents idiomes
                       'class' => 'iocDisplayBlock',
                     ),
                     'DJO' => array (
@@ -360,17 +471,15 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'autoSize' => true,
                         'visible' => false,
                         'standbyId' => '\'bodyContent\'',
-                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=edit\'',
-                        'getQuery' => 'function(){var _ret=null; _ret=\'\';if (this.dispatcher.getGlobalState().currentTabId) { var ns=this.dispatcher.getGlobalState().pages[ this.dispatcher.getGlobalState().currentTabId][\'ns\']; var rev = this.dispatcher.getGlobalState().getCurrentContent().rev; if(this.query){ _ret=this.query + \'&id=\' + ns; }else{ _ret=\'id=\' + ns; } if (rev) { _ret+=\'&rev=\' + rev; }}return _ret;}',
+                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_pdf\'',
                     ),
-                )
-        );
+                );
+        $event->data->addWikiIocButton($control1);
         
-        $event->data->addWikiIocButton(
-                array(
+        $control2 = array(
                     'DOM' => array (
                       'id' => 'exportHtml',
-                      'label' => 'Exportar Html', //TODO [Josep] etiqueta en diferents idiomes
+                      'label' => 'Exportar', //TODO [Josep] etiqueta en diferents idiomes
                       'class' => 'iocDisplayBlock',
                     ),
                     'DJO' => array (
@@ -378,14 +487,12 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'autoSize' => true,
                         'visible' => false,
                         'standbyId' => '\'bodyContent\'',
-                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=edit\'',
-                        'getQuery' => 'function(){var _ret=null; _ret=\'\';if (this.dispatcher.getGlobalState().currentTabId) { var ns=this.dispatcher.getGlobalState().pages[ this.dispatcher.getGlobalState().currentTabId][\'ns\']; var rev = this.dispatcher.getGlobalState().getCurrentContent().rev; if(this.query){ _ret=this.query + \'&id=\' + ns; }else{ _ret=\'id=\' + ns; } if (rev) { _ret+=\'&rev=\' + rev; }}return _ret;}',
+                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_html\'',
                     ),
-                )
-        );
+                );
+        $event->data->addWikiIocButton($control2);
         
-        $event->data->addWikiIocButton(
-                array(
+        $control3 = array(
                     'DOM' => array (
                       'id' => 'exportOnePdf',
                       'label' => 'PDF únic', //TODO [Josep] etiqueta en diferents idiomes
@@ -396,11 +503,9 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'autoSize' => true,
                         'visible' => false,
                         'standbyId' => '\'bodyContent\'',
-                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=edit\'',
-                        'getQuery' => 'function(){var _ret=null; _ret=\'\';if (this.dispatcher.getGlobalState().currentTabId) { var ns=this.dispatcher.getGlobalState().pages[ this.dispatcher.getGlobalState().currentTabId][\'ns\']; var rev = this.dispatcher.getGlobalState().getCurrentContent().rev; if(this.query){ _ret=this.query + \'&id=\' + ns; }else{ _ret=\'id=\' + ns; } if (rev) { _ret+=\'&rev=\' + rev; }}return _ret;}',
+                        'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_onepdf\'',
                     ),
-                )
-        );
-        
-    }
+                );
+        $event->data->addWikiIocButton($control3);
+   }
 }

@@ -8,12 +8,13 @@
 
 if (!defined('DOKU_INC')) define('DOKU_INC',dirname(__FILE__).'/../../../');
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-if (!defined('DOKU_PLUGIN_TEMPLATES')) define('DOKU_PLUGIN_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
-if (!defined('DOKU_PLUGIN_LATEX_TMP')) define('DOKU_PLUGIN_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
+if (!defined('DOKU_IOCEXPORTL_TEMPLATES')) define('DOKU_IOCEXPORTL_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
+if (!defined('DOKU_IOCEXPORTL_LATEX_TMP')) define('DOKU_IOCEXPORTL_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
+if(!defined('DOKU_MODEL')) define('DOKU_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
 
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
-
+require_once DOKU_MODEL.'WikiIocModel.php';
 
 //Initialize params
 $params = array();
@@ -27,7 +28,7 @@ if ($params['id'] === $_POST['id']){
 }
 
 
-class generate_latex{
+class generate_latex implements WikiIocModel{
 
     private $end_characters;
     private $exportallowed;
@@ -35,6 +36,8 @@ class generate_latex{
     private $id;
     private $currentNs;
     private $log;
+    private $needReturnData;
+    private $returnData;    
     private $media_path;
     private $mode;
     private $tmp_dir;
@@ -52,6 +55,12 @@ class generate_latex{
     * @param array $params Array of parameters to pass to the constructor
     */
     function __construct($params){
+        if($params){
+            $this->initParams($params);
+        }
+    }
+    
+    public function initParams($params){                
         global $USERINFO;
 
         //Due listings problems whith header it's necessary to replace extended characters
@@ -67,6 +76,8 @@ class generate_latex{
         $this->permissionToExport=FALSE;
         $this->user = $params['user'];
         $this->groups = $USERINFO['grps'];
+        $this->needReturnData = isset($params['needReturnData']);        
+        $this->returnData=NULL;
     }
 
     /**
@@ -93,17 +104,17 @@ class generate_latex{
         
         
         
-        if (file_exists(DOKU_PLUGIN_TEMPLATES.'onePdfHeader.ltx')
-                && file_exists(DOKU_PLUGIN_TEMPLATES.'onePdfFrontPage.ltx')
-                && file_exists(DOKU_PLUGIN_TEMPLATES.'onePdfFooter.ltx')){
+        if (file_exists(DOKU_IOCEXPORTL_TEMPLATES.'onePdfHeader.ltx')
+                && file_exists(DOKU_IOCEXPORTL_TEMPLATES.'onePdfFrontPage.ltx')
+                && file_exists(DOKU_IOCEXPORTL_TEMPLATES.'onePdfFooter.ltx')){
             //read header
-            $latex = io_readFile(DOKU_PLUGIN_TEMPLATES.'onePdfHeader.ltx');
+            $latex = io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'onePdfHeader.ltx');
             session_start();
             $this->tmp_dir = rand();
             $_SESSION['tmp_dir'] = $this->tmp_dir;
-            if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir)){
-                mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, 0775, TRUE);
-                mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media', 0775, TRUE);
+            if (!file_exists(DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir)){
+                mkdir(DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir, 0775, TRUE);
+                mkdir(DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir.'/media', 0775, TRUE);
             }
             if (!$this->log && !$this->permissionToExport){
                 $latex .= '\draft{Provisional}' . DOKU_LF;
@@ -113,7 +124,7 @@ class generate_latex{
             $data = $this->getData();
 
             //FrontPage
-            $latexPattern = io_readFile(DOKU_PLUGIN_TEMPLATES . 'onePdfFrontPage.ltx');
+            $latexPattern = io_readFile(DOKU_IOCEXPORTL_TEMPLATES . 'onePdfFrontPage.ltx');
             
             foreach ($data as $i){
                 $latex .= $latexPattern;
@@ -121,18 +132,21 @@ class generate_latex{
             }
             
             //Footer
-            $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'onePdfFooter.ltx');
+            $latex .= io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'onePdfFooter.ltx');
         }
         if ($this->mode === 'zip'){
-            $this->createZip($output_filename,DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir,$latex);
+            $this->createZip($output_filename,DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir,$latex);
         }else{
             $result = array();
-            $this->createLatex($output_filename, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, $latex, $result);
+            $this->createLatex($output_filename, DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir, $latex, $result);
         }
-        $this->removeDir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir);
+        $this->removeDir(DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir);
         if($this->log){
             return $result;
         }
+        if($this->needReturnData){
+            return $this->returnData;
+        }            
     }
     
     /**
@@ -218,8 +232,14 @@ class generate_latex{
         }else{
             $result = 'Error en la creació del arixu: ' . $filename;
         }
-        if (!$this->log){
-            echo json_encode($data);
+        if($this->needReturnData){
+            if(!$this->log){
+                $this->returnData = $data;
+            }            
+        }else{
+            if (!$this->log){
+                echo json_encode($data);
+            }
         }
     }
 
@@ -380,4 +400,9 @@ class generate_latex{
         }
         return FALSE;
     }
+
+    public function isDenied() {
+        return FALSE;
+    }
+
 }
