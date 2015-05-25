@@ -7,6 +7,7 @@ require_once(DOKU_COMMAND . 'AjaxCmdResponseGenerator.php');
 require_once(DOKU_COMMAND . 'JsonGenerator.php');
 require_once(DOKU_COMMAND . 'abstract_command_class.php');
 require_once(DOKU_IOCEXPORTL . 'generate_html.php');
+require_once(DOKU_IOCEXPORTL . 'action.php');
 
 
 /**
@@ -53,6 +54,14 @@ class export_html_command extends abstract_command_class {
      * @return void
      */
     protected function getDefaultResponse($response, &$ret) {
-       $ret->addInfoDta("info", $response, null, -1, \date('d-m-Y H:i:s'));  
+       $response[action_plugin_iocexportl::DATA_PAGEID] = $this->params['id']; 
+       $response[action_plugin_iocexportl::DATA_IOCLANGUAGE] = $this->params['ioclanguage']; 
+       $meta = action_plugin_iocexportl::getform_html_from_data($response);    
+       $pageId = str_replace( ":", "_", $this->params['id'] );
+       $ret->addExtraMetadata($pageId, 
+               array(
+                   "id" => $pageId."_iocexportl",
+                   "content" => $meta)
+               );  
     }
 }

@@ -14,6 +14,16 @@ if (!defined('DOKU_IOCEXPORTL_COMMANDS')) define('DOKU_IOCEXPORTL_COMMANDS',DOKU
 require_once(DOKU_PLUGIN.'action.php');
 
 class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
+    const DATA_TYPE = 0;
+    const DATA_MEDIAPATH = 1;
+    const DATA_FILENAME = 2;
+    const DATA_SIZE = 3;
+    const DATA_TIME = 4;
+    const DATA_ERROR = 5;
+    const DATA_DATE = 6;
+    const DATA_INPUT_BUTTON = 7;
+    const DATA_PAGEID = 8;
+    const DATA_IOCLANGUAGE = 9;
 
     var $exportallowed = FALSE;
     var $id = '';
@@ -70,6 +80,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     }
     
     function setExtraState(&$event, $param){
+        $this->getLanguage();
         $ret=TRUE;
         $formType = $this->getFormType("show");
         if ($formType==1){
@@ -244,7 +255,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $ret .= "</div>";        
         if($inputButton){
           //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
-            $ret .= $this->getFormScript();
+            $ret .= $this->getFormScript($this->id);
         }
         return $ret;
     }
@@ -281,25 +292,49 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $ret .= "</div>";
         if($inputButton){
           //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
-            $ret .= $this->getFormScript();            
+            $ret .= $this->getFormScript($this->id);
         }
         return $ret;
     }
 
     function getform_html($inputButton=TRUE){
         global $conf;
-        $formId = str_replace(":", "_", $this->id); //Id del node que conté la pàgina
-        $url = '';
+        $data[self::DATA_TYPE]="zip";
+        $data = array();
+        //$this->id = getID();
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.zip';
         $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
         if (file_exists($path_filename)){
-            $media_path = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
+            $data[self::DATA_FILENAME]=$filename;
+            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
+            $data[self::DATA_DATE] = strftime("%e %B %Y %T", filemtime($path_filename));
+        }
+        $data[self::DATA_INPUT_BUTTON]=$inputButton;
+        $data[self::DATA_PAGEID] = $this->id;
+        $data[self::DATA_IOCLANGUAGE] = $this->language;
+        $ret = $this->getform_html_from_data($data);
+        return $ret;
+        
+    }
+    
+    function getform_html_from_data($data){
+        $formId = str_replace(":", "_", $data[self::DATA_PAGEID]); //Id del node que conté la pàgina
+        if (isset($data[self::DATA_FILENAME])){
+            $filename = $data[self::DATA_FILENAME];
+            $media_path = $data[self::DATA_MEDIAPATH];
+            if(isset($data[self::DATA_DATE])){
+                $dateFile = $data[self::DATA_DATE];
+            }
             setlocale(LC_TIME, 'ca_ES.utf8');
-            $url = '<a class="media mediafile mf_zip" href="'.$media_path.'">'.$filename.'</a> <strong>'.strftime("%e %B %Y %T", filemtime($path_filename)).'</strong>';
+            $url = '<a class="media mediafile mf_zip" href="'.$media_path.'">'.$filename.'</a> <strong>'.$dateFile.'</strong>';
+            if(isset($data[self::DATA_SIZE])){
+                $url .=' <strong>|</strong> Mida: '.$data[self::DATA_SIZE].' <strong>|</strong> Temps emprat: '.$data[self::DATA_TIME].' segons';
+            }
         }
         $ret  = "<br /><br />";
         $ret .= "<div class=\"iocexport\">\n";
+        $inputButton = isset($data[self::DATA_INPUT_BUTTON])?$data[self::DATA_INPUT_BUTTON]:FALSE;
         if($inputButton){
             $ret .= "<strong>Exportació IOC: </strong>";
         }
@@ -309,8 +344,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }else{
             $ret .= "  <input type=\"hidden\" name=\"mode\" value=\"zip\"/>";
         }
-        $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
-        $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
+        $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$data[self::DATA_PAGEID]."\" />";
+        $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$data[self::DATA_IOCLANGUAGE]."\" />";
         if($inputButton){
             $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
         }
@@ -319,13 +354,12 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $ret .= "</div>";
         if($inputButton){
         	    //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
-            $ret .= $this->getFormScript();
+            $ret .= $this->getFormScript($data[self::DATA_PAGEID]);
         }
         return $ret;
     }
     
-    private function getFormScript(){
-        $id = getID();
+    private function getFormScript($id){
         $id = str_replace(":", "_", $id); //Id del node que conté la pàgina
         $script = "<script type=\"text/javascript\">\n";
         $script .= file_get_contents(DOKU_IOCEXPORTL_LIB."forms.js");
@@ -470,8 +504,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'query' => '\'do=edit\'',
                         'autoSize' => true,
                         'visible' => false,
-                        'standbyId' => '\'bodyContent\'',
                         'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_pdf\'',
+                        'disableOnSend' => true,
                     ),
                 );
         $event->data->addWikiIocButton($control1);
@@ -486,8 +520,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'query' => '\'do=edit\'',
                         'autoSize' => true,
                         'visible' => false,
-                        'standbyId' => '\'bodyContent\'',
                         'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_html\'',
+                        'disableOnSend' => true,
                     ),
                 );
         $event->data->addWikiIocButton($control2);
@@ -502,8 +536,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'query' => '\'do=edit\'',
                         'autoSize' => true,
                         'visible' => false,
-                        'standbyId' => '\'bodyContent\'',
                         'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_onepdf\'',
+                        'disableOnSend' => true,
                     ),
                 );
         $event->data->addWikiIocButton($control3);
