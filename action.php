@@ -24,6 +24,12 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     const DATA_INPUT_BUTTON = 7;
     const DATA_PAGEID = 8;
     const DATA_IOCLANGUAGE = 9;
+    const DATA_FORM_URL = 10;
+    const DATA_URL_FILE_CLASS = 11;
+    const DATA_HAS_PDF_RADIO = 12;
+    const DATA_HAS_ZIP_RADIO = 13;
+    const DATA_HAS_ZIP_HIDDEN = 14;
+    const DATA_IS_ZIP_RADIO_CHECKED = 15;
 
     var $exportallowed = FALSE;
     var $id = '';
@@ -225,82 +231,74 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     
     function getform_onepdf($inputButton=TRUE){
         global $conf;
-        $formId = str_replace(":", "_", $this->id); //Id del node que conté la pàgina
+        $data = array();
+        $data[self::DATA_TYPE]="zip";
+        //$this->id = getID();
+
         $url = '';
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.pdf';
         $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
+
         if (file_exists($path_filename)){
-            $media_path = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
-            setlocale(LC_TIME, 'ca_ES.utf8');
-            $url = '<a class="media mediafile mf_pdf" href="'.$media_path.'">'.$filename.'</a> <strong>'.strftime("%e %B %Y %T", filemtime($path_filename)).'</strong>';
+            $data[self::DATA_FILENAME]=$filename;
+            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;            
+            $data[self::DATA_DATE] = strftime("%e %B %Y %T", filemtime($path_filename));
         }
-        $ret  = "<br /><br />";
-        $ret .= "<div class=\"iocexport\">\n";
-        if($inputButton){
-            $ret .= "<strong>Exportació IOC: </strong>";
-        }
-        $ret .= " <form action=\"lib/plugins/iocexportl/onepdf.php\" id=\"export__form_$formId\" method=\"post\" >\n";
-	if(auth_isadmin()){
-            $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" /> Zip";
-	}
-        $ret .= "  <input type=\"radio\" name=\"mode\" value=\"pdf\" checked=\"checked\" /> PDF";
-        $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
-        $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
-        if($inputButton){
-            $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
-        }
-        $ret .= " </form>\n";
-        $ret .= "<span id=\"exportacio\">".$url."</span>";
-        $ret .= "</div>";        
-        if($inputButton){
-          //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
-            $ret .= $this->getFormScript($this->id);
-        }
-        return $ret;
+        $data[self::DATA_INPUT_BUTTON]=$inputButton;
+        $data[self::DATA_PAGEID] = $this->id;
+        $data[self::DATA_IOCLANGUAGE] = $this->language;
+        $data[self::DATA_IS_ZIP_RADIO_CHECKED]=FALSE;
+        $ret = $this->getform_onepdf_from_data($data);
+        return $ret;        
+    }
+
+    function getform_onepdf_from_data($data){
+       $data[self::DATA_FORM_URL] = "onepdf.php";
+       $data[self::DATA_URL_FILE_CLASS] = "mf_pdf";
+       $data[self::DATA_HAS_PDF_RADIO] = TRUE;
+       $data[self::DATA_HAS_ZIP_RADIO] = auth_isadmin();
+       $data[self::DATA_HAS_ZIP_HIDDEN] = FALSE;
+       return self::getform_from_data($data);
     }
 
     function getform_latex($inputButton=TRUE){
-        global $conf;
-        $formId = str_replace(":", "_", $this->id); //Id del node que conté la pàgina
+       global $conf;
+        $data = array();
+        $data[self::DATA_TYPE]="zip";
+        //$this->id = getID();
+
         $url = '';
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.pdf';
         $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
+
         if (file_exists($path_filename)){
-            $media_path = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
-            setlocale(LC_TIME, 'ca_ES.utf8');
-            $url = '<a class="media mediafile mf_pdf" href="'.$media_path.'">'.$filename.'</a> <strong>'.strftime("%e %B %Y %T", filemtime($path_filename)).'</strong>';
+            $data[self::DATA_FILENAME]=$filename;
+            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;            
+            $data[self::DATA_DATE] = strftime("%e %B %Y %T", filemtime($path_filename));
         }
-        $ret  = "<br /><br />";
-        $ret .= "<div class=\"iocexport\">\n";
-                if($inputButton){
-            $ret .= "<strong>Exportació IOC: </strong>";
-        }
-        $ret .= " <form action=\"lib/plugins/iocexportl/generate_latex.php\" id=\"export__form_$formId\" method=\"post\" >\n";
-        if(auth_isadmin()){
-            $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" /> Zip";
-        }
-        $ret .= "  <input type=\"radio\" name=\"mode\" value=\"pdf\" checked=\"checked\" /> PDF";
-        $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
-        $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
-        if($inputButton){
-            $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
-        }
-        $ret .= " </form>\n";
-        $ret .= "<span id=\"exportacio\">".$url."</span>";
-        $ret .= "</div>";
-        if($inputButton){
-          //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
-            $ret .= $this->getFormScript($this->id);
-        }
-        return $ret;
+        $data[self::DATA_INPUT_BUTTON]=$inputButton;
+        $data[self::DATA_PAGEID] = $this->id;
+        $data[self::DATA_IOCLANGUAGE] = $this->language;
+        $data[self::DATA_IS_ZIP_RADIO_CHECKED]=FALSE;
+        $ret = $this->getform_latex_from_data($data);
+        return $ret;        
     }
 
+    function getform_latex_from_data($data){
+       $data[self::DATA_FORM_URL] = "generate_latex.php";
+       $data[self::DATA_URL_FILE_CLASS] = "mf_pdf";
+       $data[self::DATA_HAS_PDF_RADIO] = TRUE;
+       $data[self::DATA_HAS_ZIP_RADIO] = auth_isadmin();
+       $data[self::DATA_HAS_ZIP_HIDDEN] = FALSE;
+       return self::getform_from_data($data);
+    }
+    
     function getform_html($inputButton=TRUE){
         global $conf;
-        $data[self::DATA_TYPE]="zip";
         $data = array();
+        $data[self::DATA_TYPE]="zip";
         //$this->id = getID();
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.zip';
@@ -313,12 +311,22 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $data[self::DATA_INPUT_BUTTON]=$inputButton;
         $data[self::DATA_PAGEID] = $this->id;
         $data[self::DATA_IOCLANGUAGE] = $this->language;
+        $data[self::DATA_IS_ZIP_RADIO_CHECKED]=$inputButton;
         $ret = $this->getform_html_from_data($data);
         return $ret;
         
     }
     
     function getform_html_from_data($data){
+       $data[self::DATA_FORM_URL] = "generate_html.php";
+       $data[self::DATA_URL_FILE_CLASS] = "mf_zip";
+       $data[self::DATA_HAS_PDF_RADIO] = FALSE;
+       $data[self::DATA_HAS_ZIP_RADIO] = $data[self::DATA_INPUT_BUTTON];
+       $data[self::DATA_HAS_ZIP_HIDDEN] = !$data[self::DATA_INPUT_BUTTON];
+       return self::getform_from_data($data);
+    }
+    
+    function getform_from_data($data){
         $formId = str_replace(":", "_", $data[self::DATA_PAGEID]); //Id del node que conté la pàgina
         if (isset($data[self::DATA_FILENAME])){
             $filename = $data[self::DATA_FILENAME];
@@ -327,22 +335,29 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                 $dateFile = $data[self::DATA_DATE];
             }
             setlocale(LC_TIME, 'ca_ES.utf8');
-            $url = '<a class="media mediafile mf_zip" href="'.$media_path.'">'.$filename.'</a> <strong>'.$dateFile.'</strong>';
+            $url = '<a class="media mediafile '.$data[self::DATA_URL_FILE_CLASS].'" href="'.$media_path.'">'.$filename.'</a> <strong>'.$dateFile.'</strong>';
             if(isset($data[self::DATA_SIZE])){
                 $url .=' <strong>|</strong> Mida: '.$data[self::DATA_SIZE].' <strong>|</strong> Temps emprat: '.$data[self::DATA_TIME].' segons';
             }
         }
+
+        $pdfRadioCheckedAtt = $data[self::DATA_IS_ZIP_RADIO_CHECKED]?"":"checked=\"checked\"";
+        $zipRadioCheckedAtt = $data[self::DATA_IS_ZIP_RADIO_CHECKED]?"checked=\"checked\"":"";
+
         $ret  = "<br /><br />";
         $ret .= "<div class=\"iocexport\">\n";
-        $inputButton = isset($data[self::DATA_INPUT_BUTTON])?$data[self::DATA_INPUT_BUTTON]:FALSE;
+         $inputButton = isset($data[self::DATA_INPUT_BUTTON])?$data[self::DATA_INPUT_BUTTON]:FALSE;
         if($inputButton){
             $ret .= "<strong>Exportació IOC: </strong>";
         }
-        $ret .= " <form action=\"lib/plugins/iocexportl/generate_html.php\" id=\"export__form_$formId\" method=\"post\" >\n";
-        if($inputButton){
-            $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" checked=\"checked\" /> zip";
-        }else{
-            $ret .= "  <input type=\"hidden\" name=\"mode\" value=\"zip\"/>";
+        $ret .= " <form action=\"lib/plugins/iocexportl/{$data[self::DATA_FORM_URL]}\" id=\"export__form_$formId\" method=\"post\" >\n";
+        if($data[self::DATA_HAS_ZIP_RADIO]){
+            $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" $zipRadioCheckedAtt/> Zip";
+        }else if($data[self::DATA_HAS_ZIP_HIDDEN]){
+             $ret .= "  <input type=\"hidden\" name=\"mode\" value=\"zip\"/>";
+        }
+        if($data[self::DATA_HAS_PDF_RADIO]){
+            $ret .= "  <input type=\"radio\" name=\"mode\" value=\"pdf\" $pdfRadioCheckedAtt /> PDF";
         }
         $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$data[self::DATA_PAGEID]."\" />";
         $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$data[self::DATA_IOCLANGUAGE]."\" />";
@@ -353,12 +368,12 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $ret .= "<span id=\"exportacio\">".$url."</span>";
         $ret .= "</div>";
         if($inputButton){
-        	    //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+          //$ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
             $ret .= $this->getFormScript($data[self::DATA_PAGEID]);
         }
         return $ret;
     }
-    
+
     private function getFormScript($id){
         $id = str_replace(":", "_", $id); //Id del node que conté la pàgina
         $script = "<script type=\"text/javascript\">\n";

@@ -54,14 +54,19 @@ class export_html_command extends abstract_command_class {
      * @return void
      */
     protected function getDefaultResponse($response, &$ret) {
-       $response[action_plugin_iocexportl::DATA_PAGEID] = $this->params['id']; 
-       $response[action_plugin_iocexportl::DATA_IOCLANGUAGE] = $this->params['ioclanguage']; 
-       $meta = action_plugin_iocexportl::getform_html_from_data($response);    
-       $pageId = str_replace( ":", "_", $this->params['id'] );
-       $ret->addExtraMetadata($pageId, 
-               array(
-                   "id" => $pageId."_iocexportl",
-                   "content" => $meta)
-               );  
+        if($response){
+            $response[action_plugin_iocexportl::DATA_PAGEID] = $this->params['id']; 
+            $response[action_plugin_iocexportl::DATA_IOCLANGUAGE] = $this->params['ioclanguage']; 
+            $response[action_plugin_iocexportl::DATA_IS_ZIP_RADIO_CHECKED] = $this->params['mode']==="zip";        
+            $meta = action_plugin_iocexportl::getform_html_from_data($response);    
+            $pageId = str_replace( ":", "_", $this->params['id'] );
+            $ret->addExtraMetadata($pageId, 
+                    array(
+                        "id" => $pageId."_iocexportl",
+                        "content" => $meta)
+                    );  
+        }else{
+            $ret->addError(1000, "EXPORTACIÓ NO REALITZADA");  //[TODO] codi i internacionaLITZACIÓ
+        }
     }
 }
