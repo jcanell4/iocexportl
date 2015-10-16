@@ -314,6 +314,7 @@ class generate_html{
                         }
                         $_SESSION['activities'] = FALSE;
                     }else{
+                        $_SESSION['iocintro'] = TRUE;
                         $text = io_readFile(wikiFN($section));
                         list($header, $text) = $this->extractHeader($text);
                         $navmenu = $this->createNavigation('../../',array($unitname,$this->tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
@@ -328,6 +329,7 @@ class generate_html{
                         $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
                         $html = $this->createrefstopages($html, $unit, $ku, '', $ks, '../../');
                         $zip->addFromString($this->web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html', $html);
+                        $_SESSION['iocintro'] = FALSE;
                     }
                 }
                 //Attach media files
