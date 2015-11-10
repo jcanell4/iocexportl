@@ -326,6 +326,7 @@ class generate_html implements WikiIocModel{
                         }
                         $_SESSION['activities'] = FALSE;
                     }else{
+                        $_SESSION['iocintro'] = TRUE;
                         $text = io_readFile(wikiFN($section));
                         list($header, $text) = $this->extractHeader($text);
                         $navmenu = $this->createNavigation('../../',array($unitname,$this->tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
@@ -340,6 +341,7 @@ class generate_html implements WikiIocModel{
                         $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
                         $html = $this->createrefstopages($html, $unit, $ku, '', $ks, '../../');
                         $zip->addFromString($this->web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html', $html);
+                        $_SESSION['iocintro'] = FALSE;
                     }
                 }
                 //Attach media files
@@ -373,8 +375,9 @@ class generate_html implements WikiIocModel{
         }
         $_SESSION['export_html'] = FALSE;
         session_destroy();
-
-        $this->removeDir(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir);
+        if(!$conf['plugin']['iocexportl']['saveWorkDir']){            
+            $this->removeDir(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir);
+        }
         if($this->log){
             return $result;
         }
