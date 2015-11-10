@@ -140,7 +140,7 @@ class generate_latex implements WikiIocModel{
             $result = array();
             $this->createLatex($output_filename, DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir, $latex, $result);
         }
-        if(!$conf['plugin']['iocexportl']['saveWorkDir']){         
+        if(!$conf['plugin']['iocexportl']['saveWorkDir']){        
             $this->removeDir(DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir);
         }
         if($this->log){

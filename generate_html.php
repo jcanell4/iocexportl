@@ -375,7 +375,7 @@ class generate_html implements WikiIocModel{
         }
         $_SESSION['export_html'] = FALSE;
         session_destroy();
-        if(!$conf['plugin']['iocexportl']['saveWorkDir']){            
+        if(!$conf['plugin']['iocexportl']['saveWorkDir']){        
             $this->removeDir(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir);
         }
         if($this->log){
