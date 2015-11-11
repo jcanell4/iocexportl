@@ -377,7 +377,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     private function getFormScript($id){
         $id = str_replace(":", "_", $id); //Id del node que conté la pàgina
         $script = "<script type=\"text/javascript\">\n";
-        $script .= file_get_contents(DOKU_IOCEXPORTL_LIB."forms.js");
+        $script .= file_get_contents(DOKU_IOCEXPORTL_LIB."form.js");
         $script = str_replace("export__form", "export__form_$id", $script);
         $script .= "</script>";
         return $script;
