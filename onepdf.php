@@ -60,6 +60,10 @@ class generate_latex implements WikiIocModel{
         }
     }
     
+    public function setParams($element, $value) {
+        $this->params[$element] = $value;
+    }
+    
     public function initParams($params){                
         global $USERINFO;
 

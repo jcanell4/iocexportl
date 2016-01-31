@@ -104,23 +104,23 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
         if($ret){
             $event->data["ajaxCmdResponseGenerator"]->addExtraContentStateResponse(
-                $event->data["responseData"]["id"],
+                $event->data["responseData"]["structure"]["id"],
                 "exportableType",
                 $strFromType
                 );
             $event->data["ajaxCmdResponseGenerator"]->addExtraMetadata(
-                    $event->data["responseData"]["id"],
-                    $event->data["responseData"]["id"]."_iocexportl",
+                    $event->data["responseData"]["structure"]["id"],
+                    $event->data["responseData"]["structure"]["id"]."_iocexportl",
                     "Propietats exportació",  //TODO [JOSEP] internacionalització
                     $strForm
                     );
             $event->data["ajaxCmdResponseGenerator"]->addProcessDomFromFunction(
-                    $event->data["responseData"]["id"],
+                    $event->data["responseData"]["structure"]["id"],
                     TRUE,
                     "ioc/dokuwiki/runChooser"
                     );
             $event->data["ajaxCmdResponseGenerator"]->addProcessDomFromFunction(
-                    $event->data["responseData"]["id"],
+                    $event->data["responseData"]["structure"]["id"],
                     TRUE,
                     "ioc/dokuwiki/runCounter"
                     );
