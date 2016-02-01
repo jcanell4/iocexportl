@@ -64,6 +64,10 @@ class generate_html implements WikiIocModel{
         }
     }
     
+    public function setParams($element, $value) {
+        $this->params[$element] = $value;
+    }
+    
     public function initParams($params){
         $this->def_section_href = 'continguts';
         $this->exportallowed = FALSE;

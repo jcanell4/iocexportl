@@ -33,6 +33,10 @@ class export_html_command extends abstract_command_class {
         $params["needReturnData"] = true;
         $this->modelWrapper->initParams($params);
     }
+    
+    public function getNameCommandClass() {
+        return "save";
+    }
 
     /**
      * Cancela la edició.
