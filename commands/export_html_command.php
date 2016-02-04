@@ -34,7 +34,7 @@ class export_html_command extends abstract_command_class {
         $this->modelWrapper->initParams($params);
     }
     
-    public function getNameCommandClass() {
+    public function getAuthorizationType() {
         return "save";
     }
 
