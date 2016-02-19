@@ -158,10 +158,10 @@ div.dokuwiki #toc__inside ul{
   clear: right;
   float:right;
   margin-bottom: 1em;
-  width:200px !important;
+  width:235px !important;
 }
 .imgb img{
-  max-width:195px;
+  max-width:225px;
   float:left !important;
 }
 
@@ -177,7 +177,7 @@ div.dokuwiki #toc__inside ul{
   line-height: 1.2em;
   padding: 0.3em 0 1em;
   text-align: left;
-  width: 145px;
+  width: 175px;
 }
 
 .newcontent{
@@ -218,14 +218,14 @@ div.dokuwiki #toc__inside ul{
   position: relative;
   clear: right;
   float:right;
-  width:200px !important;
+  width:235px !important;
   margin-bottom:1em;
   padding: 0;
   font-size:0.85em;
 }
 
 .ioctext .ioccontent {
-  width: 148px;
+  width: 178px;
   float: left;
 }
 
@@ -235,7 +235,7 @@ div.dokuwiki #toc__inside ul{
   position: relative;
   clear: right;
   float:right;
-  width:145px !important;
+  width:175px !important;
   margin-bottom:1em;
   background: url("img/iocreference.png") no-repeat scroll left 0.2em #efefef;
   padding:1em 0.5em 1em 5em;
@@ -246,7 +246,7 @@ div.dokuwiki #toc__inside ul{
   position: relative;
   clear: right;
   float:right;
-  width:145px !important;
+  width:175px !important;
   margin-bottom:1em;
   background: url("img/iocnote.png") no-repeat scroll left 0.2em #efefef;
   padding:1em 0.5em 1em 5em;

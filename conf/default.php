@@ -11,5 +11,4 @@ $conf['toccontents'] = FALSE;
 $conf['largetablecaptmargin'] = FALSE;
 $conf['UsersWithPdfSelf-generationAllowed'] = '';
 $conf['ContentPageName'] = 'continguts';
-$conf['saveWorkDir'] = FALSE;
 

@@ -14,7 +14,6 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/ContentCounterClass.php');
 
 if (!checkPerms(getID())) return FALSE;
- loadConfig();
  session_start();
  countCharacters(getID());
  session_destroy();
@@ -118,27 +117,3 @@ if (!checkPerms(getID())) return FALSE;
         // AUTH_ADMIN, AUTH_READ,AUTH_EDIT,AUTH_CREATE,AUTH_UPLOAD,AUTH_DELETE
         return ($aclLevel >=  AUTH_UPLOAD);
       }
-   
-    function loadConfig(){
-        global $conf;
-
-        $defaults = readDefaultSettings();
-        $plugin = 'iocexportl';
-
-        foreach ($defaults as $key => $value) {
-            if (isset($conf['plugin'][$plugin][$key])) continue;
-            $conf['plugin'][$plugin][$key] = $value;
-        }
-    }
-    
-    function readDefaultSettings() {
-
-        $path = DOKU_PLUGIN.'iocexportl/conf/';
-        $conf = array();
-
-        if (@file_exists($path.'default.php')) {
-            include($path.'default.php');
-        }
-
-        return $conf;
-    }

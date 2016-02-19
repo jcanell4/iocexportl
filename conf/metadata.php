@@ -12,5 +12,4 @@ $meta['toccontents'] = array('onoff');
 $meta['largetablecaptmargin'] = array('onoff');
 $meta['UsersWithPdfSelf-generationAllowed'] = array('string');
 $meta['ContentPageName'] = array('string');
-$meta['saveWorkDir'] = array('onoff');
 
