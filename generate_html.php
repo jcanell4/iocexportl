@@ -8,13 +8,15 @@
 
 if (!defined('DOKU_INC')) define('DOKU_INC',dirname(__FILE__).'/../../../');
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-if (!defined('DOKU_PLUGIN_TEMPLATES')) define('DOKU_PLUGIN_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
-if (!defined('DOKU_PLUGIN_TEMPLATES_HTML')) define('DOKU_PLUGIN_TEMPLATES_HTML',DOKU_PLUGIN_TEMPLATES.'html/');
-if (!defined('DOKU_PLUGIN_LATEX_TMP')) define('DOKU_PLUGIN_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
+if (!defined('DOKU_IOCEXPORTL_TEMPLATES')) define('DOKU_IOCEXPORTL_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
+if (!defined('DOKU_IOCEXPORTL_TEMPLATES_HTML')) define('DOKU_IOCEXPORTL_TEMPLATES_HTML',DOKU_IOCEXPORTL_TEMPLATES.'html/');
+if (!defined('DOKU_IOCEXPORTL_LATEX_TMP')) define('DOKU_IOCEXPORTL_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
+if(!defined('DOKU_MODEL')) define('DOKU_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
 
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once DOKU_INC.'inc/parser/xhtml.php';
+require_once DOKU_MODEL.'WikiIocModel.php';
 
 //Initialize params
 $params = array();
@@ -27,7 +29,7 @@ if ($params['id'] === $_POST['id']){
     $generate->init();
 }
 
-class generate_html{
+class generate_html implements WikiIocModel{
 
     private $def_section_href;
     private $double_cicle;
@@ -36,6 +38,8 @@ class generate_html{
     private $id;
     private $lang;
     private $log;
+    private $needReturnData;
+    private $returnData;
     private $max_menu;
     private $max_navmenu;
     private $media_path;
@@ -54,7 +58,17 @@ class generate_html{
     *
     * @param array $params Array of parameters to pass to the constructor
     */
-    function __construct($params){
+    function __construct($params=NULL){
+        if($params){
+            $this->initParams($params);
+        }
+    }
+    
+    public function setParams($element, $value) {
+        $this->params[$element] = $value;
+    }
+    
+    public function initParams($params){
         $this->def_section_href = 'continguts';
         $this->exportallowed = FALSE;
         $this->export_ok = ($params['mode'] === 'zip' && !empty($params['toexport']));
@@ -77,7 +91,9 @@ class generate_html{
         $this->meta_dcicle = 'dcicle';
         $this->double_cicle = FALSE;
         $this->toexport = explode(',', preg_replace('/:index(,|$)/',',',$params['toexport']));
-        $this->log = isset($params['log']);
+        $this->log = isset($params['log']);        
+        $this->needReturnData = isset($params['needReturnData']);        
+        $this->returnData=NULL;
     }
 
     /**
@@ -105,18 +121,18 @@ class generate_html{
         $_SESSION['latex_images'] = array();
         $_SESSION['media_files'] = array();
         $_SESSION['graphviz_images'] = array();
-        if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
-            mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
+        if (!file_exists(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir)){
+            mkdir(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir, 0775, TRUE);
         }
         //get all pages and activitites
         $data = $this->getData();
 
         $zip = new ZipArchive;
-        $res = $zip->open(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
+        $res = $zip->open(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
         if ($res === TRUE) {
             list($this->menu_html, $files_name) = $this->createMenu($data[0]);
             //Get build.js and add which filenames will be used to search
-            $build = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'_/js/build.js');
+            $build = io_readFile(DOKU_IOCEXPORTL_TEMPLATES_HTML.'_/js/build.js');
             preg_match('/^([^.]*\.)*([^\.]*\.[^\/]*)\/.*?$/',$data[1]['creditcodi'],$matches);
             $build = preg_replace('/"@IOCFILENAMES@"/', implode(',', $files_name), $build, 1);
             $build = preg_replace('/@IOCSEARCHING@/', $this->lang['searching'], $build, 1);
@@ -134,21 +150,21 @@ class generate_html{
             }
             $build = preg_replace('/@IOCCOOKIENAME@/', $cookiename, $build);
             $zip->addFromString('_/js/build.js', $build);
-            $this->getFiles(DOKU_PLUGIN_TEMPLATES_HTML,$zip);
+            $this->getFiles(DOKU_IOCEXPORTL_TEMPLATES_HTML,$zip);
             //Get index source
-            $text_index = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
+            $text_index = io_readFile(DOKU_IOCEXPORTL_TEMPLATES_HTML.'index.html');
             $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 3);
             $text_index = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_index, 1);
             $text_index = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_index, 1);
             //Get search source
-            $text_search = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'search.html');
+            $text_search = io_readFile(DOKU_IOCEXPORTL_TEMPLATES_HTML.'search.html');
             $text_search = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_search, 3);
             $text_search = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_search, 1);
             $text_search = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_search, 1);
             $text_search = preg_replace('/@IOCLICENSE@/',$this->lang['license'], $text_search, 1);
             $text_search = preg_replace('/@IOCTOPPAGE@/',$this->lang['toppage'], $text_search, 1);
             //Get template source
-            $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
+            $text_template = io_readFile(DOKU_IOCEXPORTL_TEMPLATES_HTML.'template.html');
             $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 3);
             $text_template = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_template, 1);
             $text_template = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_template, 1);
@@ -314,6 +330,7 @@ class generate_html{
                         }
                         $_SESSION['activities'] = FALSE;
                     }else{
+                        $_SESSION['iocintro'] = TRUE;
                         $text = io_readFile(wikiFN($section));
                         list($header, $text) = $this->extractHeader($text);
                         $navmenu = $this->createNavigation('../../',array($unitname,$this->tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
@@ -328,6 +345,7 @@ class generate_html{
                         $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
                         $html = $this->createrefstopages($html, $unit, $ku, '', $ks, '../../');
                         $zip->addFromString($this->web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html', $html);
+                        $_SESSION['iocintro'] = FALSE;
                     }
                 }
                 //Attach media files
@@ -355,16 +373,20 @@ class generate_html{
             }
             $zip->close();
             $result = array();
-            $this->returnData(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, $output_filename.'.zip', $result);
+            $this->returnData(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir, $output_filename.'.zip', $result);
         }else{
             $result = $this->lang['nozipfile'];
         }
         $_SESSION['export_html'] = FALSE;
         session_destroy();
-
-        $this->removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
+        if(!$conf['plugin']['iocexportl']['saveWorkDir']){        
+            $this->removeDir(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir);
+        }
         if($this->log){
             return $result;
+        }
+        if($this->needReturnData){
+            return $this->returnData;
         }
     }
 
@@ -400,8 +422,14 @@ class generate_html{
         }else{
             $result = $this->lang['createfileerror'] . $filename;
         }
-        if (!$this->log){
-            echo json_encode($data);
+        if($this->needReturnData){
+            if(!$this->log){
+                $this->returnData = $data;
+            }            
+        }else{
+            if (!$this->log){
+                echo json_encode($data);
+            }
         }
     }
 
@@ -749,12 +777,12 @@ class generate_html{
                 if($contents != '.' && $contents != '..') {
                     $path = $directory . "/" . $contents;
                     if(is_dir($path)) {
-                        $dirname = str_replace(DOKU_PLUGIN_TEMPLATES_HTML,'',$path);
+                        $dirname = str_replace(DOKU_IOCEXPORTL_TEMPLATES_HTML,'',$path);
                         $zip->addEmptyDir($dirname);
                         $this->getFiles($path, $zip);
                     }else{
                         if (!in_array($contents, $ignore)){
-                            $dirname = str_replace(DOKU_PLUGIN_TEMPLATES_HTML,'',$directory);
+                            $dirname = str_replace(DOKU_IOCEXPORTL_TEMPLATES_HTML,'',$directory);
                             $zip->addFile($path, $dirname ."/".$contents);
                         }
                     }
@@ -889,7 +917,7 @@ class generate_html{
         }
 
         if(isset($data['familia'])){
-            $urlfamily = DOKU_PLUGIN_TEMPLATES;
+            $urlfamily = DOKU_IOCEXPORTL_TEMPLATES;
             if (preg_match('/administraci/i', $data['familia'])){
                 $urlfamily .= 'gad';
             }elseif (preg_match('/electricitat/i', $data['familia'])){
@@ -1142,4 +1170,9 @@ class generate_html{
         }
         return FALSE;
     }
+
+    public function isDenied() {
+        return FALSE;
+    }
+
 }
