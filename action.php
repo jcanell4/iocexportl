@@ -513,15 +513,16 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $control1 = array(
                     'DOM' => array (
                       'id' => 'exportPdf',
-                      'label' => 'Exportar', //TODO [Josep] etiqueta en diferents idiomes
+                      'title' => 'Exportar', //TODO [Josep] etiqueta en diferents idiomes
                       'class' => 'iocDisplayBlock',
                     ),
                     'DJO' => array (
                         'query' => '\'do=edit\'',
                         'autoSize' => true,
                         'visible' => false,
+                        'iconClass' => "'iocExportPdfIcon'",
                         'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_pdf\'',
-                        'disableOnSend' => true,
+                        'disableOnSend' => true
                     ),
                 );
         $event->data->addWikiIocButton($control1);
@@ -529,7 +530,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $control2 = array(
                     'DOM' => array (
                       'id' => 'exportHtml',
-                      'label' => 'Exportar', //TODO [Josep] etiqueta en diferents idiomes
+                      'title' => 'Exportar', //TODO [Josep] etiqueta en diferents idiomes
                       'class' => 'iocDisplayBlock',
                     ),
                     'DJO' => array (
@@ -538,6 +539,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'visible' => false,
                         'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_html\'',
                         'disableOnSend' => true,
+                        'iconClass' => "'iocExportHtmlIcon'"
                     ),
                 );
         $event->data->addWikiIocButton($control2);
@@ -545,7 +547,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $control3 = array(
                     'DOM' => array (
                       'id' => 'exportOnePdf',
-                      'label' => 'PDF únic', //TODO [Josep] etiqueta en diferents idiomes
+                      'title' => 'PDF únic', //TODO [Josep] etiqueta en diferents idiomes
                       'class' => 'iocDisplayBlock',
                     ),
                     'DJO' => array (
@@ -554,6 +556,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'visible' => false,
                         'urlBase' => '\'lib/plugins/ajaxcommand/ajax.php?call=export_onepdf\'',
                         'disableOnSend' => true,
+                        'iconClass' => "'iocExportPdfsIcon'"
                     ),
                 );
         $event->data->addWikiIocButton($control3);

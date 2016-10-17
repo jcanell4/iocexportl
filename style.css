@@ -339,3 +339,21 @@ img.latex_displayed{
   margin:1em auto!important;
   display:block;
 }
+
+.iocExportPdfIcon{
+    background-image: url("img/iocPdf.png"); 
+    width: 32px;
+    height: 32px;    
+}
+
+.iocExportPdfsIcon{
+    background-image: url("img/iocPdfs.png"); 
+    width: 32px;
+    height: 32px;    
+}
+
+.iocExportHtmlIcon{
+    background-image: url("img/iocHtml.png"); 
+    width: 32px;
+    height: 32px;    
+}
