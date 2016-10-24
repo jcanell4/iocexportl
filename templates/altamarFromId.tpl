@@ -6,7 +6,7 @@
         return "AQ~~,AAABNMyTcTE~,zjiPB9Bfp4EykEGoTnvDHUfnwtGu2QvJ";
     }
     function _m(){
-        return "http://c.brightcove.com/services/viewer/federated_f9?";
+        return "https://c.brightcove.com/services/viewer/federated_f9?";
     }
     function _akdsaghj(){   
         return _m()+'width=@WIDTH@&height=@HEIGHT@&flashID=objvi@ID_VIDEO@&bgcolor=%23FFFFFF&playerID=@ID_VIDEO@&playerKey='+_pk()+'&isVid=true&dynamicStreaming=true&@videoPlayer=@ID_VIDEO@&autoplay=false&quality=low&autoStart=false';
