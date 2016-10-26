@@ -1,4 +1,4 @@
-<script type="text/javascript">
+<!--script type="text/javascript">
     function _pi(){
         return "1326284612001";
     }
@@ -39,4 +39,13 @@
                 +'<param value="#FFFFFF" name="bgcolor">'
             +'</object>';
     }
-</script>
+</script-->
+<object seamlesstabbing="undefined" class="BrightcoveExperience" id=objvi@ID_VIDEO@ data="https://c.brightcove.com/services/viewer/federated_f9?width=@WIDTH@&height=@HEIGHT@&flashID=objvi@ID_VIDEO@&bgcolor=%23FFFFFF&playerID=@ID_VIDEO@&playerKey=AQ~~,AAABNMyTcTE~,zjiPB9Bfp4EykEGoTnvDHUfnwtGu2QvJ&isVid=true&dynamicStreaming=true&@videoPlayer=@ID_VIDEO@&autoplay=false&quality=low&autoStart=false" type="application/x-shockwave-flash" height="@HEIGHT@" width="@WIDTH@">
+    <param value="always" name="allowScriptAccess">
+    <param value="true" name="allowFullScreen">
+    <param value="false" name="seamlessTabbing">
+    <param value="true" name="swliveconnect">
+    <param value="window" name="wmode">
+    <param value="high" name="quality">
+    <param value="#FFFFFF" name="bgcolor">
+</object>
