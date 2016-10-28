@@ -28,7 +28,7 @@ if ($params['id'] === $_POST['id']){
 }
 
 
-class generate_latex implements WikiIocModel{
+class onepdf implements WikiIocModel{
 
     private $end_characters;
     private $exportallowed;
@@ -37,6 +37,7 @@ class generate_latex implements WikiIocModel{
     private $currentNs;
     private $log;
     private $needReturnData;
+    private $formByColumns;
     private $returnData;    
     private $media_path;
     private $mode;
@@ -81,6 +82,7 @@ class generate_latex implements WikiIocModel{
         $this->user = $params['user'];
         $this->groups = $USERINFO['grps'];
         $this->needReturnData = isset($params['needReturnData']);        
+        $this->formByColumns = isset($params['form_by_columns']);        
         $this->returnData=NULL;
     }
 
@@ -138,10 +140,10 @@ class generate_latex implements WikiIocModel{
             //Footer
             $latex .= io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'onePdfFooter.ltx');
         }
+        $result = array();
         if ($this->mode === 'zip'){
-            $this->createZip($output_filename,DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir,$latex);
+            $this->createZip($output_filename,DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir,$latex, $result);
         }else{
-            $result = array();
             $this->createLatex($output_filename, DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir, $latex, $result);
         }
         if(!$conf['plugin']['iocexportl']['saveWorkDir']){        
@@ -222,17 +224,18 @@ class generate_latex implements WikiIocModel{
             $dest = preg_replace('/\//', ':', $dest);
             $time_end = microtime(TRUE);
             $time = round($time_end - $this->time_start, 2);
+            setlocale(LC_TIME, 'ca_ES.utf8');
+            $dateFile = strftime("%e %B %Y %T", filemtime($path.'/'.$filename));
             if($this->log){
                 if($type === 'log'){
                     $num_pages = 'E';
                 }
-                setlocale(LC_TIME, 'ca_ES.utf8');
-                $result = array('time' => strftime("%e %B %Y %T", filemtime($path.'/'.$filename)), 'path' => $dest.':'.$filename_dest, 'pages' => $num_pages, 'size' => $filesize);
+                $result = array('time' => $dateFile, 'path' => $dest.':'.$filename_dest, 'pages' => $num_pages, 'size' => $filesize);
             }else{
                 if ($type === 'pdf'){
-                    $data = array($type, $this->media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $num_pages, $time);
+                    $data = array($type, $this->media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $num_pages, $time, $dateFile, $this->formByColumns);
                 }else{
-                    $data = array($type, $this->media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $time, $error);
+                    $data = array($type, $this->media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $time, $error, $dateFile, $this->formByColumns);
                 }
             }
         }else{
@@ -411,4 +414,22 @@ class generate_latex implements WikiIocModel{
         return FALSE;
     }
 
+    /**
+     * Wrapper around msg() but outputs only when debug is enabled
+     *
+     * @param string $message
+     * @param int    $err
+     * @param int    $line
+     * @param string $file
+     * @return void
+     */
+    protected function _debug($message, $err, $line, $file, $level=1) {
+        if($this->getConf('debug')<$level) return;
+        msg($message, $err, $line, $file);
+    }
+    
+    protected function getConf($key){
+        global $conf;
+        return $conf['plugin']['iocexportl'][$key];
+    }    
 }

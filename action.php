@@ -19,17 +19,20 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     const DATA_FILENAME = 2;
     const DATA_SIZE = 3;
     const DATA_TIME = 4;
+    const DATA_NUM_PAGES = 4;
+    const DATA_PDF_TIME = 5;
     const DATA_ERROR = 5;
     const DATA_DATE = 6;
-    const DATA_INPUT_BUTTON = 7;
-    const DATA_PAGEID = 8;
-    const DATA_IOCLANGUAGE = 9;
-    const DATA_FORM_URL = 10;
-    const DATA_URL_FILE_CLASS = 11;
-    const DATA_HAS_PDF_RADIO = 12;
-    const DATA_HAS_ZIP_RADIO = 13;
-    const DATA_HAS_ZIP_HIDDEN = 14;
-    const DATA_IS_ZIP_RADIO_CHECKED = 15;
+    const DATA_FORM_BY_COLUMNS = 7;
+    const DATA_INPUT_BUTTON = 8;
+    const DATA_PAGEID = 9;
+    const DATA_IOCLANGUAGE = 10;
+    const DATA_FORM_URL = 11;
+    const DATA_URL_FILE_CLASS = 12;
+    const DATA_HAS_PDF_RADIO = 13;
+    const DATA_HAS_ZIP_RADIO = 14;
+    const DATA_HAS_ZIP_HIDDEN = 15;
+    const DATA_IS_ZIP_RADIO_CHECKED = 16;
 
     var $exportallowed = FALSE;
     var $id = '';
@@ -244,6 +247,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         if (file_exists($path_filename)){
             $data[self::DATA_FILENAME]=$filename;
             $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;            
+            setlocale(LC_TIME, 'ca_ES.utf8');
             $data[self::DATA_DATE] = strftime("%e %B %Y %T", filemtime($path_filename));
         }
         $data[self::DATA_INPUT_BUTTON]=$inputButton;
@@ -276,7 +280,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
         if (file_exists($path_filename)){
             $data[self::DATA_FILENAME]=$filename;
-            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;            
+            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;   
+            setlocale(LC_TIME, 'ca_ES.utf8');
             $data[self::DATA_DATE] = strftime("%e %B %Y %T", filemtime($path_filename));
         }
         $data[self::DATA_INPUT_BUTTON]=$inputButton;
@@ -307,6 +312,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         if (file_exists($path_filename)){
             $data[self::DATA_FILENAME]=$filename;
             $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
+            setlocale(LC_TIME, 'ca_ES.utf8');
             $data[self::DATA_DATE] = strftime("%e %B %Y %T", filemtime($path_filename));
         }
         $data[self::DATA_INPUT_BUTTON]=$inputButton;
@@ -334,11 +340,41 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $media_path = $data[self::DATA_MEDIAPATH];
             if(isset($data[self::DATA_DATE])){
                 $dateFile = $data[self::DATA_DATE];
+            }else{
+                if($data[self::DATA_URL_FILE_CLASS]==='mf_zip' || $data[self::DATA_IS_ZIP_RADIO_CHECKED]){
+                    $ext = ".zip";
+                }else{
+                    $ext = ".pdf";
+                }
+                $path_filename = str_replace(':','/',$data[self::DATA_PAGEID]);
+                $filename = str_replace(':','_',basename($data[self::DATA_PAGEID])).$ext;
+                $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
+                if (file_exists($path_filename)){
+                   setlocale(LC_TIME, 'ca_ES.utf8');
+                   $data[self::DATA_DATE] = $dateFile  = strftime("%e %B %Y %T", filemtime($path_filename));
+                }
             }
-            setlocale(LC_TIME, 'ca_ES.utf8');
-            $url = '<a class="media mediafile '.$data[self::DATA_URL_FILE_CLASS].'" href="'.$media_path.'">'.$filename.'</a> <strong>'.$dateFile.'</strong>';
+            $url = '<a class="media mediafile '.$data[self::DATA_URL_FILE_CLASS].'" href="'.$media_path.'">'.$filename.'</a>';
+            if($data[self::DATA_FORM_BY_COLUMNS]){
+                $url .= "</li>\n<li>\n";
+            }
+            $url .= ' <strong>'.$dateFile.'</strong>';
             if(isset($data[self::DATA_SIZE])){
-                $url .=' <strong>|</strong> Mida: '.$data[self::DATA_SIZE].' <strong>|</strong> Temps emprat: '.$data[self::DATA_TIME].' segons';
+                if($data[self::DATA_FORM_BY_COLUMNS]){
+                    $url .= "</li>\n<li>\n";
+                }else{
+                    $url .= ' <strong>|</strong>';
+                }
+                $url .=' Mida: '.$data[self::DATA_SIZE];
+                if($data[self::DATA_FORM_BY_COLUMNS]){
+                    $url .= "</li>\n<li>\n";
+                }else{
+                    $url .= ' <strong>|</strong>';                    
+                }
+                $url .=' Temps emprat: '.$data[self::DATA_PDF_TIME].' segons';
+            }
+            if($data[self::DATA_FORM_BY_COLUMNS]){
+                $url .= "</li>\n</ul>\n";
             }
         }
 
@@ -363,7 +399,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$data[self::DATA_PAGEID]."\" />";
         $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$data[self::DATA_IOCLANGUAGE]."\" />";
         if($inputButton){
-            $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
+            $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" /><br/>\n";
         }
         $ret .= " </form>\n";
         $ret .= "<span id=\"exportacio\">".$url."</span>";
