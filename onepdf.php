@@ -23,7 +23,7 @@ $params['mode'] = $_POST['mode'];
 if ($params['id'] === $_POST['id']){
     $params['ioclanguage'] = $_POST['ioclanguage'];
     $params['user'] = $_SERVER['REMOTE_USER'];
-    $generate = new generate_latex($params);
+    $generate = new onepdf($params);
     $generate->init();
 }
 
@@ -293,7 +293,7 @@ class onepdf implements WikiIocModel{
         }else{
             @exec('tail -n 20 '.$path.'/'.$filename.'.log;', $output);
             io_saveFile($path.'/'.filename.'.log', implode(DOKU_LF, $output));
-            $this->returnData($path, $filename.'.log', 'log');
+            $this->returnData($path, $filename.'.log', 'log', $return);
         }
     }
 
@@ -424,8 +424,11 @@ class onepdf implements WikiIocModel{
      * @return void
      */
     protected function _debug($message, $err, $line, $file, $level=1) {
+        if (!defined('DOKU_TMP_LOG')) define('DOKU_TMP_LOG',DOKU_INC.'lib/plugins/tmp/debug.log');
         if($this->getConf('debug')<$level) return;
         msg($message, $err, $line, $file);
+        $tag = $err===0?"Info: ":"Error($err): ";
+        file_put_contents(DOKU_TMP_LOG, "$tag\"$message\" ($file:$line)\n", FILE_APPEND);
     }
     
     protected function getConf($key){

@@ -15,6 +15,7 @@ if(!defined('DOKU_MODEL')) define('DOKU_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once DOKU_MODEL.'WikiIocModel.php';
+require_once DOKU_PLUGIN.'ownInit/WikiGlobalConfig.php';
 
 //Initialize params
 $params = array();
@@ -258,9 +259,7 @@ class generate_latex implements WikiIocModel{
         if($this->log){
             return $result;
         }
-        $this->_debug("generate_latex esta a punt d'entrar en needReturnData. Es disposa a retornar {$this->returnData}.", "debug", __LINE__, __FILE__, -1);
         if($this->needReturnData){
-            $this->_debug("generate_latex ha entrat en needReturnData. Es disposa a retornar {$this->returnData}.", "debug", __LINE__, __FILE__, -1);
             return $this->returnData;
         }            
     }
@@ -521,7 +520,6 @@ class generate_latex implements WikiIocModel{
      * @param string $filename
      */
     private function getLogError($path, $filename, &$return=array()){
-
         $output = array();
 
         if($this->log || auth_isadmin()){
@@ -814,12 +812,14 @@ class generate_latex implements WikiIocModel{
      * @return void
      */
     protected function _debug($message, $err, $line, $file, $level=1) {
+        if (!defined('DOKU_TMP_LOG')) define('DOKU_TMP_LOG',DOKU_INC.'lib/plugins/tmp/debug.log');
         if($this->getConf('debug')<$level) return;
         msg($message, $err, $line, $file);
+        $tag = $err===0?"Info: ":"Error($err): ";
+        file_put_contents(DOKU_TMP_LOG, "$tag\"$message\" ($file:$line)\n", FILE_APPEND);
     }
     
     protected function getConf($key){
-        global $conf;
-        return $conf['plugin']['iocexportl'][$key];
+        return WikiGlobalConfig::getConf($key, "iocexportl");
     }
 }

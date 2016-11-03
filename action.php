@@ -343,6 +343,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             }else{
                 if($data[self::DATA_URL_FILE_CLASS]==='mf_zip' || $data[self::DATA_IS_ZIP_RADIO_CHECKED]){
                     $ext = ".zip";
+                }else if($data[self::DATA_TYPE]==="log"){
+                    $ext = ".txt";
                 }else{
                     $ext = ".pdf";
                 }
@@ -371,7 +373,18 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                 }else{
                     $url .= ' <strong>|</strong>';                    
                 }
-                $url .=' Temps emprat: '.$data[self::DATA_PDF_TIME].' segons';
+                if($data[self::DATA_TYPE]==='log'){
+                    $url .=' Temps emprat: '.$data[self::DATA_TIME].' segons'; 
+                    $url .= "</li>\n<li>\n";
+                    $e = is_array($data[self::DATA_ERROR])?$data[self::DATA_ERROR][0]:$data[self::DATA_ERROR];
+                    $url .= " <strong>Error:</strong> $e";
+                }else{
+                    $url .=' Temps emprat: '.$data[self::DATA_PDF_TIME].' segons';
+                    if($data[self::DATA_TYPE]==='zip' && $data[self::DATA_ERROR]!==0){
+                        $e = is_array($data[self::DATA_ERROR])?$data[self::DATA_ERROR][0]:$data[self::DATA_ERROR];
+                        $url .= " <strong>Error:</strong> $e";
+                    }
+                }
             }
             if($data[self::DATA_FORM_BY_COLUMNS]){
                 $url .= "</li>\n</ul>\n";
