@@ -14,7 +14,7 @@ require_once(DOKU_IOCEXPORTL . 'onepdf.php');
  *
  * @author Josep Cañellas <jcanell4@ioc.cat>
  */
-class export_pdf_command extends abstract_command_class {
+class export_onepdf_command extends abstract_command_class {
 
     /**
      * Constructor per defecte que estableix el tipus id.
@@ -30,6 +30,7 @@ class export_pdf_command extends abstract_command_class {
     public function setParameters($params) {
         parent::setParameters($params);
         $params["needReturnData"] = true;
+        $params["form_by_columns"] = true;
         $this->modelWrapper->initParams($params);
     }
 

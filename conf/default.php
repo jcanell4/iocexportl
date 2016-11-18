@@ -12,4 +12,5 @@ $conf['largetablecaptmargin'] = FALSE;
 $conf['UsersWithPdfSelf-generationAllowed'] = '';
 $conf['ContentPageName'] = 'continguts';
 $conf['saveWorkDir'] = FALSE;
+$conf['debug'] = 0;
 

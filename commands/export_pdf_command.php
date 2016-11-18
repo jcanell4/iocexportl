@@ -30,6 +30,7 @@ class export_pdf_command extends abstract_command_class {
     public function setParameters($params) {
         parent::setParameters($params);
         $params["needReturnData"] = true;
+        $params["form_by_columns"] = true;
         $this->modelWrapper->initParams($params);
     }
 

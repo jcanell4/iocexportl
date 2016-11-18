@@ -413,11 +413,12 @@ class generate_html implements WikiIocModel{
             $dest = preg_replace('/\//', ':', $dest);
             $time_end = microtime(TRUE);
             $time = round($time_end - $this->time_start, 2);
+            setlocale(LC_TIME, 'ca_ES.utf8');
+            $dateFile = strftime("%e %B %Y %T", filemtime($path.'/'.$filename));
             if($this->log){
-                setlocale(LC_TIME, 'ca_ES.utf8');
-                $result = array('time' => strftime("%e %B %Y %T", filemtime($path.'/'.$filename)), 'path' => $dest.':'.$filename, 'size' => $filesize);
+                $result = array('time' => $dateFile, 'path' => $dest.':'.$filename, 'size' => $filesize);
             }else{
-                $data = array('zip', $this->media_path.$dest.':'.$filename.'&time='.gettimeofday(TRUE), $filename, $filesize, $time, $error);
+                $data = array('zip', $this->media_path.$dest.':'.$filename.'&time='.gettimeofday(TRUE), $filename, $filesize, $time, $error, $dateFile);
             }
         }else{
             $result = $this->lang['createfileerror'] . $filename;
