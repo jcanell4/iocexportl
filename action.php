@@ -42,7 +42,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         global $ACT;
         $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'handle_dokuwiki_started');
         $controller->register_hook('WIOC_AJAX_COMMAND_STARTED', 'AFTER', $this, 'handle_dokuwiki_started');
-        if ($ACT === 'show' || (is_array($ACT) && $ACT['preview'])){
+        if ($_COOKIE["IOCForceScriptLoad"] || $ACT === 'show' || (is_array($ACT) && $ACT['preview'])){
             $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'handle_tpl_metaheader_output');
             $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'getLanguage', array());
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'showform', array());
