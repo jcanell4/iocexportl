@@ -378,12 +378,14 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                     $url .= "</li>\n<li>\n";
                     $e = is_array($data[self::DATA_ERROR])?$data[self::DATA_ERROR][0]:$data[self::DATA_ERROR];
                     $url .= " <strong>Error:</strong> $e";
-                }else{
-                    $url .=' Temps emprat: '.$data[self::DATA_PDF_TIME].' segons';
-                    if($data[self::DATA_TYPE]==='zip' && $data[self::DATA_ERROR]!==0){
+                }else if($data[self::DATA_TYPE]==='zip'){
+                    $url .=' Temps emprat: '.$data[self::DATA_TIME].' segons';
+                    if($data[self::DATA_ERROR] && $data[self::DATA_ERROR]!==0){
                         $e = is_array($data[self::DATA_ERROR])?$data[self::DATA_ERROR][0]:$data[self::DATA_ERROR];
                         $url .= " <strong>Error:</strong> $e";
                     }
+                }else{
+                    $url .=' Temps emprat: '.$data[self::DATA_PDF_TIME].' segons';
                 }
             }
             if($data[self::DATA_FORM_BY_COLUMNS]){
