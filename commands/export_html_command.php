@@ -26,6 +26,7 @@ class export_html_command extends abstract_command_class {
         $this->types['mode'] = abstract_command_class::T_STRING;
         $this->types['ioclanguage'] = abstract_command_class::T_STRING;
         $this->types['toexport'] = abstract_command_class::T_STRING;
+        $this->setPermissionFor(array('admin','manager'));        
     }
     
     public function setParameters($params) {

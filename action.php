@@ -77,7 +77,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         if ($this->isExportPage() && $this->checkPerms() && $this->showcounts()){
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js');
         }
-        if ($this->isExportPage() && ($this->exportallowed || auth_isadmin())){
+        if ($this->isExportPage() && ($this->exportallowed || auth_ismanager())){
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/chooser.js');
         }
         if (!$this->isExportPage()){
@@ -158,7 +158,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         if ($data != 'show') return $ret;
         if (!$this->checkPerms()) return $ret;
         //Always admin can export
-        if ($this->exportallowed || auth_isadmin()){
+        if ($this->exportallowed || auth_ismanager()){
 	        if (preg_match('/^(?!talk).*?:pdfindex$/', $this->id)){
                     $ret = 1;
 	        }elseif (preg_match('/^(?!talk).*?:htmlindex$/', $this->id)){
@@ -262,7 +262,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
        $data[self::DATA_FORM_URL] = "onepdf.php";
        $data[self::DATA_URL_FILE_CLASS] = "mf_pdf";
        $data[self::DATA_HAS_PDF_RADIO] = TRUE;
-       $data[self::DATA_HAS_ZIP_RADIO] = auth_isadmin();
+       $data[self::DATA_HAS_ZIP_RADIO] = auth_ismanager();
        $data[self::DATA_HAS_ZIP_HIDDEN] = FALSE;
        return self::getform_from_data($data);
     }
@@ -296,7 +296,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
        $data[self::DATA_FORM_URL] = "generate_latex.php";
        $data[self::DATA_URL_FILE_CLASS] = "mf_pdf";
        $data[self::DATA_HAS_PDF_RADIO] = TRUE;
-       $data[self::DATA_HAS_ZIP_RADIO] = auth_isadmin();
+       $data[self::DATA_HAS_ZIP_RADIO] = auth_ismanager();
        $data[self::DATA_HAS_ZIP_HIDDEN] = FALSE;
        return self::getform_from_data($data);
     }
