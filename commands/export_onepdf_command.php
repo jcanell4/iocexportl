@@ -25,6 +25,7 @@ class export_onepdf_command extends abstract_command_class {
         $this->types['mode'] = abstract_command_class::T_STRING;
         $this->types['ioclanguage'] = abstract_command_class::T_STRING;
         $this->types['toexport'] = abstract_command_class::T_STRING;
+        $this->setPermissionFor(array('admin','manager'));        
     }
     
     public function setParameters($params) {
@@ -70,4 +71,8 @@ class export_onepdf_command extends abstract_command_class {
             $ret->addError(1000, "EXPORTACIÓ NO REALITZADA");  //[TODO] codi i internacionaLITZACIÓ
         }                 
     }
+    
+    public function getAuthorizationType() {
+        return 'save';
+    }    
 }
