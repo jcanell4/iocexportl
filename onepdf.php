@@ -379,7 +379,7 @@ class onepdf implements WikiIocModel{
       }
       
     private function hasUserPermissionToExport($userWIthPermission){
-        $return = auth_isadmin();
+        $return = auth_ismanager();
         if(!$return){
             $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups); 
             $pattern = '/'.$this->user.'(?:\b)/';
