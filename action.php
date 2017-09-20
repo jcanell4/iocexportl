@@ -51,9 +51,10 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $controller->register_hook('ADD_TPL_CONTROLS', "AFTER", $this, "addWikiIocButtons", array());
         $controller->register_hook('ADD_TPL_CONTROL_SCRIPTS', "AFTER", $this, "addControlScripts", array());
         $controller->register_hook('WIOC_PROCESS_RESPONSE_page', "AFTER", $this, "setExtraState", array());
+        $controller->register_hook('WIOC_PROCESS_RESPONSE_cancel', "AFTER", $this, "setExtraState", array());
         $controller->register_hook('CALLING_EXTRA_COMMANDS', "AFTER", $this, "addCommands", array());
     }
-    
+
     public function handle_dokuwiki_started(Doku_Event &$event, $param) {
         global $JSINFO;
 
@@ -73,7 +74,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $this->link_script($event, 'http://code.jquery.com/jquery.min.js');
             $this->include_script($event, 'jQuery.noConflict();');
         }
-        
+
         if ($this->isExportPage() && $this->checkPerms() && $this->showcounts()){
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js');
         }
@@ -88,7 +89,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
 
     }
-    
+
     function setExtraState(&$event, $param){
         $this->getLanguage();
         $ret=TRUE;
@@ -127,7 +128,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                     TRUE,
                     "ioc/dokuwiki/runCounter"
                     );
-            
+
         }
         return $ret;
     }
@@ -147,7 +148,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
         return $ret;
     }
-    
+
     function getFormType($data){
         global $conf;
         $ret = 0;
@@ -167,7 +168,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                     $ret = 3;
 	        }
         }
-        return $ret;        
+        return $ret;
     }
 
     public function has_jquery() {
@@ -232,7 +233,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $this->language = preg_replace('/~/', '', $lang);
         }
     }
-    
+
     function getform_onepdf($inputButton=TRUE){
         global $conf;
         $data = array();
@@ -246,7 +247,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
         if (file_exists($path_filename)){
             $data[self::DATA_FILENAME]=$filename;
-            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;            
+            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
             setlocale(LC_TIME, 'ca_ES.utf8');
             $data[self::DATA_DATE] = strftime("%e %B %Y %T", filemtime($path_filename));
         }
@@ -255,7 +256,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $data[self::DATA_IOCLANGUAGE] = $this->language;
         $data[self::DATA_IS_ZIP_RADIO_CHECKED]=FALSE;
         $ret = $this->getform_onepdf_from_data($data);
-        return $ret;        
+        return $ret;
     }
 
     function getform_onepdf_from_data($data){
@@ -280,7 +281,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
         if (file_exists($path_filename)){
             $data[self::DATA_FILENAME]=$filename;
-            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;   
+            $data[self::DATA_MEDIAPATH] = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
             setlocale(LC_TIME, 'ca_ES.utf8');
             $data[self::DATA_DATE] = strftime("%e %B %Y %T", filemtime($path_filename));
         }
@@ -289,7 +290,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $data[self::DATA_IOCLANGUAGE] = $this->language;
         $data[self::DATA_IS_ZIP_RADIO_CHECKED]=FALSE;
         $ret = $this->getform_latex_from_data($data);
-        return $ret;        
+        return $ret;
     }
 
     function getform_latex_from_data($data){
@@ -300,7 +301,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
        $data[self::DATA_HAS_ZIP_HIDDEN] = FALSE;
        return self::getform_from_data($data);
     }
-    
+
     function getform_html($inputButton=TRUE){
         global $conf;
         $data = array();
@@ -321,9 +322,9 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $data[self::DATA_IS_ZIP_RADIO_CHECKED]=$inputButton;
         $ret = $this->getform_html_from_data($data);
         return $ret;
-        
+
     }
-    
+
     function getform_html_from_data($data){
        $data[self::DATA_FORM_URL] = "generate_html.php";
        $data[self::DATA_URL_FILE_CLASS] = "mf_zip";
@@ -332,7 +333,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
        $data[self::DATA_HAS_ZIP_HIDDEN] = !$data[self::DATA_INPUT_BUTTON];
        return self::getform_from_data($data);
     }
-    
+
     function getform_from_data($data){
         $formId = str_replace(":", "_", $data[self::DATA_PAGEID]); //Id del node que conté la pàgina
         if (isset($data[self::DATA_FILENAME])){
@@ -371,10 +372,10 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                 if($data[self::DATA_FORM_BY_COLUMNS]){
                     $url .= "</li>\n<li>\n";
                 }else{
-                    $url .= ' <strong>|</strong>';                    
+                    $url .= ' <strong>|</strong>';
                 }
                 if($data[self::DATA_TYPE]==='log'){
-                    $url .=' Temps emprat: '.$data[self::DATA_TIME].' segons'; 
+                    $url .=' Temps emprat: '.$data[self::DATA_TIME].' segons';
                     $url .= "</li>\n<li>\n";
                     $e = is_array($data[self::DATA_ERROR])?$data[self::DATA_ERROR][0]:$data[self::DATA_ERROR];
                     $url .= " <strong>Error:</strong> $e";
@@ -542,7 +543,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             'block'  => TRUE,
         );
     }
-    
+
     function addCommands(Doku_Event &$event, $param) {
         $event->data["export_html"] = array(
             "callFile" => DOKU_IOCEXPORTL_COMMANDS."export_html_command.php"
@@ -554,12 +555,12 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             "callFile" =>  DOKU_IOCEXPORTL_COMMANDS."export_onepdf_command.php"
         );
     }
-    
+
     function addControlScripts(Doku_Event &$event, $param) {
         $event->data->addControlScript(DOKU_IOCEXPORTL_LIB."ExportButtonGetQuery.js");
         $event->data->addControlScript(DOKU_IOCEXPORTL_LIB."UpdateViewHandler.js");
     }
-    
+
     function addWikiIocButtons(Doku_Event &$event, $param) {
         $control1 = array(
                     'DOM' => array (
@@ -576,8 +577,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'disableOnSend' => true
                     ),
                 );
-        $event->data->addWikiIocButton($control1);
-        
+        $event->data->addWikiIocButton("WikiIocButton", $control1);
+
         $control2 = array(
                     'DOM' => array (
                       'id' => 'exportHtml',
@@ -593,8 +594,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'iconClass' => "'iocExportHtmlIcon'"
                     ),
                 );
-        $event->data->addWikiIocButton($control2);
-        
+        $event->data->addWikiIocButton("WikiIocButton", $control2);
+
         $control3 = array(
                     'DOM' => array (
                       'id' => 'exportOnePdf',
@@ -610,6 +611,6 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'iconClass' => "'iocExportPdfsIcon'"
                     ),
                 );
-        $event->data->addWikiIocButton($control3);
+        $event->data->addWikiIocButton("WikiIocButton", $control3);
    }
 }
