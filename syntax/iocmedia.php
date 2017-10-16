@@ -28,7 +28,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
     static $altamarFromId = 'vídeo[altamar: @VIDEO@]';
     static $altamarFromReq = 'vídeo[altamar: @VIDEO@]';
     static $altamarVideos = 'vídeo[altamar: @VIDEO@]';
-    
+
 //    static $altamarFromUrl = 'http://bcove.me/@VIDEO@';
 //    static $altamarFromId = http://link.brightcove.com/services/player/bcpid1326284612001?bckey=AQ~~,AAABNMyTcTE~,zjiPB9Bfp4EykEGoTnvDHUfnwtGu2QvJ&bctid=@VIDEO@';
 
@@ -110,8 +110,8 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
     function render($mode, &$renderer, $data) {
         if ($mode === 'iocexportl'){
             list($site, $url, $title) = $data;
-            if($site === 'dailymotion' || $site === 'vimeo' 
-                    || $site === 'youtube' 
+            if($site === 'dailymotion' || $site === 'vimeo'
+                    || $site === 'youtube'
                     || $site === 'altamarVideos'
                     || $site === 'altamarFromId'
                     || $site === 'altamarFromReq'
@@ -137,10 +137,11 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             }
             return TRUE;
         }elseif ($mode === 'ioccounter'){
+            list($site, $url, $title) = $data;
             $renderer->doc .= $title;
         }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
             list($site, $url, $title, $width, $height) = $data;
-            if($site === 'dailymotion' || $site === 'vimeo' 
+            if($site === 'dailymotion' || $site === 'vimeo'
                     || $site === 'youtube'){
                 if ($site === 'dailymotion'){
                     $type = self::$dailymotion;
@@ -163,8 +164,8 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                 $renderer->doc .= '<div id="vi'.$url.'">';
                 $renderer->doc .= '</div>';
                 $tpl = io_readFile(DOKU_PLUGIN_TEMPLATES.$site.'.tpl');
-                $tpl = preg_replace("/@QUERY@/", $site, $tpl);                
-                $tpl = preg_replace("/@ID_DIV@/", 'vi'.$url, $tpl);                
+                $tpl = preg_replace("/@QUERY@/", $site, $tpl);
+                $tpl = preg_replace("/@ID_DIV@/", 'vi'.$url, $tpl);
                 $tpl = preg_replace("/@HEIGHT@/", $height, $tpl);
                 $tpl = preg_replace("/@WIDTH@/", $width, $tpl);
                 $tpl = preg_replace("/@ID_VIDEO@/", strval($url), $tpl);
