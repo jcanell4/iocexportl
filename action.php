@@ -115,7 +115,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $event->data["ajaxCmdResponseGenerator"]->addExtraMetadata(
                     $event->data["responseData"]["structure"]["id"],
                     $event->data["responseData"]["structure"]["id"]."_iocexportl",
-                    "Propietats exportació",  //TODO [JOSEP] internacionalització
+                    WikiIocLangManager::getLang("metadata_export_title"),
                     $strForm
                     );
             $event->data["ajaxCmdResponseGenerator"]->addProcessDomFromFunction(
