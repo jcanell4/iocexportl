@@ -63,11 +63,11 @@ class generate_html implements WikiIocModel{
             $this->initParams($params);
         }
     }
-    
+
     public function setParams($element, $value) {
         $this->params[$element] = $value;
     }
-    
+
     public function initParams($params){
         $this->def_section_href = 'continguts';
         $this->exportallowed = FALSE;
@@ -91,8 +91,8 @@ class generate_html implements WikiIocModel{
         $this->meta_dcicle = 'dcicle';
         $this->double_cicle = FALSE;
         $this->toexport = explode(',', preg_replace('/:index(,|$)/',',',$params['toexport']));
-        $this->log = isset($params['log']);        
-        $this->needReturnData = isset($params['needReturnData']);        
+        $this->log = isset($params['log']);
+        $this->needReturnData = isset($params['needReturnData']);
         $this->returnData=NULL;
     }
 
@@ -268,6 +268,7 @@ class generate_html implements WikiIocModel{
                  }
                  $_SESSION['iocintro'] = FALSE;
                  unset($data[0]['intro']);
+
                  //Attach media files
                  foreach($_SESSION['media_files'] as $f){
                      resolve_mediaid(getNS($f),$f,$exists);
@@ -276,6 +277,7 @@ class generate_html implements WikiIocModel{
                      }
                  }
                  $_SESSION['media_files'] = array();
+
                  //Attach latex files
                  foreach($_SESSION['latex_images'] as $l){
                      if (file_exists($l)){
@@ -283,6 +285,7 @@ class generate_html implements WikiIocModel{
                      }
                  }
                  $_SESSION['latex_images'] = array();
+
                  //Attach graphviz files
                  foreach($_SESSION['graphviz_images'] as $l){
                      if (file_exists($l)){
@@ -290,9 +293,18 @@ class generate_html implements WikiIocModel{
                      }
                  }
                  $_SESSION['graphviz_images'] = array();
+
+                 //Attach gif (png,jpg,etc) files
+                 foreach($_SESSION['gif_images'] as $l){
+                     if (file_exists(mediaFN($l))){
+                        $zip->addFile($l, 'gifs/'.  str_replace(":", "/", $l));
+                     }
+                 }
+                 $_SESSION['gif_images'] = array();
             }
-             //Content
-             foreach ($data[0] as $ku => $unit){
+
+            //Content
+            foreach ($data[0] as $ku => $unit){
                 //Section
                 $unitname = $unit['iocname'];
                 unset($unit['iocname']);
@@ -356,6 +368,7 @@ class generate_html implements WikiIocModel{
                     }
                 }
                 $_SESSION['media_files'] = array();
+
                 //Attach latex files
                 foreach($_SESSION['latex_images'] as $l){
                     if (file_exists($l)){
@@ -363,6 +376,7 @@ class generate_html implements WikiIocModel{
                     }
                 }
                 $_SESSION['latex_images'] = array();
+
                 //Attach graphviz files
                 foreach($_SESSION['graphviz_images'] as $l){
                     if (file_exists($l)){
@@ -370,6 +384,14 @@ class generate_html implements WikiIocModel{
                     }
                 }
                 $_SESSION['graphviz_images'] = array();
+
+                 //Attach gif (png, jpg, etc.) files
+                 foreach($_SESSION['gif_images'] as $l){
+                     if (file_exists(mediaFN($l))){
+                        $zip->addFile(mediaFN($l), 'gifs/'. basename(str_replace(":", "/", $l)));
+                     }
+                 }
+                 $_SESSION['gif_images'] = array();
             }
             $zip->close();
             $result = array();
@@ -377,9 +399,10 @@ class generate_html implements WikiIocModel{
         }else{
             $result = $this->lang['nozipfile'];
         }
+
         $_SESSION['export_html'] = FALSE;
         session_destroy();
-        if(!$conf['plugin']['iocexportl']['saveWorkDir']){        
+        if(!$conf['plugin']['iocexportl']['saveWorkDir']){
             $this->removeDir(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir);
         }
         if($this->log){
@@ -426,7 +449,7 @@ class generate_html implements WikiIocModel{
         if($this->needReturnData){
             if(!$this->log){
                 $this->returnData = $data;
-            }            
+            }
         }else{
             if (!$this->log){
                 echo json_encode($data);

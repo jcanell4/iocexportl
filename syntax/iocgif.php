@@ -15,18 +15,19 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
 
     static $hrefiocgif = DOKU_BASE."lib/exe/detail.php?id=@ID@&media=@MEDIA@";
     static $srciocgif = "lib/exe/fetch.php?w=@W@&tok=@TOK@&media=@MEDIA@";
+    const DOKU_IOC_XTEC = "ioc.xtec.cat/materials/FP/Materials/images/";
 
     function getInfo(){
         return array(
             'name' => 'IOC gif Plugin',
-            'desc' => 'Plugin to parse animated gif files',
+            'desc' => 'Plugin to parse gif, animated gif, png, jpeg and other image files',
             'sintax' => '{{iocgif>ns_path:file.gif?width|title}}',
             'url'  => 'http://ioc.gencat.cat/',
         );
     }
 
     function getType(){
-        return 'paragraphs'; //¿Qué tipo de sintaxis? (container,substition,formatting,protected,paragraphs)
+        return 'substition'; //¿Qué tipo de sintaxis? (container,substition,formatting,protected,paragraphs)
     }
 
     function getPType(){
@@ -34,15 +35,14 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
     }
 
     function getSort(){
-        return 520; //{{uri}} dokuwiki has 320 priority
+        return 318; //{{uri}} dokuwiki has 320 priority
     }
 
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        //$this->Lexer->addEntryPattern('\{\{iocgif>.*?:[^}]+\}\}', $mode, 'plugin_iocexportl_iocgif');
-        $this->Lexer->addEntryPattern('##iocgifK.*?:[^#]+##', $mode, 'plugin_iocexportl_iocgif');
+        $this->Lexer->addSpecialPattern('\{\{iocgif>.*?:[^}]+\}\}', $mode, 'plugin_iocexportl_iocgif');
     }
 
     /**
@@ -76,45 +76,31 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
 
         }elseif ($mode === "iocexportl"){
             list($type, $title, $width, $ns, $id, $gif) = $data;
-            if ($type === "iocgif"){
-                $_SESSION['qrcode'] = TRUE;
-                $href = preg_replace('/@ID@/', $id, self::$hrefiocgif);
-                $href = preg_replace('/@MEDIA@/', "$ns:$gif", $href);
-                qrcode_media_url($renderer, $href, $title, $type);
-            }
+            $_SESSION['qrcode'] = TRUE;
+            $href = self::DOKU_IOC_XTEC."$ns/$gif";
+            $_SESSION['gif_images'] = $href;
+            qrcode_media_url($renderer, $href, $title, $type);
             return TRUE;
 
         }elseif ($mode === "xhtml"){
             list($type, $title, $width, $ns, $id, $gif) = $data;
-            if ($type === "iocgif"){
-                $href = preg_replace('/@ID@/', $id, self::$hrefiocgif);
-                $href = preg_replace('/@MEDIA@/', "$ns:$gif", $href);
-                $src = preg_replace('/@W@/', $width, self::$srciocgif);
-                $src = preg_replace('/@TOK@/', media_get_token("$ns:$gif", $width), $src);
-                $src = preg_replace('/@MEDIA@/', "$ns:$gif", $src);
-            }
+            $href = preg_replace('/@ID@/', $id, self::$hrefiocgif);
+            $href = preg_replace('/@MEDIA@/', "$ns:$gif", $href);
+            $src = preg_replace('/@W@/', $width, self::$srciocgif);
+            $src = preg_replace('/@TOK@/', media_get_token("$ns:$gif", $width), $src);
+            $src = preg_replace('/@MEDIA@/', "$ns:$gif", $src);
+
             $renderer->doc .= '<div class="iocgif">';
             $renderer->doc .= '<a class="media" href="'.$href.'" title="'.$title.'">';
-            $renderer->doc .= '<img class="media" src="'.$src.'" width="'.$width.'px" alt="'.$title.'" />';
+            $renderer->doc .= '<img class="media" src="'.$src.'" width="'.$width.'px" alt="'.$title.'" title="'.$title.'" />';
             $renderer->doc .= '</a>';
             $renderer->doc .= '</div>';
-            return TRUE;
 
         }elseif ($mode === "iocxhtml"){
             list($type, $title, $width, $ns, $id, $gif) = $data;
-            if ($type === "iocgif"){
-                $href = preg_replace('/@ID@/', $id, self::$hrefiocgif);
-                $href = preg_replace('/@MEDIA@/', "$ns:$gif", $href);
-                $src = preg_replace('/@W@/', $width, self::$srciocgif);
-                $src = preg_replace('/@TOK@/', media_get_token("$ns:$gif", $width), $src);
-                $src = preg_replace('/@MEDIA@/', "$ns:$gif", $src);
-            }
-            $renderer->doc .= '<div class="iocgif">';
-            $renderer->doc .= '<a class="media" href="'.$href.'" title="'.$title.'">';
-            $renderer->doc .= '<img class="media" src="'.$src.'" width="'.$width.'px" alt="'.$title.'" title="'.$title.'">';
-            $renderer->doc .= '</a>';
-            $renderer->doc .= '</div>';
-            return TRUE;
+
+            if (!isset($_SESSION['gif_images'])) $_SESSION['gif_images'] = array();
+            array_push($_SESSION['gif_images'], "$ns:$gif");
         }
         return FALSE;
     }
