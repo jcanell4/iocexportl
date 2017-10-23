@@ -297,7 +297,8 @@ class generate_html implements WikiIocModel{
                  //Attach gif (png,jpg,etc) files
                  foreach($_SESSION['gif_images'] as $l){
                      if (file_exists(mediaFN($l))){
-                        $zip->addFile(mediaFN($l), 'gifs/'. str_replace(":", "/", $l));
+                        $ns = $l[0]===":"?substr($l, 1):$l;
+                        $zip->addFile(mediaFN($l), 'gifs/'. str_replace(":", "/", $ns));
                      }
                  }
                  $_SESSION['gif_images'] = array();
@@ -388,7 +389,8 @@ class generate_html implements WikiIocModel{
                  //Attach gif (png, jpg, etc.) files
                  foreach($_SESSION['gif_images'] as $l){
                      if (file_exists(mediaFN($l))){
-                        $zip->addFile(mediaFN($l), 'gifs/'. str_replace(":", "/", $l));
+                        $ns = $l[0]===":"?substr($l, 1):$l;
+                        $zip->addFile(mediaFN($l), 'gifs/'. str_replace(":", "/", $ns));
                      }
                  }
                  $_SESSION['gif_images'] = array();
