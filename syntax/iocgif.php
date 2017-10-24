@@ -77,7 +77,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
         }elseif ($mode === "iocexportl"){
             list($type, $title, $width, $ns, $id, $gif) = $data;
             $_SESSION['qrcode'] = TRUE;
-            $href = self::DOKU_IOC_XTEC."$ns/$gif";
+            $href = self::DOKU_IOC_XTEC.str_replace(":", "/", $ns)."/$gif";
             $_SESSION['gif_images'] = $href;
             qrcode_media_url($renderer, $href, $title, $type);
             return TRUE;
