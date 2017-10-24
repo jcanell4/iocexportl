@@ -15,7 +15,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
 
     static $hrefiocgif = DOKU_BASE."lib/exe/detail.php?id=@ID@&media=@MEDIA@";
     static $srciocgif = "lib/exe/fetch.php?w=@W@&tok=@TOK@&media=@MEDIA@";
-    const DOKU_IOC_XTEC = "ioc.xtec.cat/materials/FP/Materials/images/";
+    const DOKU_IOC_XTEC = "ioc.xtec.cat/materials/FP/Materials/media/";
 
     function getInfo(){
         return array(
