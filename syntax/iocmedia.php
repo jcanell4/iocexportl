@@ -21,7 +21,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
 
-    static $vimeo = 'http://www.vimeo.com/moogaloop.swf?clip_id=@VIDEO@';
+    static $vimeo = 'https://www.vimeo.com/moogaloop.swf?clip_id=@VIDEO@';
     static $youtube = 'http://www.youtube.com/v/@VIDEO@?allowFullScreen=true&allowScriptAccess=always&fs=1';
     static $dailymotion = 'http://www.dailymotion.com/embed/video/@VIDEO@';
     static $altamarFromUrl = 'vídeo[altamar: @VIDEO@]';
@@ -109,7 +109,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
     */
     function render($mode, &$renderer, $data) {
         if ($mode === 'iocexportl'){
-            list($site, $url, $title) = $data;
+            list($site, $params, $title) = $data;
             if($site === 'dailymotion' || $site === 'vimeo'
                     || $site === 'youtube'
                     || $site === 'altamarVideos'
@@ -132,6 +132,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                 }else{
                     $type = self::$youtube;
                 }
+                list($url, $full) = explode(":", $params);
                 $url = preg_replace('/@VIDEO@/', $url, $type);
                 qrcode_media_url($renderer, $url, $title, $site);
             }
@@ -140,7 +141,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             list($site, $url, $title) = $data;
             $renderer->doc .= $title;
         }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
-            list($site, $url, $title, $width, $height) = $data;
+            list($site, $params, $title, $width, $height) = $data;
             if($site === 'dailymotion' || $site === 'vimeo'
                     || $site === 'youtube'){
                 if ($site === 'dailymotion'){
@@ -150,6 +151,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                 }else{
                     $type = self::$youtube;
                 }
+                list($url, $full) = explode(":", $params);                
                 $url = preg_replace('/@VIDEO@/', $url, $type);
 //            }else if($site === 'altamarFromUrl'){
 //                    $type = self::$altamarFromUrl;
@@ -177,6 +179,11 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                                 $height,
                                 array('wmode' => 'opaque'));
             }
+            //if(!isset($full) && $full === "full"){
+                //$tagMessage = WikiIocLangManager::getLang("fullScreenMessage", "iocexportl");                
+                $tagMessage = 'Cliqueu aquí per veure en pantalla complerta';                
+                $renderer->doc .= "<p><a target=_blank href='$url'>$tagMessage</a></p>";
+            //}
             $renderer->doc .= '</div>';
         }
         return FALSE;
