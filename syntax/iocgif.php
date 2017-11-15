@@ -103,7 +103,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
             if (!isset($_SESSION['gif_images'])) $_SESSION['gif_images'] = array();
             array_push($_SESSION['gif_images'], "$ns:$gif");
 
-            $src = self::DOKU_IOC_XTEC.str_replace(":", "/", $ns)."/$gif";
+            $src = "//".self::DOKU_IOC_XTEC.str_replace(":", "/", $ns)."/$gif";
 
             $renderer->doc .= '<div class="iocgif">';
             $renderer->doc .= '<img class="media" src="'.$src.'" width="'.$width.'px" alt="'.$title.'" title="'.$title.'" />';
