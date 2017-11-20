@@ -20,3 +20,4 @@ $lang['tablink_btn'] = 'Sintaxis d\'enllaç a table';
 $lang['text_btn']  = 'Incloure la sintaxis de text';
 $lang['textlarge_btn']  = 'Incloure la sintaxis de text large';
 $lang['toolbar_btn']  = 'Estils IOC';
+$lang['fullScreenMessage']  = 'Cliqueu aquí per veure en pantalla complerta';
