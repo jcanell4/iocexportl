@@ -83,6 +83,24 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
             qrcode_media_url($renderer, $href, $title, $type);
             return TRUE;
 
+        }elseif ($mode === "iocxhtml") {
+            list($type, $title, $width, $ns, $id, $gif) = $data;
+            $rutagif = str_replace(":", "/", $ns)."/$gif";
+
+            if (!isset($_SESSION['gif_images'])) $_SESSION['gif_images'] = array();
+            array_push($_SESSION['gif_images'], "$ns:$gif");
+
+            if ($_SESSION['alternateAddress']) {
+                $src = ($data['media_address']) ? $data['media_address'] : "../media/";
+                $src.= $rutagif;
+            }else {
+                $src = "//".self::DOKU_IOC_XTEC.$rutagif;
+            }
+
+            $renderer->doc .= '<div class="iocgif">';
+            $renderer->doc .= '<img class="media" src="'.$src.'" width="'.$width.'px" alt="'.$title.'" title="'.$title.'" />';
+            $renderer->doc .= '</div>';
+
         }elseif ($mode === "xhtml"){
             list($type, $title, $width, $ns, $id, $gif) = $data;
             $href = preg_replace('/@ID@/', $id, self::$hrefiocgif);
@@ -96,19 +114,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= '<img class="media" src="'.$src.'" width="'.$width.'px" alt="'.$title.'" title="'.$title.'" />';
             $renderer->doc .= '</a>';
             $renderer->doc .= '</div>';
-
-        }elseif ($mode === "iocxhtml"){
-            list($type, $title, $width, $ns, $id, $gif) = $data;
-
-            if (!isset($_SESSION['gif_images'])) $_SESSION['gif_images'] = array();
-            array_push($_SESSION['gif_images'], "$ns:$gif");
-
-            $src = "//".self::DOKU_IOC_XTEC.str_replace(":", "/", $ns)."/$gif";
-
-            $renderer->doc .= '<div class="iocgif">';
-            $renderer->doc .= '<img class="media" src="'.$src.'" width="'.$width.'px" alt="'.$title.'" title="'.$title.'" />';
-            $renderer->doc .= '</div>';
-            }
+        }
         return FALSE;
     }
 }
