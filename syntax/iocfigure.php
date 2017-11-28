@@ -70,13 +70,15 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
      */
     function handle($match, $state, $pos, &$handler){
         $matches = array();
-        $data = array();
-		$id = '';
-		$params = array();
+        $id = '';
+        $params = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
                 if (preg_match('/::figure:(.*?$)/', $match, $matches)){
                     $id = trim($matches[1]);
+                    if (strpos($id,"_") !== FALSE) {
+                        throw new Exception("ERROR: No es pot generar un arxiu PDF si el ID de la figura conté el caracter '_'");
+                    }
                 }
                 break;
             case DOKU_LEXER_UNMATCHED :
@@ -112,12 +114,13 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'iocexportl'){
+        }
+        elseif ($mode === 'iocexportl'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-    				$_SESSION['figlabel'] = trim($renderer->_xmlEntities($id));
-    				break;
+                    $_SESSION['figlabel'] = trim($renderer->_xmlEntities($id));
+                    break;
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['figure'] = TRUE;
                     $_SESSION['figtitle'] = (isset($params['title']))?$params['title']:'';
@@ -128,74 +131,75 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     //Transform quotes
                     $_SESSION['figfooter'] = preg_replace('/(")([^"]+)(")/', '``$2\'\'', $_SESSION['figfooter']);
                     $instructions = get_latex_instructions($text);
-                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                    /*if ($_SESSION['figfooter']){
-                        $renderer->doc .='\small '. $_SESSION['figfooter'] .'\\\\';
-                    }*/
+                    //[Rafa] Este $new_mode hardcoded debe ser revisado, no solo aquí, si no en un ámbito más amplio
+                    $new_mode = (get_class($renderer)==="renderer_plugin_wikiiocmodel_basiclatex") ? "wikiiocmodel_basiclatex" : $mode;
+                    $renderer->doc .= p_latex_render($new_mode, $instructions, $info);
                     $_SESSION['figure'] = FALSE;
-    				$_SESSION['figlabel'] = '';
-    				$_SESSION['figtitle'] = '';
-    				$_SESSION['figlarge'] = FALSE;
-    				$_SESSION['figfooter'] = '';
+                    $_SESSION['figlabel'] = '';
+                    $_SESSION['figtitle'] = '';
+                    $_SESSION['figlarge'] = FALSE;
+                    $_SESSION['figfooter'] = '';
                     break;
                 case DOKU_LEXER_EXIT :
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'xhtml'){
+        }
+        elseif ($mode === 'xhtml'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
-                    case DOKU_LEXER_ENTER :
-                        $renderer->doc .= '<div class="iocfigure">';
-                        $renderer->doc .= '<div class="iocinfo">';
-                        $renderer->doc .= '<a name="'.$id.'">';
-                        $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
-                        $renderer->doc .= '</a>';
-                        break;
-                    case DOKU_LEXER_UNMATCHED :
-                        if (isset($params['title'])){
-                            $instructions = p_get_instructions($params['title']);
-                            $title = preg_replace('/(<p>)(.*?)(<\/p>)/s','<span>$2</span>', p_render($mode, $instructions, $info));
-                            $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$title.'<br />';
-                        }
-                        if (isset($params['footer'])){
-                            $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
-                        }
-                        $renderer->doc .= '</div>';
-                        $instructions = p_get_instructions($text);
-                        $renderer->doc .= p_render($mode, $instructions, $info);
-                        break;
-                    case DOKU_LEXER_EXIT :
-                        $renderer->doc .= '</div>';
-                        break;
-                }
+                case DOKU_LEXER_ENTER :
+                    $renderer->doc .= '<div class="iocfigure">';
+                    $renderer->doc .= '<div class="iocinfo">';
+                    $renderer->doc .= '<a name="'.$id.'">';
+                    $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
+                    $renderer->doc .= '</a>';
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    if (isset($params['title'])){
+                        $instructions = p_get_instructions($params['title']);
+                        $title = preg_replace('/(<p>)(.*?)(<\/p>)/s','<span>$2</span>', p_render($mode, $instructions, $info));
+                        $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$title.'<br />';
+                    }
+                    if (isset($params['footer'])){
+                        $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
+                    }
+                    $renderer->doc .= '</div>';
+                    $instructions = p_get_instructions($text);
+                    $renderer->doc .= p_render($mode, $instructions, $info);
+                    break;
+                case DOKU_LEXER_EXIT :
+                    $renderer->doc .= '</div>';
+                    break;
+            }
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
+        }
+        elseif ($mode === 'iocxhtml'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
-                    case DOKU_LEXER_ENTER :
-                        $renderer->doc .= '<div class="iocfigure">';
-                        $renderer->doc .= '<a name="'.$id.'"></a>';
-                        break;
-                    case DOKU_LEXER_UNMATCHED :
-                        if (isset($params['title'])){
-                            $instructions = get_latex_instructions($params['title']);
-                            $_SESSION['fig_title'] = preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info));
-                        }
-                        $this->footer = (isset($params['footer']))?$params['footer']:'';
-                        $_SESSION['figure'] = TRUE;
-                        $instructions = get_latex_instructions($text);
-                        $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                        $_SESSION['figure'] = FALSE;
-                        $_SESSION['fig_title'] = '';
-                        if (!empty($this->footer)){
-                            $renderer->doc .= '<div class="footfigure">'.$this->footer.'</div>';
-                        }
-                        break;
-                    case DOKU_LEXER_EXIT :
-                        $renderer->doc .= '</div>';
-                        break;
-                }
+                case DOKU_LEXER_ENTER :
+                    $renderer->doc .= '<div class="iocfigure">';
+                    $renderer->doc .= '<a name="'.$id.'"></a>';
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    if (isset($params['title'])){
+                        $instructions = get_latex_instructions($params['title']);
+                        $_SESSION['fig_title'] = preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info));
+                    }
+                    $this->footer = (isset($params['footer']))?$params['footer']:'';
+                    $_SESSION['figure'] = TRUE;
+                    $instructions = get_latex_instructions($text);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    $_SESSION['figure'] = FALSE;
+                    $_SESSION['fig_title'] = '';
+                    if (!empty($this->footer)){
+                        $renderer->doc .= '<div class="footfigure">'.$this->footer.'</div>';
+                    }
+                    break;
+                case DOKU_LEXER_EXIT :
+                    $renderer->doc .= '</div>';
+                    break;
+            }
             return TRUE;
         }
         return FALSE;
