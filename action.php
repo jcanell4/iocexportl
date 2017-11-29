@@ -573,7 +573,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'autoSize' => true,
                         'visible' => false,
                         'iconClass' => "'iocExportPdfIcon'",
-                        'urlBase' => '\'ajax.php?call=export_pdf\'',
+                        'urlBase' => '\'lib/exe/ioc_ajax.php?call=export_pdf\'',
                         'disableOnSend' => true
                     ),
                 );
@@ -589,7 +589,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'query' => '\'do=edit\'',
                         'autoSize' => true,
                         'visible' => false,
-                        'urlBase' => '\'ajax.php?call=export_html\'',
+                        'urlBase' => '\'lib/exe/ioc_ajax.php?call=export_html\'',
                         'disableOnSend' => true,
                         'iconClass' => "'iocExportHtmlIcon'"
                     ),
@@ -606,7 +606,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                         'query' => '\'do=edit\'',
                         'autoSize' => true,
                         'visible' => false,
-                        'urlBase' => '\'ajax.php?call=export_onepdf\'',
+                        'urlBase' => '\'lib/exe/ioc_ajax.php?call=export_onepdf\'',
                         'disableOnSend' => true,
                         'iconClass' => "'iocExportPdfsIcon'"
                     ),
