@@ -5,17 +5,15 @@
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author Marc Català <mcatala@ioc.cat>
  */
-
-if (!defined('DOKU_INC')) define('DOKU_INC',dirname(__FILE__).'/../../../');
+if (!defined('DOKU_INC')) die();
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 if (!defined('DOKU_IOCEXPORTL_TEMPLATES')) define('DOKU_IOCEXPORTL_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
 if (!defined('DOKU_IOCEXPORTL_LATEX_TMP')) define('DOKU_IOCEXPORTL_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
 if(!defined('DOKU_MODEL')) define('DOKU_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
 
-require_once(DOKU_INC.'/inc/init.php');
-require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
-require_once DOKU_MODEL.'WikiIocModel.php';
-require_once DOKU_PLUGIN.'ownInit/WikiGlobalConfig.php';
+require_once (DOKU_INC.'/inc/init.php');
+require_once (DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
+require_once (DOKU_MODEL.'WikiIocModel.php');
 
 //Initialize params
 $params = array();
@@ -74,12 +72,12 @@ class generate_latex implements WikiIocModel{
             $this->initParams($params);
         }
     }
-    
+
     public function setParams($element, $value) {
         $this->params[$element] = $value;
     }
-    
-    public function initParams($params){        
+
+    public function initParams($params){
         global $USERINFO;
 
         //Due listings problems whith header it's necessary to replace extended characters
@@ -107,8 +105,8 @@ class generate_latex implements WikiIocModel{
         $this->user = $params['user'];
         $this->groups = $USERINFO['grps'];
         $this->fpd = FALSE;
-        $this->needReturnData = isset($params['needReturnData']);        
-        $this->formByColumns = isset($params['form_by_columns']);        
+        $this->needReturnData = isset($params['needReturnData']);
+        $this->formByColumns = isset($params['form_by_columns']);
         $this->returnData=NULL;
     }
 
@@ -125,9 +123,9 @@ class generate_latex implements WikiIocModel{
                     $conf['plugin']['iocexportl']['UsersWithPdfSelf-generationAllowed']
                 );
         $this->exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
-        if (!$this->log && !$this->exportallowed 
+        if (!$this->log && !$this->exportallowed
                                 && !$this->permissionToExport) return FALSE;
-        if (!$this->log && !$this->permissionToExport 
+        if (!$this->log && !$this->permissionToExport
                                 && $params['mode'] === 'zip') return FALSE;
 
         $this->time_start = microtime(TRUE);
@@ -261,9 +259,9 @@ class generate_latex implements WikiIocModel{
         }
         if($this->needReturnData){
             return $this->returnData;
-        }            
+        }
     }
-    
+
     private function renderCoverPage(&$latex, $frontCover, $bacground='', $extraData=NULL){
         $latex .= io_readFile(DOKU_IOCEXPORTL_TEMPLATES . $frontCover);
         $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', "media/".$bacground, $latex);
@@ -271,7 +269,7 @@ class generate_latex implements WikiIocModel{
         if(isset($extraData)){
             foreach ($extraData as $key => $value) {
                 $latex = preg_replace($key, $value, $latex);
-            }            
+            }
         }
         if($bacground){
             $this->copyToTmp(DOKU_IOCEXPORTL_TEMPLATES . $bacground.".pdf", "media/".$bacground.".pdf");
@@ -290,10 +288,10 @@ class generate_latex implements WikiIocModel{
             $filename = 'backgroundfpd';
             if ($this->unitzero) {
                 if($this->bCoverPage){
-                    $this->renderCoverPage($latex, 
-                                    'frontCoverFpd.ltx', 
+                    $this->renderCoverPage($latex,
+                                    'frontCoverFpd.ltx',
                                     'backgroundcfpd',
-                                    array("/@BACK_COVER_TEXT@/" 
+                                    array("/@BACK_COVER_TEXT@/"
                                             => trim($data[1]["backcovertext"])));
                 }else{
                     $this->renderCoverPage($latex, 'frontNoCover.ltx');
@@ -322,7 +320,7 @@ class generate_latex implements WikiIocModel{
             if($this->bCoverPage){
                 $this->renderCoverPage($latex, 'frontCoverFp.ltx', 'backgroundcfp');
             }else{
-                $this->renderCoverPage($latex, 'frontNoCover.ltx');                
+                $this->renderCoverPage($latex, 'frontNoCover.ltx');
             }
             $filename = 'backgroundu0';
             $latex .= io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'frontpage_u0.ltx');
@@ -479,7 +477,7 @@ class generate_latex implements WikiIocModel{
         if($this->needReturnData){
             if(!$this->log){
                 $this->returnData = $data;
-            }            
+            }
         }else{
             if (!$this->log){
                 echo json_encode($data);
@@ -611,17 +609,17 @@ class generate_latex implements WikiIocModel{
         // AUTH_ADMIN, AUTH_READ,AUTH_EDIT,AUTH_CREATE,AUTH_UPLOAD,AUTH_DELETE
         return ($aclLevel >=  AUTH_UPLOAD);
       }
-      
+
     private function hasUserPermissionToExport($userWIthPermission){
         $return = auth_ismanager();
         if(!$return){
-            $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups);             
+            $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups);
             $pattern = '/'.$this->user.'(?:\b)/';
             $selfGenerationAllowed = (preg_match($pattern,$userWIthPermission)===1);
             $return = (($aclLevel >= AUTH_UPLOAD)&&($selfGenerationAllowed));
         }
         return $return;
-    }   
+    }
 
     /**
      *
@@ -786,14 +784,14 @@ class generate_latex implements WikiIocModel{
         }
         return FALSE;
     }
-    
+
     private function getPathImage($wikiLink){
         preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$wikiLink, $matches);
         resolve_mediaid(getNS($matches[1]),$matches[1],$exists);
         return mediaFN($matches[1]);
     }
-    
-    private function copyToTmp($image, $targetName){ 
+
+    private function copyToTmp($image, $targetName){
         $dest = DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir."/".$targetName;
         copy($image, $dest);
     }
@@ -818,7 +816,7 @@ class generate_latex implements WikiIocModel{
         $tag = $err===0?"Info: ":"Error($err): ";
         file_put_contents(DOKU_TMP_LOG, "$tag\"$message\" ($file:$line)\n", FILE_APPEND);
     }
-    
+
     protected function getConf($key){
         return WikiGlobalConfig::getConf($key, "iocexportl");
     }
