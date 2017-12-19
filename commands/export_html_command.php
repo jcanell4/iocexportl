@@ -22,7 +22,7 @@ class export_html_command extends abstract_command_class {
     public function setParameters($params) {
         parent::setParameters($params);
         $params["needReturnData"] = true;
-        $this->modelWrapper->initParams($params);
+        $this->modelAdapter->initParams($params);
     }
 
     public function getAuthorizationType() {
@@ -33,7 +33,7 @@ class export_html_command extends abstract_command_class {
      * @return string[] array associatiu amb la resposta formatada (id, ns, tittle i content)
      */
     protected function process() {
-        $contentData = $this->modelWrapper->init();
+        $contentData = $this->modelAdapter->init();
         return $contentData;
     }
 
