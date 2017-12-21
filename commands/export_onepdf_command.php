@@ -22,14 +22,14 @@ class export_onepdf_command extends abstract_command_class {
         parent::setParameters($params);
         $params["needReturnData"] = true;
         $params["form_by_columns"] = true;
-        $this->modelWrapper->initParams($params);
+        $this->modelAdapter->initParams($params);
     }
 
     /**
      * @return string[] array associatiu amb la resposta formatada (id, ns, tittle i content)
      */
     protected function process() {
-        $contentData = $this->modelWrapper->init();
+        $contentData = $this->modelAdapter->init();
         return $contentData;
     }
 
