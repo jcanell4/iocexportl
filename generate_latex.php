@@ -15,19 +15,6 @@ require_once (DOKU_INC.'/inc/init.php');
 require_once (DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once (DOKU_MODEL.'WikiIocModel.php');
 
-//Initialize params
-$params = array();
-$params['id'] = getID();
-$params['mode'] = $_POST['mode'];
-if ($params['id'] === $_POST['id']){
-    $params['toexport'] = $_POST['toexport'];
-    $params['ioclanguage'] = $_POST['ioclanguage'];
-    $params['user'] = $_SERVER['REMOTE_USER'];
-    $generate = new generate_latex($params);
-    $generate->init();
-}
-
-
 class generate_latex implements WikiIocModel{
 
     private $end_characters;
@@ -819,5 +806,19 @@ class generate_latex implements WikiIocModel{
 
     protected function getConf($key){
         return WikiGlobalConfig::getConf($key, "iocexportl");
+    }
+}
+
+if(!isset($_GET["call"])){
+    //Initialize params
+    $params = array();
+    $params['id'] = getID();
+    $params['mode'] = $_POST['mode'];
+    if ($params['id'] === $_POST['id']){
+        $params['toexport'] = $_POST['toexport'];
+        $params['ioclanguage'] = $_POST['ioclanguage'];
+        $params['user'] = $_SERVER['REMOTE_USER'];
+        $generate = new generate_latex($params);
+        $generate->init();
     }
 }

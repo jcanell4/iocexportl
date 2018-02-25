@@ -16,18 +16,6 @@ require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once DOKU_MODEL.'WikiIocModel.php';
 
-//Initialize params
-$params = array();
-$params['id'] = getID();
-$params['mode'] = $_POST['mode'];
-if ($params['id'] === $_POST['id']){
-    $params['ioclanguage'] = $_POST['ioclanguage'];
-    $params['user'] = $_SERVER['REMOTE_USER'];
-    $generate = new onepdf($params);
-    $generate->init();
-}
-
-
 class onepdf implements WikiIocModel{
 
     private $end_characters;
@@ -435,4 +423,17 @@ class onepdf implements WikiIocModel{
         global $conf;
         return $conf['plugin']['iocexportl'][$key];
     }    
+}
+
+if(!isset($_GET["call"])){
+    //Initialize params
+    $params = array();
+    $params['id'] = getID();
+    $params['mode'] = $_POST['mode'];
+    if ($params['id'] === $_POST['id']){
+        $params['ioclanguage'] = $_POST['ioclanguage'];
+        $params['user'] = $_SERVER['REMOTE_USER'];
+        $generate = new onepdf($params);
+        $generate->init();
+    }
 }

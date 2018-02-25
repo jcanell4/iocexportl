@@ -21,9 +21,11 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
 
-    static $vimeo = 'https://www.vimeo.com/moogaloop.swf?clip_id=@VIDEO@';
-    static $youtube = 'http://www.youtube.com/v/@VIDEO@?allowFullScreen=true&allowScriptAccess=always&fs=1';
-    static $dailymotion = 'http://www.dailymotion.com/embed/video/@VIDEO@';
+    //static $vimeo = 'https://www.vimeo.com/moogaloop.swf?clip_id=@VIDEO@';
+    static $vimeo = 'https://player.vimeo.com/video/@VIDEO@';
+    //static $youtube = 'http://www.youtube.com/v/@VIDEO@?allowFullScreen=true&allowScriptAccess=always&fs=1';
+    static $youtube = 'https://www.youtube.com/embed/@VIDEO@?controls=1';
+    static $dailymotion = 'https://www.dailymotion.com/embed/video/@VIDEO@';
     static $altamarFromUrl = 'vídeo[altamar: @VIDEO@]';
     static $altamarFromId = 'vídeo[altamar: @VIDEO@]';
     static $altamarFromReq = 'vídeo[altamar: @VIDEO@]';
@@ -157,9 +159,10 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
 //                    $type = self::$altamarFromUrl;
             }
             $renderer->doc .= '<div class="mediavideo">';
-            if ($site === 'dailymotion'){
-                 $renderer->doc .='<iframe height="'.$height.'" width="'.$width.'" src="'.$url.'"></iframe>';
-            }elseif ($site === 'altamarVideos'
+//            if ($site === 'dailymotion'){
+//                 $renderer->doc .='<iframe height="'.$height.'" width="'.$width.'" src="'.$url.'"></iframe>';
+//            }elseif ($site === 'altamarVideos'
+            if ($site === 'altamarVideos'
                             || $site === 'altamarFromUrl'
                             || $site === 'altamarFromId'
                             || $site === 'altamarFromReq') {
@@ -173,11 +176,13 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                 $tpl = preg_replace("/@ID_VIDEO@/", strval($url), $tpl);
                 $renderer->doc .= $tpl;
             }else{
-                $renderer->doc .= html_flashobject(
-                                $url,
-                                $width,
-                                $height,
-                                array('wmode' => 'opaque'));
+                 $renderer->doc .='<iframe height="'.$height.'" width="'.$width.'" src="'.$url.'"></iframe>';
+//                $renderer->doc .= html_flashobject(
+//                                $url,
+//                                $width,
+//                                $height,
+//                                array('wmode' => 'opaque'));
+                
             }
             //if(!isset($full) && $full === "full"){
                 //$tagMessage = WikiIocLangManager::getLang("fullScreenMessage", "iocexportl");                
