@@ -11,12 +11,8 @@
  *
  * @author josep
  */
-abstract class export_command extends abstract_command_class {
+abstract class export_command extends abstract_writer_command_class{
     public function getAuthorizationType() {
         return "save";
-    }
-    
-    public function isEmptyText(){
-        return FALSE;
-    }
+    }    
 }
