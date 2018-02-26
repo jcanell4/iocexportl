@@ -2,12 +2,13 @@
 if(!defined('DOKU_INC')) die();
 if (!defined('DOKU_IOCEXPORTL')) define('DOKU_IOCEXPORTL',DOKU_INC."lib/plugins/iocexportl/");
 require_once(DOKU_IOCEXPORTL . "onepdf.php");
+require_once(DOKU_IOCEXPORTL . 'commands/export_command.php');
 
 /**
  * Class export_onepdf_command
  * @author Josep Cañellas <jcanell4@ioc.cat>
  */
-class export_onepdf_command extends abstract_command_class {
+class export_onepdf_command extends export_command {
 
     public function __construct() {
         parent::__construct(new onepdf());
@@ -54,9 +55,5 @@ class export_onepdf_command extends abstract_command_class {
         }else{
             $ret->addError(1000, "EXPORTACIÓ NO REALITZADA");  //[TODO] codi i internacionaLITZACIÓ
         }
-    }
-
-    public function getAuthorizationType() {
-        return 'save';
     }
 }

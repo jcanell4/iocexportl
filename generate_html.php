@@ -18,17 +18,6 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once DOKU_INC.'inc/parser/xhtml.php';
 require_once DOKU_MODEL.'WikiIocModel.php';
 
-//Initialize params
-$params = array();
-$params['id'] = getID();
-$params['mode'] = $_POST['mode'];
-if ($params['id'] === $_POST['id']){
-    $params['toexport'] = $_POST['toexport'];
-    $params['ioclanguage'] = $_POST['ioclanguage'];
-    $generate = new generate_html($params);
-    $generate->init();
-}
-
 class generate_html implements WikiIocModel{
 
     private $def_section_href;
@@ -1199,4 +1188,17 @@ class generate_html implements WikiIocModel{
         return FALSE;
     }
 
+}
+
+if(!isset($_GET["call"])){
+    //Initialize params
+    $params = array();
+    $params['id'] = getID();
+    $params['mode'] = $_POST['mode'];
+    if ($params['id'] === $_POST['id']){
+        $params['toexport'] = $_POST['toexport'];
+        $params['ioclanguage'] = $_POST['ioclanguage'];
+        $generate = new generate_html($params);
+        $generate->init();
+    }
 }

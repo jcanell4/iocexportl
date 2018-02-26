@@ -2,12 +2,13 @@
 if(!defined('DOKU_INC')) die();
 if (!defined('DOKU_IOCEXPORTL')) define('DOKU_IOCEXPORTL',DOKU_INC.'lib/plugins/iocexportl/');
 require_once(DOKU_IOCEXPORTL . 'generate_latex.php');
+require_once(DOKU_IOCEXPORTL . 'commands/export_command.php');
 
 /**
  * Class export_pdf_command
  * @author Josep Cañellas <jcanell4@ioc.cat>
  */
-class export_pdf_command extends abstract_command_class {
+class export_pdf_command extends export_command {
 
     public function __construct() {
         parent::__construct(new generate_latex());
