@@ -106,7 +106,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
             $href = preg_replace('/@ID@/', $id, self::$hrefiocgif);
             $href = preg_replace('/@MEDIA@/', "$ns:$gif", $href);
             $src = preg_replace('/@W@/', $width, self::$srciocgif);
-            $src = preg_replace('/@TOK@/', media_get_token("$ns:$gif", $width), $src);
+            $src = preg_replace('/@TOK@/', media_get_token("$ns:$gif", $width, NULL), $src);
             $src = preg_replace('/@MEDIA@/', "$ns:$gif", $src);
 
             $renderer->doc .= '<div class="iocgif">';
