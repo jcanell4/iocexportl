@@ -77,7 +77,7 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                 if (preg_match('/::figure:(.*?$)/', $match, $matches)){
                     $id = trim($matches[1]);
                     if (strpos($id,"_") !== FALSE) {
-                        throw new Exception("ERROR: No es pot generar un arxiu PDF si el ID de la figura conté el caracter '_'");
+                        //throw new Exception("ERROR: No es pot generar un arxiu PDF si el ID de la figura conté el caracter '_'");
                     }
                 }
                 break;
