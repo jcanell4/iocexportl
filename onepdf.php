@@ -26,7 +26,7 @@ class onepdf implements WikiIocModel{
     private $log;
     private $needReturnData;
     private $formByColumns;
-    private $returnData;    
+    private $returnData;
     private $media_path;
     private $mode;
     private $tmp_dir;
@@ -48,17 +48,17 @@ class onepdf implements WikiIocModel{
             $this->initParams($params);
         }
     }
-    
+
     public function setParams($element, $value) {
         $this->params[$element] = $value;
     }
-    
-    public function initParams($params){                
+
+    public function initParams($params){
         global $USERINFO;
 
         //Due listings problems whith header it's necessary to replace extended characters
         $this->end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}','\break ');
-        $this->exportallowed = FALSE;        
+        $this->exportallowed = FALSE;
         $this->export_ok = ($params['mode'] === 'pdf' || $params['mode'] === 'zip' );
         $this->id = $params['id'];
         $this->currentNs = getNS($this->id);
@@ -69,8 +69,8 @@ class onepdf implements WikiIocModel{
         $this->permissionToExport=FALSE;
         $this->user = $params['user'];
         $this->groups = $USERINFO['grps'];
-        $this->needReturnData = isset($params['needReturnData']);        
-        $this->formByColumns = isset($params['form_by_columns']);        
+        $this->needReturnData = isset($params['needReturnData']);
+        $this->formByColumns = isset($params['form_by_columns']);
         $this->returnData=NULL;
     }
 
@@ -87,17 +87,17 @@ class onepdf implements WikiIocModel{
                     $conf['plugin']['iocexportl']['UsersWithPdfSelf-generationAllowed']
                 );
         $this->exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
-        if (!$this->log && !$this->exportallowed 
+        if (!$this->log && !$this->exportallowed
                                 && !$this->permissionToExport) return FALSE;
-        if (!$this->log && !$this->permissionToExport 
-                                && $params['mode'] === 'zip') return FALSE;
+        if (!$this->log && !$this->permissionToExport
+                                && $params['mode'] === 'zip') return FALSE; //[Rafa] ERROR: $params Not defined
 
         $this->time_start = microtime(TRUE);
 
         $output_filename = str_replace(':','_',$this->id);
-        
-        
-        
+
+
+
         if (file_exists(DOKU_IOCEXPORTL_TEMPLATES.'onePdfHeader.ltx')
                 && file_exists(DOKU_IOCEXPORTL_TEMPLATES.'onePdfFrontPage.ltx')
                 && file_exists(DOKU_IOCEXPORTL_TEMPLATES.'onePdfFooter.ltx')){
@@ -119,12 +119,12 @@ class onepdf implements WikiIocModel{
 
             //FrontPage
             $latexPattern = io_readFile(DOKU_IOCEXPORTL_TEMPLATES . 'onePdfFrontPage.ltx');
-            
+
             foreach ($data as $i){
                 $latex .= $latexPattern;
                 $latex = preg_replace('/@PDF_NAME@/', trim($i), $latex);
             }
-            
+
             //Footer
             $latex .= io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'onePdfFooter.ltx');
         }
@@ -134,7 +134,7 @@ class onepdf implements WikiIocModel{
         }else{
             $this->createLatex($output_filename, DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir, $latex, $result);
         }
-        if(!$conf['plugin']['iocexportl']['saveWorkDir']){        
+        if(!$conf['plugin']['iocexportl']['saveWorkDir']){
             $this->removeDir(DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir);
         }
         if($this->log){
@@ -142,9 +142,9 @@ class onepdf implements WikiIocModel{
         }
         if($this->needReturnData){
             return $this->returnData;
-        }            
+        }
     }
-    
+
     /**
      *
      * Compile latex document to create a pdf file
@@ -232,7 +232,7 @@ class onepdf implements WikiIocModel{
         if($this->needReturnData){
             if(!$this->log){
                 $this->returnData = $data;
-            }            
+            }
         }else{
             if (!$this->log){
                 echo json_encode($data);
@@ -365,17 +365,17 @@ class onepdf implements WikiIocModel{
         // AUTH_ADMIN, AUTH_READ,AUTH_EDIT,AUTH_CREATE,AUTH_UPLOAD,AUTH_DELETE
         return ($aclLevel >=  AUTH_UPLOAD);
       }
-      
+
     private function hasUserPermissionToExport($userWIthPermission){
         $return = auth_ismanager();
         if(!$return){
-            $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups); 
+            $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups);
             $pattern = '/'.$this->user.'(?:\b)/';
             $selfGenerationAllowed = (preg_match($pattern,$userWIthPermission)===1);
             $return = (($aclLevel >= AUTH_UPLOAD)&&($selfGenerationAllowed));
         }
         return $return;
-    }   
+    }
 
     /**
      *
@@ -418,11 +418,11 @@ class onepdf implements WikiIocModel{
         $tag = $err===0?"Info: ":"Error($err): ";
         file_put_contents(DOKU_TMP_LOG, "$tag\"$message\" ($file:$line)\n", FILE_APPEND);
     }
-    
+
     protected function getConf($key){
         global $conf;
         return $conf['plugin']['iocexportl'][$key];
-    }    
+    }
 }
 
 if(!isset($_GET["call"])){
