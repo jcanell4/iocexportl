@@ -90,7 +90,7 @@ class onepdf implements WikiIocModel{
         if (!$this->log && !$this->exportallowed
                                 && !$this->permissionToExport) return FALSE;
         if (!$this->log && !$this->permissionToExport
-                                && $params['mode'] === 'zip') return FALSE; //[Rafa] ERROR: $params Not defined
+                                && $this->mode === 'zip') return FALSE; //[Rafa] ERROR: $params Not defined
 
         $this->time_start = microtime(TRUE);
 

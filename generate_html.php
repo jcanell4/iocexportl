@@ -320,7 +320,7 @@ class generate_html implements WikiIocModel{
                             $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
                             $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
                             $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
-                            $html = preg_replace('/@IOCTOC@/', $toc, $html, 1);         //[Rafa] ERROR: $toc Not defined
+                            $html = preg_replace('/@IOCTOC@/', $this->getTOC($text), $html, 1); 
                             $html = preg_replace('/@IOCPATH@/', '../../../', $html);
                             $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
                             $html = $this->createrefstopages($html, $unit, $ku, $ks, $ka, '../../../');
