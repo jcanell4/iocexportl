@@ -187,11 +187,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     case DOKU_LEXER_ENTER :
                         preg_match('/::([^:]*):/', $text, $matches);
                         $this->type = (isset($matches[1]))?$matches[1]:'';
-                        if($this->type === 'table'){
-                            $renderer->doc .= '<div class="ioctable">';
-                        }else{
-                            $renderer->doc .= '<div class="iocaccounting">';
-                        }
+                        $renderer->doc .= $this->_getDivClass($params['type']);
                         $renderer->doc .= '<div class="iocinfo">';
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
@@ -225,11 +221,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     case DOKU_LEXER_ENTER :
                         preg_match('/::([^:]*):/', $text, $matches);
                         $this->type = (isset($matches[1]))?$matches[1]:'';
-                        if($this->type === 'table'){
-                            $renderer->doc .= '<div class="ioctable donthyphenate">';
-                        }else{
-                            $renderer->doc .= '<div class="iocaccounting donthyphenate">';
-                        }
+                        $renderer->doc .= $this->_getDivClass($params['type']);
                         $this->footer = (isset($params['footer']))?$params['footer']:'';
                         $renderer->doc .= '<div class="titletable"><a name="'.$id.'">';
                         $renderer->doc .= '<span>Taula</span>';
@@ -255,5 +247,19 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             return TRUE;
         }
         return FALSE;
+    }
+    
+    function _getDivClass($type=NULL){
+        if($this->type === 'table'){
+            $divclass = '<div class="ioctable';
+        }else{
+            $divclass = '<div class="iocaccounting';
+        }
+        if(isset($type)){
+            $divclass .= ' '. $type . '">';
+        }else{
+            $divclass .= '">';
+        }
+        return $divclass;        
     }
 }

@@ -64,7 +64,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('\{\{\s?(?:vimeo|youtube|dailymotion|altamarVideos|altamarFromUrl|altamarFromId|altamarFromReq).*?>[^}]+\}\}', $mode, 'plugin_iocexportl_iocmedia');
+        $this->Lexer->addSpecialPattern('\{\{\s?(?:vimeo|youtube|dailymotion|altamarVideos).*?>[^}]+\}\}', $mode, 'plugin_iocexportl_iocmedia');
     }
 
     /**
@@ -114,10 +114,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             list($site, $params, $title) = $data;
             if($site === 'dailymotion' || $site === 'vimeo'
                     || $site === 'youtube'
-                    || $site === 'altamarVideos'
-                    || $site === 'altamarFromId'
-                    || $site === 'altamarFromReq'
-                    || $site === 'altamarFromUrl'){
+                    || $site === 'altamarVideos'){
                 $_SESSION['qrcode'] = TRUE;
                 if ($site === 'dailymotion'){
                     $type = self::$dailymotion;
@@ -125,12 +122,6 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                     $type = self::$vimeo;
                 }elseif($site === 'altamarVideos'){
                     $type = self::$altamarVideos;
-                }elseif($site === 'altamarFromUrl'){
-                    $type = self::$altamarFromUrl;
-                }elseif($site === 'altamarFromId'){
-                    $type = self::$altamarFromId;
-                }elseif($site === 'altamarFromReq'){
-                    $type = self::$altamarFromReq;
                 }else{
                     $type = self::$youtube;
                 }
@@ -155,40 +146,21 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                 }
                 list($url, $full) = explode(":", $params);                
                 $url = preg_replace('/@VIDEO@/', $url, $type);
-//            }else if($site === 'altamarFromUrl'){
-//                    $type = self::$altamarFromUrl;
             }
             $renderer->doc .= '<div class="mediavideo">';
-//            if ($site === 'dailymotion'){
-//                 $renderer->doc .='<iframe height="'.$height.'" width="'.$width.'" src="'.$url.'"></iframe>';
-//            }elseif ($site === 'altamarVideos'
-            if ($site === 'altamarVideos'
-                            || $site === 'altamarFromUrl'
-                            || $site === 'altamarFromId'
-                            || $site === 'altamarFromReq') {
-                $renderer->doc .= '<div id="vi'.$url.'">';
-                $renderer->doc .= '</div>';
+            if ($site === 'altamarVideos') {
+//                $renderer->doc .= '<div id="vi'.$url.'">';
+//                $renderer->doc .= '</div>';
                 $tpl = io_readFile(DOKU_PLUGIN_TEMPLATES.$site.'.tpl');
-                $tpl = preg_replace("/@QUERY@/", $site, $tpl);
-                $tpl = preg_replace("/@ID_DIV@/", 'vi'.$url, $tpl);
                 $tpl = preg_replace("/@HEIGHT@/", $height, $tpl);
                 $tpl = preg_replace("/@WIDTH@/", $width, $tpl);
-                $tpl = preg_replace("/@ID_VIDEO@/", strval($url), $tpl);
+                $tpl = preg_replace("/@ID_VIDEO@/", strval($params), $tpl);
                 $renderer->doc .= $tpl;
             }else{
-                 $renderer->doc .='<iframe height="'.$height.'" width="'.$width.'" src="'.$url.'"></iframe>';
-//                $renderer->doc .= html_flashobject(
-//                                $url,
-//                                $width,
-//                                $height,
-//                                array('wmode' => 'opaque'));
-                
-            }
-            //if(!isset($full) && $full === "full"){
-                //$tagMessage = WikiIocLangManager::getLang("fullScreenMessage", "iocexportl");                
+                $renderer->doc .='<iframe height="'.$height.'px" width="'.$width.'px" src="'.$url.'"></iframe>';
                 $tagMessage = 'Cliqueu aquí per veure en pantalla completa';                
                 $renderer->doc .= "<p><a target=_blank href='$url'>$tagMessage</a></p>";
-            //}
+            }
             $renderer->doc .= '</div>';
         }
         return FALSE;
