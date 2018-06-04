@@ -255,6 +255,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         }else{
             $divclass = '<div class="iocaccounting';
         }
+        $type = str_replace(",", " ", $type);
         if(isset($type)){
             $divclass .= ' '. $type . '">';
         }else{
