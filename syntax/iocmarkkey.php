@@ -28,7 +28,7 @@ class syntax_plugin_iocexportl_iocmarkkey extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',        );
     }
 
-    function getType(){ return 'substition'; }
+    function getType(){ return 'formatting'; }
     function getPType(){ return 'normal'; }
     //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
 //    function getAllowedTypes() {
@@ -43,7 +43,7 @@ class syntax_plugin_iocexportl_iocmarkkey extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('\x60|\$\\\grave{\\\\:}\$', $mode, 'plugin_iocexportl_iocgrave'); 
+        $this->Lexer->addSpecialPattern('@@[_|A-Z]+?@@', $mode, 'plugin_iocexportl_iocmarkkey'); 
         
     }
     
@@ -61,18 +61,36 @@ class syntax_plugin_iocexportl_iocmarkkey extends DokuWiki_Syntax_Plugin {
     function render($mode, &$renderer, $data) {
         global $symbols;
         if ($mode === 'ioccounter'){
-            $renderer->doc .=  '`';
+            $this->renderCounter($mode, $renderer, $data);
             return TRUE;
         }elseif ($mode === 'xhtml'){
-            $renderer->doc .= '`';
+            $this->renderWiki($mode, $renderer, $data);
             return TRUE;
         }elseif ($mode === 'iocxhtml'){
-            $renderer->doc .= '`';
+            $this->renderHtmlExport($mode, $renderer, $data);
             return TRUE;
         }elseif ($mode === 'iocexportl'){
-            $renderer->doc .= filter_tex_sanitize_formula("$\grave{\:}$");
+            $this->renderPdfExport($mode, $renderer, $data);
             return TRUE;
         }
         return FALSE;
+    }
+    
+    function renderPdfExport($mode, &$renderer, $data) {
+        
+    }
+    
+    function renderHtmlExport($mode, &$renderer, $data) {
+        
+    }
+    
+    function renderCounter($mode, &$renderer, $data) {
+        
+    }
+    
+    function renderWiki($mode, &$renderer, $data) {
+        global $symbols;
+        list ($state, $text) = $data;
+        $renderer->doc .= "<span class='iocmarkkey'>$text</span>";
     }
 }
