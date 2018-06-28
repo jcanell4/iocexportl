@@ -145,6 +145,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
      * NOVA
      */
     function _initialize_globals(){
+        if (!isset($_SESSION['accounting'])){
+            $_SESSION['accounting'] = FALSE;
+        }
         if (!isset($_SESSION['activities_header'])){
             $_SESSION['activities_header'] = FALSE;
         }
@@ -186,6 +189,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
         if (!isset($_SESSION['quizmode'])){
             $_SESSION['quizmode'] = FALSE;
+        }
+        if (!isset($_SESSION['table'])){
+            $_SESSION['table'] = FALSE;
         }
         if (!isset($_SESSION['table_id'])){
             $_SESSION['table_id'] = '';
@@ -448,8 +454,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if ($_SESSION['activity']){
             $class .= ' tabminheight';
         }
-        $this->doc .= '<div class="' . $class . '"><table class="inline">' .
-                      DOKU_LF;
+        $this->doc .= '<div class="'.$class.'"><table class="inline">'.DOKU_LF;
         $this->table = TRUE;
     }
 
@@ -503,6 +508,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
         if ( $rowspan > 1 ) {
             $this->doc .= ' rowspan="'.$rowspan.'"';
+        }
+        //Esta función no es llamada, en su lugar se usa: dokuwiki_30/inc/parser/hhtml.php
+        if (!empty($_SESSION['table_widths'])) {
+            $this->doc .= ' width="'.$_SESSION['table_widths'][0].'%"';
+            array_shift($_SESSION['table_widths']);
         }
         $this->doc .= '>';
     }
@@ -657,7 +667,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         global $ID;
         list($src,$hash) = explode('#',$src,2);
         resolve_mediaid(getNS($ID),$src, $exists);
-        
+
         $noLink = false;
         $render = ($linking == 'linkonly') ? false : true;
         $link = $this->_getMediaLinkConf($src, $title, $align, $width, $height, $cache, $render);

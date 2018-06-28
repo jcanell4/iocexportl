@@ -120,6 +120,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     preg_match('/::([^:]*):/', $text, $matches);
                     $this->type = (isset($matches[1]))?$matches[1]:'';
                     $_SESSION['accounting'] = ($this->type === 'accounting');
+                    $_SESSION['table'] = ($this->type === 'table');
                     $this->vertical = (isset($params['vertical']))?$params['vertical']:FALSE;
                     $_SESSION['table_title'] = (isset($params['title']))?$params['title']:'';
                     //Transform quotes
@@ -202,6 +203,14 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         }
                         if (isset($params['widths'])){
                             $renderer->doc .= '<strong>Amplada columnes:</strong> '.$params['widths'].'<br />';
+                            $e = explode(',', $params['widths']);
+                            $t = 0;
+                            for ($i=0; $i<count($e); $i++) {
+                                $t += $e[$i];
+                            }
+                            for ($i=0; $i<count($e); $i++) {
+                                $_SESSION['table_widths'][$i] = $e[$i] * 100 / $t;
+                            }
                         }
                         $renderer->doc .= '</div>';
                         break;
@@ -223,6 +232,16 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         $this->type = (isset($matches[1]))?$matches[1]:'';
                         $renderer->doc .= $this->_getDivClass($params['type']);
                         $this->footer = (isset($params['footer']))?$params['footer']:'';
+                        if (isset($params['widths'])){
+                            $e = explode(',', $params['widths']);
+                            $t = 0;
+                            for ($i=0; $i<count($e); $i++) {
+                                $t += $e[$i];
+                            }
+                            for ($i=0; $i<count($e); $i++) {
+                                $_SESSION['table_widths'][$i] = $e[$i] * 100 / $t;
+                            }
+                        }
                         $renderer->doc .= '<div class="titletable"><a name="'.$id.'">';
                         $renderer->doc .= '<span>Taula</span>';
                         $renderer->doc .= '</a>';
@@ -248,19 +267,13 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         }
         return FALSE;
     }
-    
+
     function _getDivClass($type=NULL){
-        if($this->type === 'table'){
-            $divclass = '<div class="ioctable';
-        }else{
-            $divclass = '<div class="iocaccounting';
-        }
+        $class = ($this->type === 'table') ? "ioctable" : "iocaccounting";
         $type = str_replace(",", " ", $type);
-        if(isset($type)){
-            $divclass .= ' '. $type . '">';
-        }else{
-            $divclass .= '">';
-        }
-        return $divclass;        
+        $divclass = trim('<div class="' . $class . ' '. $type);
+        $divclass .= '" style="width:40% !important;">';
+        //$divclass .= '">';
+        return $divclass;
     }
 }

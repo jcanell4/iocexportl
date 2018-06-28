@@ -89,6 +89,11 @@ div.solution{
   width:73% !important;
 }
 
+.ioctable, .iocaccounting{
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 div.level1, div.level2, div.level3, div.level4{
   float:none !important;
 }
