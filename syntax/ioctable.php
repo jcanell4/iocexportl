@@ -9,7 +9,6 @@
       :large: (bool)
 	:::
  */
-
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
@@ -35,23 +34,14 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    /**
-     * What kind of syntax are we?
-     */
     function getType(){
-        return 'container';
+        return 'container'; //tipo de sintaxis (container,substition,formatting,protected,paragraphs)
     }
 
-    /**
-     * What about paragraphs?
-     */
     function getPType(){
-        return 'block';
+        return 'block';  //tipo de párrafo (stack, block, normal)
     }
 
-    /**
-     * Where to sort in?
-     */
     function getSort(){
         return 513;
     }
@@ -78,7 +68,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         switch ($state) {
             case DOKU_LEXER_ENTER :
                 if (preg_match('/::(table|accounting):(.*?)\n/', $match, $matches)){
-					$id = trim($matches[2]);
+                    $id = trim($matches[2]);
                 }
                 preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
                 foreach($matches as $m){
@@ -203,13 +193,15 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         }
                         if (isset($params['widths'])){
                             $renderer->doc .= '<strong>Amplada columnes:</strong> '.$params['widths'].'<br />';
-                            $e = explode(',', $params['widths']);
-                            $t = 0;
-                            for ($i=0; $i<count($e); $i++) {
-                                $t += $e[$i];
-                            }
-                            for ($i=0; $i<count($e); $i++) {
-                                $_SESSION['table_widths'][$i] = $e[$i] * 100 / $t;
+                            if (isset($params['force_widths'])){
+                                $e = explode(',', $params['widths']);
+                                $t = 0;
+                                for ($i=0; $i<count($e); $i++) {
+                                    $t += $e[$i];
+                                }
+                                for ($i=0; $i<count($e); $i++) {
+                                    $_SESSION['table_widths'][$i] = $e[$i] * 100 / $t;
+                                }
                             }
                         }
                         $renderer->doc .= '</div>';
@@ -231,8 +223,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         preg_match('/::([^:]*):/', $text, $matches);
                         $this->type = (isset($matches[1]))?$matches[1]:'';
                         $renderer->doc .= $this->_getDivClass($params['type']);
-                        $this->footer = (isset($params['footer']))?$params['footer']:'';
-                        if (isset($params['widths'])){
+                        $this->footer = (isset($params['footer'])) ?$params['footer'] : '';
+                        if (isset($params['widths']) && isset($params['force_widths'])){
                             $e = explode(',', $params['widths']);
                             $t = 0;
                             for ($i=0; $i<count($e); $i++) {
@@ -272,8 +264,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         $class = ($this->type === 'table') ? "ioctable" : "iocaccounting";
         $type = str_replace(",", " ", $type);
         $divclass = trim('<div class="' . $class . ' '. $type);
-        $divclass .= '" style="width:40% !important;">';
-        //$divclass .= '">';
+        //$divclass .= '" style="width:30% !important;';
+        $divclass .= '">';
         return $divclass;
     }
 }
