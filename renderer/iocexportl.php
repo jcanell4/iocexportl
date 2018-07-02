@@ -165,6 +165,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!isset($_SESSION['quizmode'])){
             $_SESSION['quizmode'] = FALSE;
         }
+        if (!isset($_SESSION['table'])){
+            $_SESSION['table'] = FALSE;
+        }
         if (!isset($_SESSION['table_id'])){
             $_SESSION['table_id'] = '';
         }
@@ -646,9 +649,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
         for($i=0; $i < $maxcols; $i++) {
-            $table_widths = $_SESSION['accounting'] &&
-                is_array($_SESSION['table_widths']) &&
-                array_key_exists($i, $_SESSION['table_widths']);
+            $table_widths = ($_SESSION['accounting'] || $_SESSION['table'])
+                             && is_array($_SESSION['table_widths'])
+                             && array_key_exists($i, $_SESSION['table_widths']);
             if ($table_widths) {
                 $value = floatval($_SESSION['table_widths'][$i]);
                 if ($value <= 1) {
