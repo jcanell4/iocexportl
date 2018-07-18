@@ -79,7 +79,7 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
     function renderWiki(&$renderer, $state, $text) {
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                $renderer->doc .= '<div">';
+                $renderer->doc .= '<div>';
                 break;
             case DOKU_LEXER_UNMATCHED:
                 $renderer->doc .= str_replace("\\\\", "<br>", $text);
