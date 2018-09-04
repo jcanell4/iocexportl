@@ -17,7 +17,7 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
         return array(
             'name' => 'IOC TODO syntax plugin',
             'desc' => 'Plugin to parse TODO tag: mark yellow text background',
-            'sintax' => '[TODO: text]',
+            'sintax' => '[[TODO: text]]',
             'url'  => 'http://ioc.gencat.cat/'
         );
     }
