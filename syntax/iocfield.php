@@ -74,7 +74,7 @@ class syntax_plugin_iocexportl_iocfield extends DokuWiki_Syntax_Plugin {
 
         $data = $this->getDataSource();
 
-        $renderer->doc .=  '<b>TODO: obtenir el valor del mdpr per "' . $field . '"</b>';
+        $renderer->doc .=  '<b style="color:red">' . $data[$field] . '</b>';
 
 
 
