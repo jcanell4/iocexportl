@@ -13,7 +13,7 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-class syntax_plugin_iocexportl_iocfield extends DokuWiki_Syntax_Plugin {
+class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
     protected $dataSource = null;
 
@@ -48,7 +48,7 @@ class syntax_plugin_iocexportl_iocfield extends DokuWiki_Syntax_Plugin {
     function connectTo($mode) {
 //        $this->Lexer->addSpecialPattern('\x60|\$\\\grave{\\\\:}\$', $mode, 'plugin_iocexportl_iocfield');
         //$this->Lexer->addSpecialPattern('\{\#\#(?=.*)\#\#\}', $mode, 'plugin_iocexportl_iocfield');
-        $this->Lexer->addSpecialPattern('{##.*?##}', $mode, 'plugin_iocexportl_iocfield');
+        $this->Lexer->addSpecialPattern('{##.*?##}', $mode, 'plugin_iocexportl_wiocclfield');
 //        $this->Lexer->addSpecialPattern('{##durada##}', $mode, 'plugin_iocexportl_iocfield');
     }
     
@@ -61,7 +61,7 @@ class syntax_plugin_iocexportl_iocfield extends DokuWiki_Syntax_Plugin {
         // $match es la coincidencia, per exemple: {##tipusModulBloc##}
         // auquests valors arriban com a index 0 = $state y 1 = $match al $data del render
 
-        return array($state, $match);
+        return array($state, $match, true);
     }
 
    /**
@@ -72,9 +72,13 @@ class syntax_plugin_iocexportl_iocfield extends DokuWiki_Syntax_Plugin {
         $field = substr($data[1], 3, strlen($data[1])-6);
 
 
-        $data = $this->getDataSource();
+        $dataSource = $this->getDataSource();
 
-        $renderer->doc .=  '<b style="color:red">' . $data[$field] . '</b>';
+        if ($dataSource == null || !$data[2]) {
+            $renderer->doc .=  '<b style="color:grey">' . $data[1] . '</b>';
+        } else {
+            $renderer->doc .=  '<b style="color:red">' . $dataSource[$field] . '</b>';
+        }
 
 
 
@@ -101,16 +105,19 @@ class syntax_plugin_iocexportl_iocfield extends DokuWiki_Syntax_Plugin {
         $this->dataSource = $dataSource;
     }
 
-    function getDataSource(){
+    function getDataSource()
+    {
         global $plugin_controller;
 
         if ($this->dataSource) {
             return $this->dataSource;
-        }
-        else {
+        } else {
 
-            return $plugin_controller->getCurrentProjectDataSource();
+            try {
+                return  $plugin_controller->getCurrentProjectDataSource();
+            } catch (Exception $e) {
+                return null;
+            }
         }
-
     }
 }
