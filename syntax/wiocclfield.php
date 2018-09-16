@@ -74,7 +74,7 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
         $dataSource = $this->getDataSource();
 
-        if ($dataSource == null || !$data[2]) {
+        if ($dataSource == null || isset($data[2]) && $data[2]===false) {
             $renderer->doc .=  '<b style="color:grey">' . $data[1] . '</b>';
         } else {
             $renderer->doc .=  '<b style="color:red">' . $dataSource[$field] . '</b>';
