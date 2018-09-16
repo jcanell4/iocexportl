@@ -17,6 +17,11 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
 {
 
     /**
+     * ALERTA[Xavi] Duplicat
+     */
+    protected $dataSource = null;
+    
+    /**
      * Get an associative array with plugin info.
      */
     function getInfo()
@@ -107,10 +112,16 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
 //        return FALSE;
     }
 
+    /**
+     * ALERTA[XAVI] Duplicat
+     */
     function setDataSource($dataSource) {
         $this->dataSource = $dataSource;
     }
 
+    /**
+     * ALERTA[XAVI] Duplicat
+     */
     function getDataSource()
     {
         global $plugin_controller;
@@ -127,6 +138,9 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
         }
     }
 
+    /**
+     * ALERTA[XAVI] Duplicat
+     */
     function getRenderString($data)
     {
 

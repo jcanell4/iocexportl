@@ -15,6 +15,9 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
+    /**
+     * ALERTA[Xavi] Duplicat
+     */
     protected $dataSource = null;
 
    /**
@@ -66,20 +69,26 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
    /**
     * output
+    * ALERTA[XAVI] Duplicat
     */
     function render($mode, &$renderer, $data) {
 
-        $field = substr($data[1], 3, strlen($data[1])-6);
 
+        if ($mode !== 'xhtml' && $mode !== 'iocxhtml') {
+            return FALSE;
+        }
 
         $dataSource = $this->getDataSource();
 
-        if ($dataSource == null || isset($data[2]) && $data[2]===false) {
-            $renderer->doc .=  '<b style="color:grey">' . $data[1] . '</b>';
+        if ($dataSource == null || !$data[2]) {
+            $renderer->doc .= '<b style="color:grey">'. $data[1].'</b>';
+            return true;
         } else {
-            $renderer->doc .=  '<b style="color:red">' . $dataSource[$field] . '</b>';
+            $renderedString = $this->getRenderString($data[1]);
+            if (strlen($renderedString>0)) {
+                $renderer->doc .= '<b style="color:red;">' . $this->getRenderString($data[1]). '</b>';
+            }
         }
-
 
 
         return true;
@@ -101,10 +110,22 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 //        return FALSE;
     }
 
+
+    function getRenderString($data)
+    {
+        return $this->dataSource[substr($data, 3, strlen($data)-6)];
+    }
+
+    /**
+     * ALERTA[XAVI] Duplicat
+     */
     function setDataSource($dataSource) {
         $this->dataSource = $dataSource;
     }
 
+    /**
+     * * ALERTA[XAVI] Duplicat
+     */
     function getDataSource()
     {
         global $plugin_controller;
