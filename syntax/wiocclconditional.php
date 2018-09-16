@@ -126,16 +126,14 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
     {
         global $plugin_controller;
 
-        if ($this->dataSource) {
-            return $this->dataSource;
-        } else {
-
+        if (!$this->dataSource) {
             try {
-                return  $plugin_controller->getCurrentProjectDataSource();
+                $this->dataSource = $plugin_controller->getCurrentProjectDataSource();
             } catch (Exception $e) {
-                return null;
+                $this->dataSource = null;
             }
         }
+        return $this->dataSource;
     }
 
     /**

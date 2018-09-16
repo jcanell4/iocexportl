@@ -85,7 +85,7 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
             return true;
         } else {
             $renderedString = $this->getRenderString($data[1]);
-            if (strlen($renderedString>0)) {
+            if (strlen($renderedString)>0) {
                 $renderer->doc .= '<b style="color:red;">' . $this->getRenderString($data[1]). '</b>';
             }
         }
@@ -113,7 +113,8 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
     function getRenderString($data)
     {
-        return $this->dataSource[substr($data, 3, strlen($data)-6)];
+        $dataSource = $this->getDataSource();
+        return $dataSource[substr($data, 3, strlen($data)-6)];
     }
 
     /**
@@ -130,15 +131,13 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
     {
         global $plugin_controller;
 
-        if ($this->dataSource) {
-            return $this->dataSource;
-        } else {
-
+        if (!$this->dataSource) {
             try {
-                return  $plugin_controller->getCurrentProjectDataSource();
+                $this->dataSource = $plugin_controller->getCurrentProjectDataSource();
             } catch (Exception $e) {
-                return null;
+                $this->dataSource = null;
             }
         }
+        return $this->dataSource;
     }
 }
