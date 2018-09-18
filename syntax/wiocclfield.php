@@ -36,10 +36,12 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
     function getType(){ return 'substition'; }
     function getPType(){ return 'normal'; }
+
     //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
-//    function getAllowedTypes() {
-//        return array('formatting', 'protected');
-//    }
+    function getAllowedTypes() {
+        return array('formatting', 'protected');
+    }
+
     function getSort(){
         return 40;
     }
@@ -84,9 +86,15 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= '<b style="color:grey">'. $data[1].'</b>';
             return true;
         } else {
-            $renderedString = $this->getRenderString($data[1]);
+            $renderedString = $this->getRenderString($data[1], $mode);
             if (strlen($renderedString)>0) {
-                $renderer->doc .= '<b style="color:red;">' . $this->getRenderString($data[1]). '</b>';
+
+
+                $text = $this->getRenderString($data[1], $mode);
+
+
+
+                $renderer->doc .= '<b style="color:red;">' . $text. '</b>';
             }
         }
 
@@ -111,10 +119,16 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
     }
 
 
-    function getRenderString($data)
+    function getRenderString($data, $mode)
     {
         $dataSource = $this->getDataSource();
-        return $dataSource[substr($data, 3, strlen($data)-6)];
+        $rawText = $dataSource[substr($data, 3, strlen($data)-6)];
+
+
+        $instructions = p_get_instructions($rawText);
+        $parsedText = p_render($mode, $instructions, $info);
+        return substr($parsedText, 4, strlen($parsedText)-9);
+
     }
 
     /**
