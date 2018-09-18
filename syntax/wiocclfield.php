@@ -34,7 +34,7 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    function getType(){ return 'substition'; }
+    function getType(){ return 'container'; }
     function getPType(){ return 'normal'; }
 
     //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
@@ -51,10 +51,7 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-//        $this->Lexer->addSpecialPattern('\x60|\$\\\grave{\\\\:}\$', $mode, 'plugin_iocexportl_iocfield');
-        //$this->Lexer->addSpecialPattern('\{\#\#(?=.*)\#\#\}', $mode, 'plugin_iocexportl_iocfield');
         $this->Lexer->addSpecialPattern('{##.*?##}', $mode, 'plugin_iocexportl_wiocclfield');
-//        $this->Lexer->addSpecialPattern('{##durada##}', $mode, 'plugin_iocexportl_iocfield');
     }
     
     /**
@@ -83,7 +80,13 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
         $dataSource = $this->getDataSource();
 
         if ($dataSource == null || !$data[2]) {
-            $renderer->doc .= '<b style="color:grey">'. $data[1].'</b>';
+
+
+
+//            $renderer->doc .= '<b style="color:grey">'. $data[1].'</b>';
+
+            $renderer->doc .= $data[1];
+
             return true;
         } else {
             $renderedString = $this->getRenderString($data[1], $mode);
@@ -93,8 +96,8 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
                 $text = $this->getRenderString($data[1], $mode);
 
 
-
-                $renderer->doc .= '<b style="color:red;">' . $text. '</b>';
+                $renderer->doc .= $text;
+//                $renderer->doc .= '<b style="color:red;">' . $text. '</b>';
             }
         }
 
@@ -119,16 +122,16 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
     }
 
 
-    function getRenderString($data, $mode)
-    {
+    function getRenderString($data, $mode) {
         $dataSource = $this->getDataSource();
         $rawText = $dataSource[substr($data, 3, strlen($data)-6)];
+        return $this->parse($rawText, $mode);
+    }
 
-
-        $instructions = p_get_instructions($rawText);
+    function parse($text, $mode) {
+        $instructions = p_get_instructions($text);
         $parsedText = p_render($mode, $instructions, $info);
         return substr($parsedText, 4, strlen($parsedText)-9);
-
     }
 
     /**
