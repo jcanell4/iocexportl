@@ -110,6 +110,8 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
         // auquests valors arriban com a index 0 = $state y 1 = $match al $data del render
         // true es el valor que passem per indicar si ha de ser raw (false) o interpretar la expresió/camp (true)
 
+        $show = false;
+
         switch ( $state ) {
             case DOKU_LEXER_ENTER: // Aquesta es l'entrada i s'ha d'extreure el conditional
                 // aquí ja es té suficient informació per determinar si el unmatched s'ha d'afegir o no
@@ -119,9 +121,10 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
 
             case DOKU_LEXER_EXIT: // Aquesta es la sortida, aquí s'ha d'indicar d'alguna forma que si la condició s'ha resolt com a true o com a false>?
 
-                if (!$this->conditionResult) {
-                    $match = '';
-                }
+                $this->conditionResult = false;
+//                if (!$this->conditionResult) {
+//                    $match = '';
+//                }
 
                 break;
 
@@ -129,6 +132,7 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
                 // aquí tenim accés al que afegim al enter, així que podem reemplaçar el $match per ''
                 // ALERTA: aquí s'ha de modificar el $match per ser
 
+                $show = $this->conditionResult;
 //                $match = $this->parse($match, $mode);<-- no hi ha mode aquí
 
                 break;
@@ -138,12 +142,12 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
         }
 
 
-        return array($state, $match, true, $this->conditionResult);
+        return array($state, $match, true, $show);
     }
 
 
 
-    function render($mode, &$renderer, $data, $show) {
+    function render($mode, &$renderer, $data) {
         // ALERTA[Xavi] Falta controlar el $mode com al wiooclfield!
 
         if ($data[0] !== DOKU_LEXER_UNMATCHED) { // només s'afegeix el unmatched
@@ -152,8 +156,9 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
 
 
 
-        if (!$show) {
-            $text = 0;
+        if (!$data[3]) {
+            return true;
+            $text = '';
         }
 
         $text = $this->parse($data[1], $mode);
@@ -332,7 +337,8 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
 
         $parsedText = substr($parsedText, 4, strlen($parsedText)-9);
 
-        preg_replace( "/^\n*/m", "", $parsedText );
+//        $parsedText = preg_replace( "/^[\n|\r]*/g", "", $parsedText );
+        $parsedText = str_replace(array("\r\n", "\r", "\n"), "", $parsedText);
 
         return $parsedText;
 
