@@ -73,7 +73,11 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
     function render($mode, &$renderer, $data) {
 
 
-        if ($mode !== 'xhtml' && $mode !== 'iocxhtml') {
+        if ($mode === 'xhtml') {
+            $htmlText="<mark title='@TITLE@'>@VALUE@</mark>";
+        }else if ($mode === 'iocxhtml') {
+            $htmlText="@VALUE@";
+        }else {
             return FALSE;
         }
 
@@ -83,9 +87,7 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
 
 
-//            $renderer->doc .= '<b style="color:grey">'. $data[1].'</b>';
-
-            $renderer->doc .= $data[1];
+            $renderer->doc .= str_replace("@TITLE@", "", str_replace("@VALUE@", $data[1], $htmlText));
 
             return true;
         } else {
@@ -94,10 +96,8 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
 
                 $text = $this->getRenderString($data[1], $mode);
-
-
-                $renderer->doc .= $text;
-//                $renderer->doc .= '<b style="color:red;">' . $text. '</b>';
+//                $renderer->doc .= $text;
+                $renderer->doc .= str_replace("@TITLE@", $data[1], str_replace("@VALUE@", $text, $htmlText));
             }
         }
 
