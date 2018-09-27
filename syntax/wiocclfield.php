@@ -13,7 +13,7 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
+class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin {
 
     /**
      * ALERTA[Xavi] Duplicat
@@ -34,7 +34,7 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    function getType(){ return 'container'; }
+    function getType(){ return 'substition'; }
     function getPType(){ return 'normal'; }
 
     //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
@@ -75,7 +75,7 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
 
         if ($mode === 'xhtml') {
             $htmlText="<mark title='@TITLE@'>@VALUE@</mark>";
-        }else if ($mode === 'iocxhtml') {
+        }else if ($mode === 'iocxhtml'|| $mode === 'none') {
             $htmlText="@VALUE@";
         }else {
             return FALSE;

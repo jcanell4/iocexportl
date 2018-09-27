@@ -21,7 +21,15 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
      */
     protected $dataSource = null;
 
-    protected $conditionResult = false;
+//    protected $conditionResult = false;
+
+    protected $conditionString = null;
+
+
+    const INDEX_STATE = 0;
+    const INDEX_MATCH = 1;
+    const INDEX_PROCESS_TEXT = 2;
+    const INDEX_CONDITION = 3;
 
     /**
      * Get an associative array with plugin info.
@@ -93,6 +101,10 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
 //
 //        $this->Lexer->addPattern('\^','plugin_iocexportl_iocbtable');
 //        $this->Lexer->addPattern('\|','plugin_iocexportl_iocbtable');
+
+        // condició
+        $this->Lexer->addPattern('condition=".*?"','plugin_iocexportl_wiocclconditional');
+
     }
 
 
@@ -110,18 +122,21 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
         // auquests valors arriban com a index 0 = $state y 1 = $match al $data del render
         // true es el valor que passem per indicar si ha de ser raw (false) o interpretar la expresió/camp (true)
 
-        $show = false;
+//        $show = false;
+        $condition = null;
 
         switch ( $state ) {
             case DOKU_LEXER_ENTER: // Aquesta es l'entrada i s'ha d'extreure el conditional
                 // aquí ja es té suficient informació per determinar si el unmatched s'ha d'afegir o no
 
-                $this->conditionResult = $this->evaluateCondition($match);
+//                $this->conditionResult = $this->evaluateCondition($match);
+                $this->conditionString= $match;
                 break;
 
             case DOKU_LEXER_EXIT: // Aquesta es la sortida, aquí s'ha d'indicar d'alguna forma que si la condició s'ha resolt com a true o com a false>?
 
-                $this->conditionResult = false;
+//                $this->conditionResult = false;
+                $this->conditionString = null;
 //                if (!$this->conditionResult) {
 //                    $match = '';
 //                }
@@ -132,36 +147,36 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
                 // aquí tenim accés al que afegim al enter, així que podem reemplaçar el $match per ''
                 // ALERTA: aquí s'ha de modificar el $match per ser
 
-                $show = $this->conditionResult;
+//                $show = $this->conditionResult;
+                $condition = $this->conditionString;
 //                $match = $this->parse($match, $mode);<-- no hi ha mode aquí
 
                 break;
 
             case DOKU_LEXER_MATCHED:
+                // aquí agafa la condition?
                 break;
         }
 
 
-        return array($state, $match, true, $show);
+        return array($state, $match, true, $condition);
     }
+
 
 
 
     function render($mode, &$renderer, $data) {
         // ALERTA[Xavi] Falta controlar el $mode com al wiooclfield!
 
-        if ($data[0] !== DOKU_LEXER_UNMATCHED) { // només s'afegeix el unmatched
+        if ($data[self::INDEX_STATE] !== DOKU_LEXER_UNMATCHED) { // només s'afegeix el unmatched
             return true;
         }
 
-
-
-        if (!$data[3]) {
+        if (!$data[self::INDEX_CONDITION] || !$this->evaluateCondition($data[self::INDEX_CONDITION], $mode)) {
             return true;
-            $text = '';
         }
 
-        $text = $this->parse($data[1], $mode);
+        $text = $this->parse($data[self::INDEX_MATCH], $mode);
 
 //        $field = $this->getRenderString($data[1]);
 
@@ -169,8 +184,8 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
 
         if (strlen($text) === 0) {
 
-        } else if (isset($data[2]) && $data[2]===false) {
-            $renderer->doc .=  '<b style="color:grey">' . $data[1] . '</b>';
+        } else if (isset($data[self::INDEX_PROCESS_TEXT]) && $data[self::INDEX_PROCESS_TEXT]===false) {
+            $renderer->doc .=  '<b style="color:grey">' . $data[self::INDEX_MATCH] . '</b>';
         } else {
             $renderer->doc .=  '<b style="color:blue">' . $text . '</b>';
         }
@@ -251,9 +266,9 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
 //
 //    }
 
-    protected function evaluateCondition($text) {
+    protected function evaluateCondition($text, $mode) {
 
-
+        $mode = 'none';
 
 
         // ALERTA! la condició es troba entre cometes: condition="
@@ -263,8 +278,8 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
         $arg2 = $this->normalizeArg($matches[3]);
         $operator = $matches[2];
 
-        $arg1 = $this->normalizeArg($this->parse($arg1, 'xhtml'));
-        $arg2 = $this->normalizeArg($this->parse($arg2, 'xhtml'));
+        $arg1 = $this->normalizeArg($this->parse($arg1, $mode));
+        $arg2 = $this->normalizeArg($this->parse($arg2, $mode));
 
         return $this->resolveCondition($arg1, $arg2, $operator);
     }
@@ -334,11 +349,20 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin
         $instructions = p_get_instructions($text);
         $parsedText = p_render($mode, $instructions, $info);
 
+        // intructions:
+        // - document_start
+        // - p_open
+        // - plugin (array amb el contingut)
+        // - cdata
+        // - p_close
+        // - document_end
+
+
 
         $parsedText = substr($parsedText, 4, strlen($parsedText)-9);
 
 //        $parsedText = preg_replace( "/^[\n|\r]*/g", "", $parsedText );
-        $parsedText = str_replace(array("\r\n", "\r", "\n"), "", $parsedText);
+        $parsedText = str_replace(array("\r", "\n"), "", $parsedText);
 
         return $parsedText;
 
