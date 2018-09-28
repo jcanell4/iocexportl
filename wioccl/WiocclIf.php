@@ -6,9 +6,9 @@ class WiocclIf extends WiocclParser
 
     protected $condition = false;
 
-    public function __construct($value = null, $arrays = [])
+    public function __construct($value = null, $arrays = [], $dataSource)
     {
-        parent::__construct($value, $arrays);
+        parent::__construct($value, $arrays, $dataSource);
 
         $this->condition = $this->evaluateCondition($value);
 
@@ -22,7 +22,7 @@ class WiocclIf extends WiocclParser
         while ($tokenIndex < count($tokens)) {
             $parsedValue = $this->parseToken($tokens, $tokenIndex);
 
-            if ($parsedValue == null) { // tancament del if
+            if ($parsedValue === null) { // tancament del if
                 break;
 
             } else {
@@ -46,7 +46,9 @@ class WiocclIf extends WiocclParser
 
         // ALERTA! la condició es troba entre cometes: condition="
         if (preg_match('/condition="(.*?([><=]=?))(.*?)">/', $value, $matches) === 0) {
-            throw new Exception("Incorrect condition structure");
+            // ALERTA: Actualment el token amb > arriba tallat perquè l'identifica com a tancament del token d'apertura
+            return false;
+//            throw new Exception("Incorrect condition structure");
         };
 
         $arg1 = $this->normalizeArg(str_replace(['==', '>', '<', '=', '>=', '<=', '!='], '', $matches[1]));
@@ -54,8 +56,8 @@ class WiocclIf extends WiocclParser
 
         $operator = $matches[2];
 
-        $arg1 = $this->normalizeArg((new WiocclParser($arg1, $this->arrays))->getValue());
-        $arg2 = $this->normalizeArg((new WiocclParser($arg2, $this->arrays))->getValue());
+        $arg1 = $this->normalizeArg((new WiocclParser($arg1, $this->arrays, $this->dataSource))->getValue());
+        $arg2 = $this->normalizeArg((new WiocclParser($arg2, $this->arrays, $this->dataSource))->getValue());
 
         return $this->resolveCondition($arg1, $arg2, $operator);
     }

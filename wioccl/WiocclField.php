@@ -13,7 +13,11 @@ class WiocclField extends WiocclParser {
             $key = $matches[2];
             return $this->arrays[$varName][$key]; // ALERTA: El valor emmagatzemmat pot ser un field? o sempre serà un valor?
         } else {
-            return isset($this->dataSource[$token['value']])?$this->dataSource[$token['value']] : '[ERROR: undefined field]';
+            $fieldName = $token['value'];
+//            $value = $this->dataSource[$fieldName];
+
+
+            return isset($this->dataSource[$fieldName])?$this->dataSource[$token['value']] : '[ERROR: undefined field]';
         }
 
     }

@@ -3,6 +3,7 @@
 require_once "WiocclField.php";
 require_once "WiocclIf.php";
 require_once "WiocclForEach.php";
+require_once "WiocclBlock.php";
 
 class WiocclParser
 {
@@ -11,23 +12,7 @@ class WiocclParser
 
 
     // TODO: El datasource es passarà al constructor del parser desde la wiki
-    protected $dataSource = [
-        'semestre' => 2,
-        'itinerariRecomanatS2' => '<<cotxe>>',
-        'einesAprenentatge' => '[{
-		"tipus": "aaaa",
-		"eina": "bbb",
-		"opcionalitat": "111",
-		"puntuable": "true"
-	},
-	{
-		"tipus": "jjj",
-		"eina": "222",
-		"opcionalitat": "rrr",
-		"puntuable": "false"
-	}
-]'
-    ];
+    protected $dataSource = [];
 
     protected $arrays = [];
 
@@ -35,28 +20,38 @@ class WiocclParser
     protected $tokenPatterns = [
         '{##' => [
             'state' => 'open_field',
-            'type' => 'field',
+//            'type' => 'field',
         ],
         '##}' => [
             'state' => 'close_field',
-            'type' => 'field'
+//            'type' => 'field'
         ],
         '<WIOCCL:IF .*?>' => [
             'state' => 'open_if',
-            'type' => 'if',
+//            'type' => 'if',
         ],
         '</WIOCCL:IF>' => [
             'state' => 'close_if',
-            'type' => 'if'
+//            'type' => 'if'
         ],
         '<WIOCCL:FOREACH .*?>' => [
             'state' => 'open_foreach',
-            'type' => 'if',
+//            'type' => 'foreach',
         ],
         '</WIOCCL:FOREACH>' => [
             'state' => 'close_foreach',
-            'type' => 'foreach'
+//            'type' => 'foreach'
+        ],
+        '<WIOCCL:BLOCK>' => [
+            'state' => 'open_block',
+//            'type' => 'block',
+        ],
+        '</WIOCCL:BLOCK>' => [
+            'state' => 'close_block',
+//            'type' => 'block'
         ]
+
+
     ];
 
     // ALERTA: eliminar el nom de la las
@@ -64,6 +59,8 @@ class WiocclParser
     // TODO: Determinar si es necessari coneixer el tipus o només cal l'state
     // Automatitzar la generació de noms de les classes a partir del wioccl:**
     protected $tokenKey = [
+        '<WIOCCL:BLOCK' => ['state' => 'open_block', 'type' => 'block', 'class' => 'WiocclBlock', 'action' => 'open'],
+        '</WIOCCL:BLOCK>' => ['state' => 'close_block', 'type' => 'block', 'action' => 'close'],
         '<WIOCCL:FOREACH' => ['state' => 'open_foreach', 'type' => 'foreach', 'class' => 'WiocclForEach', 'action' => 'open'],
         '</WIOCCL:FOREACH>' => ['state' => 'close_foreach', 'type' => 'foreach', 'action' => 'close'],
         '<WIOCCL:IF' => ['state' => 'open_if', 'type' => 'if', 'class' => 'WiocclIf', 'action' => 'open'],
@@ -74,10 +71,11 @@ class WiocclParser
 
 
     // TODO: Afegir dataSource al constructor, deixem els arrays separats perque el seu us es intern, al datasource es ficaran com a JSON
-    public function __construct($value = null, $arrays = [])
+    public function __construct($value = null, $arrays = [], $dataSource = [])
     {
         $this->rawValue = $value;
         $this->arrays += $arrays;
+        $this->dataSource = $dataSource; // TODO: Reactivar quan es comprovi que funciona
     }
 
 
@@ -214,20 +212,7 @@ class WiocclParser
     protected function getClassForToken($token)
     {
         // TODO: pasar el datasource i els arrays al constructor
-        return new $token['class']($token['value'], $this->arrays);
+        return new $token['class']($token['value'], $this->arrays, $this->dataSource);
     }
 
 }
-
-//$t = 'Text normal al començament <WIOCCL:IF condition="{##semestre##}==2">(primer if la condició es certa) segona opció parsejada: {##itinerariRecomanatS2##} lalala <WIOCCL:IF condition="{##semestre##}==2">(if niuat la condició es certa) segona opció parsejada: {##itinerariRecomanatS3##}</WIOCCL:IF>lelele </WIOCCL:IF> (això està fora dels if) asdfasd fasd un altre de diferent: <WIOCCL:IF condition="{##semestre##}==3">(això es un altre if la condició es falsa) segona opció parsejada: {##itinerariRecomanatS2##}</WIOCCL:IF> (això es el final sense ifs) dddd';
-$t = '::table:TA0
-  :title:Planificació UFX
-  :type:io_pt
-  :footer::
-^  tipus	^  eina	 ^  opcionalitat	 ^  puntuable  ^
-<WIOCCL:FOREACH var="item" array="{##einesAprenentatge##}">
-| {##item[\'tipus\']##} | {##item[\'eina\']##} | {##item[\'opcionalitat\']##} | <WIOCCL:IF condition="{##item[\'puntuable\']##}==\'true\'">si</WIOCCL:IF><WIOCCL:IF condition="{##item[\'puntuable\']##}==\'false\'">no</WIOCCL:IF> |
-</WIOCCL:FOREACH>
-:::';
-$p = new WiocclParser($t);
-print_r($p->getValue());

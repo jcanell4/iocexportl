@@ -6,9 +6,9 @@ class WiocclForEach extends WiocclParser {
     protected $varName;
     protected $fullArray =[];
 
-    public function __construct($value = null, $arrays = [])
+    public function __construct($value = null, $arrays = [], $dataSource)
     {
-        parent::__construct($value, $arrays);
+        parent::__construct($value, $arrays, $dataSource);
 
         // varName correspón a la propietat var i es el nom de l'array
         // ALERTA! els arrays es llegeixen com un camp, la conversió d'array al seu valor es tracta al field
@@ -75,9 +75,9 @@ class WiocclForEach extends WiocclParser {
         $jsonString = '';
         // ALERTA: El $value pot ser un json directament o una variable, s'ha de fer un parse del $value
         if (preg_match('/array="(.*?)"/', $value, $matches)) {
-            $jsonString = (new WiocclParser($matches[1], $this->arrays))->getValue();
+            $jsonString = (new WiocclParser($matches[1], $this->arrays, $this->dataSource))->getValue();
         } else {
-            throw new Exception("Var name is missing");
+            throw new Exception("Array is missing");
         }
 
 

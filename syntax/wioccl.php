@@ -13,7 +13,10 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin {
+require_once(DOKU_PLUGIN.'iocexportl/wioccl/WiocclParser.php');
+
+
+class syntax_plugin_iocexportl_wioccl extends DokuWiki_Syntax_Plugin {
 
     /**
      * ALERTA[Xavi] Duplicat
@@ -51,9 +54,11 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin 
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('{##.*?##}', $mode, 'plugin_iocexportl_wiocclfield');
+//        $this->Lexer->addSpecialPattern('', $mode, 'plugin_iocexportl_wioccl');
+        $this->Lexer->addSpecialPattern('{##.*?##}|<WIOCCL:.*</WIOCCL:.*>', $mode, 'plugin_iocexportl_wioccl');
+//        $this->Lexer->addSpecialPattern('<WIOCCL:.*</WIOCCL:.*>', $mode, 'plugin_iocexportl_wioccl');
     }
-    
+
     /**
      * Handle the match
      */
@@ -73,7 +78,14 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin 
     function render($mode, &$renderer, $data) {
 
 
+        // TODO: passar la cadena del $data[1] pel wiocclparser y el resultat enviarlo al $this->parse(
+
+
+
+
+
         if ($mode === 'xhtml') {
+            // ALERTA: Això no funciona quan el camp es troba dins d'un bloc wioccl ja que la conversió del camp es realitza directament i el resultat es reparsejat (i no inclou cap diferenciació pels camps, tot es text pla)
             $htmlText="<mark title='@TITLE@'>@VALUE@</mark>";
         }else if ($mode === 'iocxhtml'|| $mode === 'none') {
             $htmlText="@VALUE@";
@@ -85,40 +97,24 @@ class syntax_plugin_iocexportl_wiocclconditional extends DokuWiki_Syntax_Plugin 
 
         if ($dataSource == null || !$data[2]) {
 
-
-
             $renderer->doc .= str_replace("@TITLE@", "", str_replace("@VALUE@", $data[1], $htmlText));
 
-            return true;
+
         } else {
-            $renderedString = $this->getRenderString($data[1], $mode);
+            $parser = new WiocclParser($data[1],[], $dataSource);
+            $renderedString = $this->parse($parser->getValue(), $mode);
+
             if (strlen($renderedString)>0) {
 
 
-                $text = $this->getRenderString($data[1], $mode);
+                $text = $renderedString;
 //                $renderer->doc .= $text;
-                $renderer->doc .= str_replace("@TITLE@", $data[1], str_replace("@VALUE@", $text, $htmlText));
+                // ALERTA: no es pot passar codi xml ni similar a htm com a contingut de la etiqueta, es trenca tot el format
+                $renderer->doc .= str_replace("@TITLE@", ''/*$data[1]*/, str_replace("@VALUE@", $text, $htmlText));
             }
         }
 
-
         return true;
-
-//        global $symbols;
-//        if ($mode === 'ioccounter'){
-//            $renderer->doc .=  '`';
-//            return TRUE;
-//        }elseif ($mode === 'xhtml'){
-//            $renderer->doc .= '`';
-//            return TRUE;
-//        }elseif ($mode === 'iocxhtml'){
-//            $renderer->doc .= '`';
-//            return TRUE;
-//        }elseif ($mode === 'iocexportl'){
-//            $renderer->doc .= filter_tex_sanitize_formula("$\grave{\:}$");
-//            return TRUE;
-//        }
-//        return FALSE;
     }
 
 
