@@ -17,8 +17,7 @@ class WiocclFunction extends WiocclParser
     protected function init($value)
     {
         if (preg_match('/{#_(.*?)\((.*?)\)_#}/', $value, $matches) === 0) {
-            return false;
-//            throw new Exception("Incorrect condition structure");
+            throw new Exception("Incorrect function structure");
         };
 
         $this->functionName = $matches[1];
