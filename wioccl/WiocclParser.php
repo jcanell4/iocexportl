@@ -4,6 +4,7 @@ require_once "WiocclField.php";
 require_once "WiocclIf.php";
 require_once "WiocclForEach.php";
 require_once "WiocclBlock.php";
+require_once "WiocclFunction.php";
 
 class WiocclParser
 {
@@ -20,27 +21,28 @@ class WiocclParser
     protected $tokenPatterns = [
         '{##' => [
             'state' => 'open_field',
-//            'type' => 'field',
         ],
         '##}' => [
             'state' => 'close_field',
-//            'type' => 'field'
         ],
+        '{#_.*?_#}' => [
+            'state' => 'open_function',
+        ],
+//        '_#}' => [
+//            'state' => 'close_function',
+//        ],
+
         '<WIOCCL:IF .*?>' => [
             'state' => 'open_if',
-//            'type' => 'if',
         ],
         '</WIOCCL:IF>' => [
             'state' => 'close_if',
-//            'type' => 'if'
         ],
         '<WIOCCL:FOREACH .*?>' => [
             'state' => 'open_foreach',
-//            'type' => 'foreach',
         ],
         '</WIOCCL:FOREACH>' => [
             'state' => 'close_foreach',
-//            'type' => 'foreach'
         ],
         '<WIOCCL:BLOCK>' => [
             'state' => 'open_block',
@@ -66,7 +68,9 @@ class WiocclParser
         '<WIOCCL:IF' => ['state' => 'open_if', 'type' => 'if', 'class' => 'WiocclIf', 'action' => 'open'],
         '</WIOCCL:IF>' => ['state' => 'close_if', 'type' => 'if', 'action' => 'close'],
         '{##' => ['state' => 'open_field', 'type' => 'field', 'class' => 'WiocclField', 'action' => 'open'],
-        '##}' => ['state' => 'close_field', 'type' => 'field', 'action' => 'close']
+        '##}' => ['state' => 'close_field', 'type' => 'field', 'action' => 'close'],
+        '{#_' => ['state' => 'open_function', 'type' => 'field', 'class' => 'WiocclFunction', 'action' => 'open'],
+        '_#}' => ['state' => 'close_function', 'type' => 'field', 'action' => 'close']
     ];
 
 
