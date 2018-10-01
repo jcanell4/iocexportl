@@ -40,8 +40,6 @@ class WiocclFunction extends WiocclParser
 
     protected function parseTokens($tokens, &$tokenIndex)
     {
-        // TODO: Afegir un try/catch per llençar una excepció propia si la funció no existeix o afegir un sistema per detectar si existeix la funció abans de cridarla
-
         if (method_exists($this, $this->functionName)) {
             $result = call_user_func_array(array($this, $this->functionName), $this->arguments);
         } else {
@@ -60,21 +58,4 @@ class WiocclFunction extends WiocclParser
     }
 
 
-    protected function normalizeArg($arg)
-    {
-        if (strtolower($arg) == 'true') {
-            return true;
-        } else if (strtolower($arg) == 'false') {
-            return false;
-        } else if (is_int($arg)) {
-            return intval($arg);
-        } else if (is_numeric($arg)) {
-            return floatval($arg);
-        } else if (preg_match("/^'(.*?)'$/", $arg, $matches) === 1) {
-            return $this->normalizeArg($matches[1]);
-        } else {
-            return $arg;
-        }
-
-    }
 }

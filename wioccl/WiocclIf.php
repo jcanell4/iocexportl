@@ -87,25 +87,4 @@ class WiocclIf extends WiocclParser
         return false;
 
     }
-
-
-    protected function normalizeArg($arg)
-    {
-        if (strtolower($arg) == 'true') {
-            return true;
-        } else if (strtolower($arg) == 'false') {
-            return false;
-        } else if (is_int($arg)) {
-            return intval($arg);
-        } else if (is_numeric($arg)) {
-            return floatval($arg);
-        } else if (preg_match("/^'(.*?)'$/", $arg, $matches) === 1) {
-            return $this->normalizeArg($matches[1]);
-        } else {
-            return $arg;
-        }
-
-    }
-
-
 }
