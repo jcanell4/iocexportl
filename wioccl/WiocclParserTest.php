@@ -29,21 +29,47 @@ $dataSource = [
 		"eina": "222",
 		"opcionalitat": "rrr",
 		"puntuable": "false"
-	}
+	},
+    {
+		"tipus": "aaaa",
+		"eina": "bbb",
+		"opcionalitat": "111",
+		"puntuable": "true"
+	},
+	{
+		"tipus": "aaaa",
+		"eina": "bbb",
+		"opcionalitat": "111",
+		"puntuable": "true"
+	},
 ]',
     'datesAC' => '[{
         "unitat": "1",
-		"enunciat": "2018/2/1",
-		"lliurament": "2018/3/2",
-		"solució": "2018/4/3",
-		"qualificació": "2018/4/4"
+		"enunciat": "2013/2/1",
+		"lliurament": "2013/3/2",
+		"solució": "2013/4/3",
+		"qualificació": "2013/4/4"
+	},
+	{
+		"unitat": "1",
+		"enunciat": "2014/2/1",
+		"lliurament": "2014/3/2",
+		"solució": "2014/4/3",
+		"qualificació": "4-4-2014"
 	},
 	{
 		"unitat": "2",
-		"enunciat": "2016/2/1",
-		"lliurament": "2016/3/2",
-		"solució": "2016/4/3",
-		"qualificació": "4-4-2016"
+		"enunciat": "2017/2/1",
+		"lliurament": "2017/3/2",
+		"solució": "2017/4/3",
+		"qualificació": "4-4-2017"
+	},
+	{
+		"unitat": "1",
+		"enunciat": "2018/2/1",
+		"lliurament": "2018/3/2",
+		"solució": "2018/4/3",
+		"qualificació": "4-4-2018"
 	}
 ]'
 ];
@@ -63,7 +89,7 @@ $dataSource = [
 //| {##item[\'tipus\']##} | {##item[\'eina\']##} | {##item[\'opcionalitat\']##} | <WIOCCL:IF condition="{##item[\'puntuable\']##}==\'true\'">si</WIOCCL:IF><WIOCCL:IF condition="{##item[\'puntuable\']##}==\'false\'">no</WIOCCL:IF> |
 //</WIOCCL:FOREACH>';
 
-$t='Les dates clau del semestre, que també podeu consultar al calendari de l\'aula, són les següents: (veure:table:TA1:).
+$t = 'Les dates clau del semestre, que també podeu consultar al calendari de l\'aula, són les següents: (veure:table:TA1:).
 
 ::table:TA1
   :title:Dates clau
@@ -73,7 +99,11 @@ $t='Les dates clau del semestre, que també podeu consultar al calendari de l\'a
 <WIOCCL:FOREACH var="item" array="{##datesAC##}">
 | U{##item[\'unitat\']##} | {#_DATE("{##item[\'enunciat\']##}")_#} | {#_DATE("{##item[\'lliurament\']##}")_#} | {#_DATE("{##item[\'solució\']##}")_#} | {#_DATE("{##item[\'qualificació\']##}")_#} |
 </WIOCCL:FOREACH>
-:::';
+:::
+Test array length: {#_ARRAY_LENGTH({##datesAC##})_#}
+Test count distinct: {#_COUNTDISTINC({##datesAC##}, "unitat")_#}
+
+';
 $p = new WiocclParser($t, [], $dataSource);
 print_r('<pre>');
 print_r($p->getValue());

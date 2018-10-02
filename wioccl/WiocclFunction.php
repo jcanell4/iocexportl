@@ -35,7 +35,7 @@ class WiocclFunction extends WiocclParser
 //        }
         $string = (new WiocclParser($string, $this->arrays, $this->dataSource))->getValue();
         $string = "[". $string."]";
-        
+
         $jsonArgs = json_decode($string, true);
 
         return $jsonArgs;
@@ -43,12 +43,10 @@ class WiocclFunction extends WiocclParser
 
     protected function parseTokens($tokens, &$tokenIndex = 0)
     {
-        $this->arguments[] = "test";
-
         if (method_exists($this, $this->functionName)) {
             $result = call_user_func_array(array($this, $this->functionName), $this->arguments);
         } else {
-            $result = '[Error: Unknown function]';
+            $result = '[Error: Unknown function ' . $this->functionName .']';
         }
 
         --$tokenIndex; // s'ha de tornar enrere perquè la funció es troba al token anterior
@@ -60,6 +58,25 @@ class WiocclFunction extends WiocclParser
     {
         return date('d-m-Y', strtotime($date));
     }
+
+    // ALERTA: El paràmetre de la funció no ha d'anar entre cometes, ja es tracta d'un JSON vàlid
+    protected function ARRAY_LENGTH($array) {
+        return count($array);
+    }
+
+    protected function COUNTDISTINC($array, $field) {
+        $unique = [];
+
+        foreach($array as $item) {
+                if (!in_array($item[$field], $unique)) {
+                $unique[] = $item[$field];
+            }
+        }
+
+
+        return count($unique);
+    }
+
 
 
 }
