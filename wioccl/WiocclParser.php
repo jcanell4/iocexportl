@@ -88,6 +88,11 @@ class WiocclParser
         return $this->parse($this->rawValue);
     }
 
+    public function getRender()
+    {
+        return '<mark>' . $this->parse($this->rawValue) . '</mark>';
+    }
+
     public function getTokensValue($tokens, &$tokenIndex)
     {
         return $this->parseTokens($tokens, $tokenIndex);

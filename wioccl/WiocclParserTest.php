@@ -33,17 +33,17 @@ $dataSource = [
 ]',
     'datesAC' => '[{
         "unitat": "1",
-		"enunciat": "2/2/2018",
-		"lliurament": "3/3/2018",
-		"solució": "4/4/2018",
-		"qualificació": "4/4/2018"
+		"enunciat": "2018/2/1",
+		"lliurament": "2018/3/2",
+		"solució": "2018/4/3",
+		"qualificació": "2018/4/4"
 	},
 	{
 		"unitat": "2",
-		"enunciat": "2/2/2016",
-		"lliurament": "3/3/2016",
-		"solució": "4/4/2016",
-		"qualificació": "4/4/2016"
+		"enunciat": "2016/2/1",
+		"lliurament": "2016/3/2",
+		"solució": "2016/4/3",
+		"qualificació": "4-4-2016"
 	}
 ]'
 ];

@@ -41,8 +41,10 @@ class WiocclFunction extends WiocclParser
         return $jsonArgs;
     }
 
-    protected function parseTokens($tokens, &$tokenIndex)
+    protected function parseTokens($tokens, &$tokenIndex = 0)
     {
+        $this->arguments[] = "test";
+
         if (method_exists($this, $this->functionName)) {
             $result = call_user_func_array(array($this, $this->functionName), $this->arguments);
         } else {
@@ -54,10 +56,9 @@ class WiocclFunction extends WiocclParser
         return $result;
     }
 
-    protected function DATE($arg1)
+    protected function DATE($date)
     {
-        // TODO: Afegir la funcionalitat real de la funció
-        return '!!' . $arg1 . '!!';
+        return date('d-m-Y', strtotime($date));
     }
 
 
