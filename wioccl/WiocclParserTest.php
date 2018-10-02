@@ -71,8 +71,10 @@ $t='Les dates clau del semestre, que també podeu consultar al calendari de l\'a
   :footer::
 ^  unitat  ^  data de publicació de l\'enunciat  ^ data de publicació de la solució ^ data de publicació de la qualificació ^
 <WIOCCL:FOREACH var="item" array="{##datesAC##}">
-| U{##item[\'unitat\']##} | {#_DATE({##item[\'enunciat\']##})_#} | {#_DATE({##item[\'lliurament\']##})_#} | {#_DATE({##item[\'solució\']}#})_#} | {#_DATE({##item[\'qualificació\']##})_#} |
+| U{##item[\'unitat\']##} | {#_DATE("{##item[\'enunciat\']##}")_#} | {#_DATE("{##item[\'lliurament\']##}")_#} | {#_DATE("{##item[\'solució\']##}")_#} | {#_DATE("{##item[\'qualificació\']##}")_#} |
 </WIOCCL:FOREACH>
 :::';
 $p = new WiocclParser($t, [], $dataSource);
+print_r('<pre>');
 print_r($p->getValue());
+print_r('</pre>');
