@@ -27,14 +27,18 @@ class WiocclFunction extends WiocclParser
 
     protected function extractArgs($string)
     {
-        $args = explode(',', $string);
-        $extractedArgs = [];
+//        $args = explode(',', $string);
+//        $extractedArgs = [];
+//
+//        foreach ($args as $arg) {
+//            $extractedArgs[] = $this->normalizeArg((new WiocclParser($arg, $this->arrays, $this->dataSource))->getValue());
+//        }
+        $string = (new WiocclParser($string, $this->arrays, $this->dataSource))->getValue();
+        $string = "[". $string."]";
+        
+        $jsonArgs = json_decode($string, true);
 
-        foreach ($args as $arg) {
-            $extractedArgs[] = $this->normalizeArg((new WiocclParser($arg, $this->arrays, $this->dataSource))->getValue());
-        }
-
-        return $extractedArgs;
+        return $jsonArgs;
     }
 
     protected function parseTokens($tokens, &$tokenIndex)
