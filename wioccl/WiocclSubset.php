@@ -12,7 +12,7 @@ class WiocclSubset extends WiocclParser {
     const ARG2 = 2;
     const OPERATOR = 1;
 
-    public function __construct($value = null, $arrays = [], $dataSource)
+    public function __construct($value = null, $arrays = [], $dataSource, $generateSubset = true)
     {
         parent::__construct($value, $arrays, $dataSource);
 
@@ -25,7 +25,7 @@ class WiocclSubset extends WiocclParser {
         $this->filterArgs = $this->extractFilterArgs($value);
 
 
-        if ($this->filterArgs!== null) {
+        if ($this->filterArgs!== null && $generateSubset) {
             // TODO: efegir el conditional
             // Crear el subsset
             $subset = $this->generateSubset();
@@ -43,7 +43,6 @@ class WiocclSubset extends WiocclParser {
         } else {
             throw new Exception("subsetvar name is missing");
         }
-
     }
 
     protected function extractArrayItemName($value) {
@@ -55,7 +54,7 @@ class WiocclSubset extends WiocclParser {
 
     }
 
-
+//** ALERTA! Duplicat al  foreach*/
     protected function extractFilterArgs($value) {
         if (preg_match('/filter="(.*?([><=]=?))(.*?)">/', $value, $matches) === 1) {
             // ALERTA: Actualment el token amb > arriba tallat perquè l'identifica com a tancament del token d'apertura
@@ -82,6 +81,8 @@ class WiocclSubset extends WiocclParser {
 
 
         foreach ($this->fullArray as $row) {
+
+            // TODO: Extreure a una funció a part per poder reutilizar al foreach, if i subset
             $this->arrays[$this->itemName] = $row;
 
             $arg1 = $this->normalizeArg((new WiocclParser($this->filterArgs[self::ARG1], $this->arrays, $this->dataSource))->getValue());
@@ -115,10 +116,9 @@ class WiocclSubset extends WiocclParser {
             case '!=':
                 return $arg1 != $arg2;
 
+            default:
+                return $arg1 && $arg2;
         }
-
-//        throw new Exception ("Condition " . $operator . " not supported.");
-        return false;
 
     }
 }

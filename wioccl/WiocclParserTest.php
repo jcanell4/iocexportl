@@ -93,6 +93,7 @@ $dataSource = [
 //| {##item[\'tipus\']##} | {##item[\'eina\']##} | {##item[\'opcionalitat\']##} | <WIOCCL:IF condition="{##item[\'puntuable\']##}==\'true\'">si</WIOCCL:IF><WIOCCL:IF condition="{##item[\'puntuable\']##}==\'false\'">no</WIOCCL:IF> |
 //</WIOCCL:FOREACH>';
 
+/* Test foreach amb filtre */
 //$t = 'Les dates clau del semestre, que també podeu consultar al calendari de l\'aula, són les següents: (veure:table:TA1:).
 //
 //::table:TA1
@@ -100,8 +101,8 @@ $dataSource = [
 //  :type:io_pt
 //  :footer::
 //^  unitat  ^  data de publicació de l\'enunciat  ^ data de publicació de la solució ^ data de publicació de la qualificació ^
-//<WIOCCL:FOREACH var="item" array="{##datesAC##}">
-//| U{##item[\'unitat\']##} | {#_DATE("{##item[\'enunciat\']##}")_#} | {#_DATE("{##item[\'lliurament\']##}")_#} | {#_DATE("{##item[\'solució\']##}")_#} | {#_DATE("{##item[\'qualificació\']##}")_#} |
+//<WIOCCL:FOREACH var="item" array="{##datesAC##}" filter="{##item[unitat]##}=={##testitem[unitat]##}">
+//| U{##item[unitat]##} | {#_DATE("{##item[enunciat]##}")_#} | {#_DATE("{##item[lliurament]##}")_#} | {#_DATE("{##item[solució]##}")_#} | {#_DATE("{##item[qualificació]##}")_#} |
 //</WIOCCL:FOREACH>
 //:::
 //Test array length: {#_ARRAY_LENGTH({##datesAC##})_#}
@@ -109,10 +110,22 @@ $dataSource = [
 //
 //';
 
-$t = '<WIOCCL:SUBSET subsetvar="filtered" array="{##datesAC##}" arrayitem="itemsub" filter="{##item[unitat]##}=={##itemsub[unitat]##}"> {#_FIRST({##filtered##}, {"FIRST":"enunciat"})_#}-{#_LAST({##filtered##}, {"LAST":"enunciat"})_#} </WIOCCL:SUBSET>
+/* Test subset, first i last */
+
+$t = '
+<WIOCCL:SUBSET subsetvar="filtered" array="{##datesAC##}" arrayitem="itemsub" filter="{##testitem[unitat]##}=={##itemsub[unitat]##}">
+{#_FIRST({##filtered##}, "FIRST[enunciat]")_#}
+{#_FIRST({##filtered##}, "FIRST")_#}
+{#_FIRST({##filtered##}, "{\"a\":\"FIRST[enunciat]\", \"b\":5, \"c\":true, \"d\":\"{##semestre##}\", \"z\":\"FIRST[lliurament]\"}")_#}
+-
+{#_LAST({##filtered##}, "LAST[enunciat]")_#}
+{#_LAST({##filtered##}, "LAST")_#}
+{#_LAST({##filtered##}, "{\"a\":\"LAST[enunciat]\", \"b\":5, \"c\":true, \"d\":\"{##semestre##}\", \"z\":\"LAST[lliurament]\"}")_#}
+
+</WIOCCL:SUBSET>
 ';
 
-$p = new WiocclParser($t, ['item'=>['unitat'=>1]], $dataSource);
+$p = new WiocclParser($t, ['testitem'=>['unitat'=>1]], $dataSource);
 print_r('<pre>');
 print_r($p->getValue());
 print_r('</pre>');

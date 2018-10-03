@@ -11,15 +11,15 @@ class WiocclField extends WiocclParser {
             // es un array
             $varName = $matches[1];
             $key = $matches[2];
-            return $this->arrays[$varName][$key]; // ALERTA: El valor emmagatzemmat pot ser un field? o sempre serà un valor?
+            return $this->arrays[$varName][$key];
         } else {
             $fieldName = $token['value'];
-//            $value = $this->dataSource[$fieldName];
 
-            if (isset($this->dataSource[$fieldName])) {
-                return $this->dataSource[$fieldName];
-            } else if (isset($this->arrays[$fieldName])) {
+            // Primer comprovem als arrays i si no es troba comprovem el datasource
+            if (isset($this->arrays[$fieldName])) {
                 return json_encode($this->arrays[$fieldName]);
+            } else if (isset($this->dataSource[$fieldName])) {
+                return $this->dataSource[$fieldName];
             }
 
 
