@@ -1,7 +1,7 @@
 <?php
 require_once "WiocclParser.php";
 
-class WiocclIf extends WiocclParser
+class _WiocclCondition extends WiocclParser
 {
 
     protected $condition = false;
@@ -13,29 +13,6 @@ class WiocclIf extends WiocclParser
         $this->condition = $this->evaluateCondition($value);
 
     }
-
-    protected function parseTokens($tokens, &$tokenIndex)
-    {
-
-        $result = '';
-
-        while ($tokenIndex < count($tokens)) {
-            $parsedValue = $this->parseToken($tokens, $tokenIndex);
-
-            if ($parsedValue === null) { // tancament del if
-                break;
-
-            } else {
-                $result .= $parsedValue;
-            }
-
-            ++$tokenIndex;
-        }
-
-
-        return ($this->condition ? $result : '');
-    }
-
 
     protected function evaluateCondition($value)
     {
@@ -63,7 +40,7 @@ class WiocclIf extends WiocclParser
     }
 
 
-    protected function resolveCondition($arg1, $arg2, $operator)
+    protected function resolveCondition($arg1, $arg2=true, $operator='')
     {
 
         switch ($operator) {
@@ -80,6 +57,8 @@ class WiocclIf extends WiocclParser
                 return $arg1 > $arg2;
             case '!=':
                 return $arg1 != $arg2;
+            default :
+                return $arg1 && $arg2;
 
         }
 
