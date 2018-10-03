@@ -7,7 +7,7 @@ class WiocclField extends WiocclParser {
 
         // es un array? el value tindrà el format xxx['yyy'] llavors el valor serà $this->arrays[xxx][yyy]
 
-        if (preg_match ('/(.*?)\[\'(.*?)\'\]/', $token['value'], $matches)===1) {
+        if (preg_match ('/(.*?)\[(.*?)\]/', $token['value'], $matches)===1) {
             // es un array
             $varName = $matches[1];
             $key = $matches[2];
@@ -16,9 +16,17 @@ class WiocclField extends WiocclParser {
             $fieldName = $token['value'];
 //            $value = $this->dataSource[$fieldName];
 
+            if (isset($this->dataSource[$fieldName])) {
+                return $this->dataSource[$fieldName];
+            } else if (isset($this->arrays[$fieldName])) {
+                return json_encode($this->arrays[$fieldName]);
+            }
 
-            return isset($this->dataSource[$fieldName])?$this->dataSource[$token['value']] : '[ERROR: undefined field]';
+
+
         }
+
+        return '[ERROR: undefined field]';
 
     }
 

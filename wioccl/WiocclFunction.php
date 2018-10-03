@@ -82,5 +82,23 @@ class WiocclFunction extends WiocclParser
     }
 
 
+    protected function FIRST($array, $store) {
+    // TODO: el valor a desar i retornar es el primer corresponent al camp
+
+        $key = key($store);
+        $field = reset($store);
+        $this->arrays[$key] = $array[0][$field];
+
+        return $this->arrays[$key];
+    }
+
+    protected function LAST($array, $store) {
+        // TODO: el valor a desar i retornar es l´ultim corresponent al camp
+        $key = key($store);
+        $field = reset($store);
+        $this->arrays[$key] = $array[count($array)-1][$field];
+
+        return $this->arrays[$key];
+    }
 
 }

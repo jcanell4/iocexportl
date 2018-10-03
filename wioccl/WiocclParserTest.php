@@ -109,10 +109,10 @@ $dataSource = [
 //
 //';
 
-$t = '<WIOCCL:SUBSET subsetvar="filtered" array="{##calendari)##}" arrayitem="itemsub" filter="{##item[unitat]##}=={##itemsub[unitat]##}"> {#_FIRST({##filtered##}, {##FIRST[inici]##})_#}-{#_LAST({##filtered##}, {##LAST[final]##})_#} </WIOCCL:SUBSET>
+$t = '<WIOCCL:SUBSET subsetvar="filtered" array="{##datesAC##}" arrayitem="itemsub" filter="{##item[unitat]##}=={##itemsub[unitat]##}"> {#_FIRST({##filtered##}, {"FIRST":"enunciat"})_#}-{#_LAST({##filtered##}, {"LAST":"enunciat"})_#} </WIOCCL:SUBSET>
 ';
 
-$p = new WiocclParser($t, [], $dataSource);
+$p = new WiocclParser($t, ['item'=>['unitat'=>1]], $dataSource);
 print_r('<pre>');
 print_r($p->getValue());
 print_r('</pre>');

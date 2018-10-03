@@ -6,6 +6,11 @@ class WiocclSubset extends WiocclParser {
     protected $varName;
     protected $fullArray =[];
     protected $itemName;
+    protected $filterArgs;
+
+    const ARG1 = 0;
+    const ARG2 = 2;
+    const OPERATOR = 1;
 
     public function __construct($value = null, $arrays = [], $dataSource)
     {
@@ -17,54 +22,18 @@ class WiocclSubset extends WiocclParser {
         $this->varName = $this->extractVarName($value);
         $this->fullArray = $this->extractArray($value);
         $this->itemName = $this->extractArrayItemName($value);
-
-        // TODO: efegir el condition
-
-
-    }
-
-    protected function parseTokens($tokens, &$tokenIndex)
-    {
-
-        $result = '';
-        $startTokenIndex = $tokenIndex;
-        $lastBlockIndex = null;
+        $this->filterArgs = $this->extractFilterArgs($value);
 
 
-        for ($arrayIndex = 0; $arrayIndex<count($this->fullArray); $arrayIndex++) {
-
-            $tokenIndex = $startTokenIndex;
-            $this->arrays[$this->varName] = $this->fullArray[$arrayIndex];
-
-            // Els format dels arrays al fullArray es similar a (sense els index 0, 1, etc):
-//            '[
-//                '0' => ['tipus' => 'lalala', 'eina' => 'ggg', 'opcionalitat' => 'cap'],
-//                '1' => ['tipus' => 'oooo', 'eina' => 'elelel', 'opcionalitat' => 'no']
-//            ]
-
-            // El format que es passa a arrays es:
-            //      ['tipus' => 'lalala', 'eina' => 'ggg', 'opcionalitat' => 'cap']
+        if ($this->filterArgs!== null) {
+            // TODO: efegir el conditional
+            // Crear el subsset
+            $subset = $this->generateSubset();
 
 
-            while ($tokenIndex < count($tokens)) {
-
-                $parsedValue = $this->parseToken($tokens, $tokenIndex);
-
-                if ($parsedValue === null) { // tancament del foreach
-                    break;
-
-                } else {
-                    $result .= $parsedValue;
-                }
-
-                ++$tokenIndex;
-            }
-
+            $this->arrays[$this->varName] = $subset;
         }
 
-
-
-        return $result;
     }
 
 
@@ -72,7 +41,7 @@ class WiocclSubset extends WiocclParser {
         if (preg_match('/subsetvar="(.*?)"/', $value, $matches)) {
             return $matches[1];
         } else {
-            throw new Exception("Var name is missing");
+            throw new Exception("subsetvar name is missing");
         }
 
     }
@@ -81,9 +50,75 @@ class WiocclSubset extends WiocclParser {
         if (preg_match('/arrayitem="(.*?)"/', $value, $matches)) {
             return $matches[1];
         } else {
-            throw new Exception("Var name is missing");
+            throw new Exception("arrayitem name is missing");
         }
 
     }
 
+
+    protected function extractFilterArgs($value) {
+        if (preg_match('/filter="(.*?([><=]=?))(.*?)">/', $value, $matches) === 1) {
+            // ALERTA: Actualment el token amb > arriba tallat perquè l'identifica com a tancament del token d'apertura
+
+            $arg1 = $this->normalizeArg(str_replace(['==', '>', '<', '=', '>=', '<=', '!='], '', $matches[1]));
+            $arg2 = $matches[3];
+
+            $operator = $matches[2];
+
+
+
+            return [$arg1, $operator, $arg2];
+//            throw new Exception("Incorrect condition structure");
+        };
+
+
+
+
+        return null;
+    }
+
+    protected function generateSubset() {
+        $subset = [];
+
+
+        foreach ($this->fullArray as $row) {
+            $this->arrays[$this->itemName] = $row;
+
+            $arg1 = $this->normalizeArg((new WiocclParser($this->filterArgs[self::ARG1], $this->arrays, $this->dataSource))->getValue());
+            $arg2 = $this->normalizeArg((new WiocclParser($this->filterArgs[self::ARG2], $this->arrays, $this->dataSource))->getValue());
+
+            if ($this->resolveCondition($arg1, $arg2, $this->filterArgs[self::OPERATOR])) {
+                $subset[] = $row;
+            }
+        }
+
+        unset($this->arrays[$this->itemName]);
+
+        return $subset;
+    }
+
+    protected function resolveCondition($arg1, $arg2, $operator)
+    {
+
+        switch ($operator) {
+
+            case '==':
+                return $arg1 == $arg2;
+            case '<=':
+                return $arg1 <= $arg2;
+            case '<':
+                return $arg1 < $arg2;
+            case '>=':
+                return $arg1 >= $arg2;
+            case '>':
+                return $arg1 > $arg2;
+            case '!=':
+                return $arg1 != $arg2;
+
+        }
+
+//        throw new Exception ("Condition " . $operator . " not supported.");
+        return false;
+
+    }
 }

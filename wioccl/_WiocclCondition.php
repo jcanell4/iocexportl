@@ -1,7 +1,7 @@
 <?php
 require_once "WiocclParser.php";
 
-class WiocclIf extends WiocclParser
+abstract class WiocclCondition extends WiocclParser
 {
 
     protected $condition = false;
