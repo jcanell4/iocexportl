@@ -84,31 +84,20 @@ class WiocclFunction extends WiocclParser
     }
 
 
-    protected function FIRST($array, $store)
+    protected function FIRST($array, $template)
     {
-        // $store pot tenir tres formes:
-        // FIRST: retorna tota la fila com a json
-        // FIRST[camp]: retorna el valor del camp com a string
-        // {"a":{##camX##}, "b":LAST[xx], "c":10, "d":"hola", "f":true})#}: retorna la mateixa plantilla amb els valors reemplaçats com a json.
-
-//        $jsonString = json_decode($store, true);
-//
-//        if ($jsonString !== null) {
-//            $replaced = preg_replace_callback('/FIRST\[(.*?)\]/', function ($matches) use ($array) {
-//                return $array[0][$matches[1]];
-//            }, $store);
-//
-//            return $replaced;
-//
-//        } else if ($store === 'FIRST') {
-//            return json_encode($array[0]);
-//        } else if (preg_match('/FIRST\[(.*?)\]/', $store, $matches)) {
-//            return $array[0][$matches[1]];
-//        }
-
-        return $this->formatItem($array[0], 'FIRST', $store);
+        return $this->formatItem($array[0], 'FIRST', $template);
     }
 
+    protected function LAST($array, $template)
+    {
+        return $this->formatItem($array[count($array)-1], 'LAST', $template);
+    }
+
+    // $template pot tenir tres formes:
+    // FIRST: retorna tota la fila com a json
+    // FIRST[camp]: retorna el valor del camp com a string
+    // {"a":{##camX##}, "b":LAST[xx], "c":10, "d":"hola", "f":true})#}: retorna la mateixa plantilla amb els valors reemplaçats com a json.
     protected function formatItem($row, $ownKey, $template)
     {
         $jsonString = json_decode($template, true);
@@ -127,41 +116,5 @@ class WiocclFunction extends WiocclParser
         }
     }
 
-
-    protected function LAST($array, $store)
-    {
-        return $this->formatItem($array[count($array)-1], 'LAST', $store);
-
-        // $store pot tenir tres formes:
-        // FIRST: retorna tota la fila com a json
-        // FIRST[camp]: retorna el valor del camp com a string
-        // {"a":{##camX##}, "b":LAST[xx], "c":10, "d":"hola", "f":true})#}: retorna la mateixa plantilla amb els valors reemplaçats com a json.
-
-//        $jsonString = json_decode($store, true);
-//
-//        if ($jsonString !== null) {
-//            $replaced = preg_replace_callback('/FIRST\[(.*?)\]/', function ($matches) use ($array) {
-//                return $array[0][$matches[1]];
-//            }, $store);
-//
-//            return $replaced;
-//
-//        } else if ($store === 'FIRST') {
-//            return json_encode($array[0]);
-//        } else if (preg_match('/FIRST\[(.*?)\]/', $store, $matches)) {
-//            return $array[0][$matches[1]];
-//        }
-    }
-
-
-//
-//
-//        // TODO: el valor a desar i retornar es l´ultim corresponent al camp
-//        $key = key($store);
-//        $field = reset($store);
-//        $this->arrays[$key] = $array[count($array) - 1][$field];
-//
-//        return $this->arrays[$key];
-//    }
 
 }
