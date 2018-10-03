@@ -1,7 +1,7 @@
 <?php
 require_once "WiocclParser.php";
 
-abstract class WiocclCondition extends WiocclParser
+class WiocclIf extends WiocclParser
 {
 
     protected $condition = false;
@@ -63,7 +63,7 @@ abstract class WiocclCondition extends WiocclParser
     }
 
 
-    protected function resolveCondition($arg1, $arg2, $operator)
+    protected function resolveCondition($arg1, $arg2=true, $operator='')
     {
 
         switch ($operator) {
@@ -80,6 +80,8 @@ abstract class WiocclCondition extends WiocclParser
                 return $arg1 > $arg2;
             case '!=':
                 return $arg1 != $arg2;
+            default :
+                return $arg1 && $arg2;
 
         }
 
