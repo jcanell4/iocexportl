@@ -45,6 +45,7 @@ $dataSource = [
 ]',
     'datesAC' => '[{
         "unitat": "1",
+        "test": "a",
 		"enunciat": "2013/2/1",
 		"lliurament": "2013/3/2",
 		"solució": "2013/4/3",
@@ -52,6 +53,7 @@ $dataSource = [
 	},
 	{
 		"unitat": "1",
+		"test": "a",
 		"enunciat": "2014/2/1",
 		"lliurament": "2014/3/2",
 		"solució": "2014/4/3",
@@ -59,6 +61,7 @@ $dataSource = [
 	},
 	{
 		"unitat": "2",
+		"test": "a",
 		"enunciat": "2017/2/1",
 		"lliurament": "2017/3/2",
 		"solució": "2017/4/3",
@@ -66,6 +69,7 @@ $dataSource = [
 	},
 	{
 		"unitat": "1",
+		"test": "b",
 		"enunciat": "2018/2/1",
 		"lliurament": "2018/3/2",
 		"solució": "2018/4/3",
@@ -89,21 +93,25 @@ $dataSource = [
 //| {##item[\'tipus\']##} | {##item[\'eina\']##} | {##item[\'opcionalitat\']##} | <WIOCCL:IF condition="{##item[\'puntuable\']##}==\'true\'">si</WIOCCL:IF><WIOCCL:IF condition="{##item[\'puntuable\']##}==\'false\'">no</WIOCCL:IF> |
 //</WIOCCL:FOREACH>';
 
-$t = 'Les dates clau del semestre, que també podeu consultar al calendari de l\'aula, són les següents: (veure:table:TA1:).
+//$t = 'Les dates clau del semestre, que també podeu consultar al calendari de l\'aula, són les següents: (veure:table:TA1:).
+//
+//::table:TA1
+//  :title:Dates clau
+//  :type:io_pt
+//  :footer::
+//^  unitat  ^  data de publicació de l\'enunciat  ^ data de publicació de la solució ^ data de publicació de la qualificació ^
+//<WIOCCL:FOREACH var="item" array="{##datesAC##}">
+//| U{##item[\'unitat\']##} | {#_DATE("{##item[\'enunciat\']##}")_#} | {#_DATE("{##item[\'lliurament\']##}")_#} | {#_DATE("{##item[\'solució\']##}")_#} | {#_DATE("{##item[\'qualificació\']##}")_#} |
+//</WIOCCL:FOREACH>
+//:::
+//Test array length: {#_ARRAY_LENGTH({##datesAC##})_#}
+//Test count distinct: {#_COUNTDISTINCT({##datesAC##}, ["unitat", "test"])_#}
+//
+//';
 
-::table:TA1
-  :title:Dates clau
-  :type:io_pt
-  :footer::
-^  unitat  ^  data de publicació de l\'enunciat  ^ data de publicació de la solució ^ data de publicació de la qualificació ^
-<WIOCCL:FOREACH var="item" array="{##datesAC##}">
-| U{##item[\'unitat\']##} | {#_DATE("{##item[\'enunciat\']##}")_#} | {#_DATE("{##item[\'lliurament\']##}")_#} | {#_DATE("{##item[\'solució\']##}")_#} | {#_DATE("{##item[\'qualificació\']##}")_#} |
-</WIOCCL:FOREACH>
-:::
-Test array length: {#_ARRAY_LENGTH({##datesAC##})_#}
-Test count distinct: {#_COUNTDISTINC({##datesAC##}, "unitat")_#}
-
+$t = '<WIOCCL:SUBSET subsetvar="filtered" array="{##calendari)##}" arrayitem="itemsub" filter="{##item[unitat]##}=={##itemsub[unitat]##}"> {#_FIRST({##filtered##}, {##FIRST[inici]##})_#}-{#_LAST({##filtered##}, {##LAST[final]##})_#} </WIOCCL:SUBSET>
 ';
+
 $p = new WiocclParser($t, [], $dataSource);
 print_r('<pre>');
 print_r($p->getValue());

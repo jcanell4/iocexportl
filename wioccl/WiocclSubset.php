@@ -1,10 +1,11 @@
 <?php
 require_once "WiocclParser.php";
 
-class WiocclForEach extends WiocclParser {
+class WiocclSubset extends WiocclParser {
 
     protected $varName;
     protected $fullArray =[];
+    protected $itemName;
 
     public function __construct($value = null, $arrays = [], $dataSource)
     {
@@ -15,6 +16,10 @@ class WiocclForEach extends WiocclParser {
 
         $this->varName = $this->extractVarName($value);
         $this->fullArray = $this->extractArray($value);
+        $this->itemName = $this->extractArrayItemName($value);
+
+        // TODO: efegir el condition
+
 
     }
 
@@ -62,5 +67,23 @@ class WiocclForEach extends WiocclParser {
         return $result;
     }
 
+
+    protected function extractVarName($value) {
+        if (preg_match('/subsetvar="(.*?)"/', $value, $matches)) {
+            return $matches[1];
+        } else {
+            throw new Exception("Var name is missing");
+        }
+
+    }
+
+    protected function extractArrayItemName($value) {
+        if (preg_match('/arrayitem="(.*?)"/', $value, $matches)) {
+            return $matches[1];
+        } else {
+            throw new Exception("Var name is missing");
+        }
+
+    }
 
 }

@@ -64,15 +64,19 @@ class WiocclFunction extends WiocclParser
         return count($array);
     }
 
-    protected function COUNTDISTINC($array, $field) {
+    protected function COUNTDISTINCT($array, $fields) {
         $unique = [];
 
+
         foreach($array as $item) {
-                if (!in_array($item[$field], $unique)) {
-                $unique[] = $item[$field];
+            $aux = '';
+            foreach($fields as $field) {
+                $aux .= $item[$field];
+            }
+                if (!in_array($aux, $unique)) {
+                $unique[] = $aux;
             }
         }
-
 
         return count($unique);
     }

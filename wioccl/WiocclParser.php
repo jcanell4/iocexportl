@@ -5,6 +5,7 @@ require_once "WiocclIf.php";
 require_once "WiocclForEach.php";
 require_once "WiocclBlock.php";
 require_once "WiocclFunction.php";
+require_once "WiocclSubset.php";
 
 class WiocclParser
 {
@@ -46,11 +47,15 @@ class WiocclParser
         ],
         '<WIOCCL:BLOCK>' => [
             'state' => 'open_block',
-//            'type' => 'block',
         ],
         '</WIOCCL:BLOCK>' => [
             'state' => 'close_block',
-//            'type' => 'block'
+        ],
+        '<WIOCCL:SUBSET .*?>' => [
+            'state' => 'open_subset',
+        ],
+        '</WIOCCL:SUBSET>' => [
+            'state' => 'close_subset',
         ]
 
 
@@ -67,6 +72,8 @@ class WiocclParser
         '</WIOCCL:FOREACH>' => ['state' => 'close_foreach', 'type' => 'foreach', 'action' => 'close'],
         '<WIOCCL:IF' => ['state' => 'open_if', 'type' => 'if', 'class' => 'WiocclIf', 'action' => 'open'],
         '</WIOCCL:IF>' => ['state' => 'close_if', 'type' => 'if', 'action' => 'close'],
+        '<WIOCCL:SUBSET' => ['state' => 'open_subset', 'type' => 'subset', 'class' => 'WiocclSubset', 'action' => 'open'],
+        '</WIOCCL:SUBSET>' => ['state' => 'close_subset', 'type' => 'subset', 'action' => 'close'],
         '{##' => ['state' => 'open_field', 'type' => 'field', 'class' => 'WiocclField', 'action' => 'open'],
         '##}' => ['state' => 'close_field', 'type' => 'field', 'action' => 'close'],
         '{#_' => ['state' => 'open_function', 'type' => 'field', 'class' => 'WiocclFunction', 'action' => 'open'],
@@ -240,5 +247,27 @@ class WiocclParser
             return $arg;
         }
 
+    }
+
+    protected function extractVarName($value) {
+        if (preg_match('/var="(.*?)"/', $value, $matches)) {
+            return $matches[1];
+        } else {
+            throw new Exception("Var name is missing");
+        }
+
+    }
+
+    protected function extractArray($value) {
+        $jsonString = '';
+        // ALERTA: El $value pot ser un json directament o una variable, s'ha de fer un parse del $value
+        if (preg_match('/array="(.*?)"/', $value, $matches)) {
+            $jsonString = (new WiocclParser($matches[1], $this->arrays, $this->dataSource))->getValue();
+        } else {
+            throw new Exception("Array is missing");
+        }
+
+
+        return json_decode($jsonString, true);
     }
 }
