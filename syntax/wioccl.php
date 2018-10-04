@@ -55,7 +55,7 @@ class syntax_plugin_iocexportl_wioccl extends DokuWiki_Syntax_Plugin {
      */
     function connectTo($mode) {
 //        $this->Lexer->addSpecialPattern('', $mode, 'plugin_iocexportl_wioccl');
-        $this->Lexer->addSpecialPattern('{##.*?##}|<WIOCCL:.*</WIOCCL:.*>', $mode, 'plugin_iocexportl_wioccl');
+//        $this->Lexer->addSpecialPattern('{##.*?##}|<WIOCCL:.*</WIOCCL:.*>', $mode, 'plugin_iocexportl_wioccl');
 //        $this->Lexer->addSpecialPattern('<WIOCCL:.*</WIOCCL:.*>', $mode, 'plugin_iocexportl_wioccl');
     }
 
@@ -76,7 +76,7 @@ class syntax_plugin_iocexportl_wioccl extends DokuWiki_Syntax_Plugin {
     * ALERTA[XAVI] Duplicat
     */
     function render($mode, &$renderer, $data) {
-
+        return false;
 
         // TODO: passar la cadena del $data[1] pel wiocclparser y el resultat enviarlo al $this->parse(
 

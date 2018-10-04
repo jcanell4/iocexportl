@@ -45,13 +45,13 @@ class WiocclIf extends WiocclParser
         }
 
         // ALERTA! la condició es troba entre cometes: condition="
-        if (preg_match('/condition="(.*?([><=]=?))(.*?)">/', $value, $matches) === 0) {
+        if (preg_match('/condition="(.*?([><=!]=?))(.*?)">/', $value, $matches) === 0) {
             // ALERTA: Actualment el token amb > arriba tallat perquè l'identifica com a tancament del token d'apertura
             return false;
 //            throw new Exception("Incorrect condition structure");
         };
 
-        $arg1 = $this->normalizeArg(str_replace(['==', '>', '<', '=', '>=', '<=', '!='], '', $matches[1]));
+        $arg1 = $this->normalizeArg(str_replace(['==', '>', '<', '!=', '>=', '<=', '='], '', $matches[1]));
         $arg2 = $matches[3];
 
         $operator = $matches[2];

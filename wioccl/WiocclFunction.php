@@ -33,6 +33,7 @@ class WiocclFunction extends WiocclParser
 //        foreach ($args as $arg) {
 //            $extractedArgs[] = $this->normalizeArg((new WiocclParser($arg, $this->arrays, $this->dataSource))->getValue());
 //        }
+        $string = preg_replace("/'/", '"', $string);
         $string = (new WiocclParser($string, $this->arrays, $this->dataSource))->getValue();
         $string = "[" . $string . "]";
 

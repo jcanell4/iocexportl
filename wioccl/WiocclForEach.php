@@ -64,7 +64,7 @@ class WiocclForEach extends WiocclParser {
 
 
             // ALERTA: No es pot fer
-            $process = $this->resolveCondition($arg1, $arg2, $this->filterArgs[self::OPERATOR]);
+            $process = $this->filterArgs==NULL || $this->resolveCondition($arg1, $arg2, $this->filterArgs[self::OPERATOR]);
 
             if (!$process && $lastTokenIndex >0) {
                 // Ja s'ha processat previament el token de tancament i no s'acompleix la condició, no cal continuar processant
@@ -73,8 +73,11 @@ class WiocclForEach extends WiocclParser {
 
             while ($tokenIndex < count($tokens)) {
 
-                $parsedValue = $this->parseToken($tokens, $tokenIndex);
-
+                $parsedValue =  $this->parseToken($tokens, $tokenIndex);
+                if($tokenIndex==$startTokenIndex){
+                    $parsedValue = ltrim($parsedValue, "\n");
+                }
+                
                 if ($parsedValue === null) { // tancament del foreach
                     break;
 

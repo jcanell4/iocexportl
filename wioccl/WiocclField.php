@@ -40,7 +40,7 @@ class WiocclField extends WiocclParser {
 
             $parsedValue = $this->parseToken($tokens, $tokenIndex);
 
-            if ($parsedValue == null) { // tancament del field
+            if ($parsedValue === null) { // tancament del field
                 break;
 
             } else {

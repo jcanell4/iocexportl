@@ -3,7 +3,7 @@
 require_once "WiocclField.php";
 require_once "WiocclIf.php";
 require_once "WiocclForEach.php";
-require_once "WiocclBlock.php";
+require_once "WiocclFor.php";
 require_once "WiocclFunction.php";
 require_once "WiocclSubset.php";
 
@@ -45,11 +45,11 @@ class WiocclParser
         '</WIOCCL:FOREACH>' => [
             'state' => 'close_foreach',
         ],
-        '<WIOCCL:BLOCK>' => [
-            'state' => 'open_block',
+        '<WIOCCL:FOR .*?>' => [
+            'state' => 'open_for',
         ],
-        '</WIOCCL:BLOCK>' => [
-            'state' => 'close_block',
+        '</WIOCCL:FOR>' => [
+            'state' => 'close_for',
         ],
         '<WIOCCL:SUBSET .*?>' => [
             'state' => 'open_subset',
@@ -66,8 +66,8 @@ class WiocclParser
     // TODO: Determinar si es necessari coneixer el tipus o només cal l'state
     // Automatitzar la generació de noms de les classes a partir del wioccl:**
     protected $tokenKey = [
-        '<WIOCCL:BLOCK' => ['state' => 'open_block', 'type' => 'block', 'class' => 'WiocclBlock', 'action' => 'open'],
-        '</WIOCCL:BLOCK>' => ['state' => 'close_block', 'type' => 'block', 'action' => 'close'],
+        '<WIOCCL:FOR' => ['state' => 'open_for', 'type' => 'for', 'class' => 'WiocclFor', 'action' => 'open'],
+        '</WIOCCL:FOR>' => ['state' => 'close_for', 'type' => 'for', 'action' => 'close'],
         '<WIOCCL:FOREACH' => ['state' => 'open_foreach', 'type' => 'foreach', 'class' => 'WiocclForEach', 'action' => 'open'],
         '</WIOCCL:FOREACH>' => ['state' => 'close_foreach', 'type' => 'foreach', 'action' => 'close'],
         '<WIOCCL:IF' => ['state' => 'open_if', 'type' => 'if', 'class' => 'WiocclIf', 'action' => 'open'],
@@ -249,13 +249,26 @@ class WiocclParser
 
     }
 
-    protected function extractVarName($value) {
-        if (preg_match('/var="(.*?)"/', $value, $matches)) {
-            return $matches[1];
-        } else {
-            throw new Exception("Var name is missing");
+    protected function extractNumber($value, $attr, $mandatory=true) {
+        $ret = 0;
+        if (preg_match('/'.$attr.'="(.*?)"/', $value, $matches)) {
+            $ret = (new WiocclParser($matches[1], $this->arrays, $this->dataSource))->getValue();
+        } else if($mandatory){
+            throw new Exception("$attr is missing");
         }
-
+        if (is_numeric($ret)) {
+            $ret = intval($ret);
+        }
+        return $ret;
+    }
+    
+    protected function extractVarName($value, $attr="var", $mandatory=true) {
+        if (preg_match('/'.$attr.'="(.*?)"/', $value, $matches)) {
+            return $matches[1];
+        } else if($mandatory){
+            throw new Exception("$attr name is missing");
+        }
+        return "";
     }
 
     protected function extractArray($value) {
