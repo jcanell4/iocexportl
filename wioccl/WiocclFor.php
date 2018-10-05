@@ -28,43 +28,42 @@ class WiocclFor extends WiocclParser {
 
         if($this->from > $this->to){
             $this->parseTokensOfItem($tokens, $tokenIndex);
+        }else{
+            for ($arrayIndex = $this->from; $arrayIndex<=$this->to; $arrayIndex+= $this->step) {
+
+                $tokenIndex = $startTokenIndex;
+                $this->arrays[$this->counterName] = $arrayIndex;
+
+                $result .= $this->parseTokensOfItem($tokens, $tokenIndex);
+
+    //            while ($tokenIndex < count($tokens)) {
+    //
+    //                $parsedValue =  $this->parseToken($tokens, $tokenIndex);
+    //                if($tokenIndex==$startTokenIndex){
+    //                    $parsedValue = ltrim($parsedValue, "\n");
+    //                }
+    //                
+    //                if ($parsedValue === null) { // tancament del foreach
+    //                    break;
+    //
+    //                }
+    //                $result .= $parsedValue;
+    //
+    //                ++$tokenIndex;
+    //            }
+
+                $lastTokenIndex = $tokenIndex;
+
+            }
+            $tokenIndex = $lastTokenIndex;
         }
-
-        for ($arrayIndex = $this->from; $arrayIndex<=$this->to; $arrayIndex+= $this->step) {
-
-            $tokenIndex = $startTokenIndex;
-            $this->arrays[$this->counterName] = $arrayIndex;
-
-            $result .= $this->parseTokensOfItem($tokens, $tokenIndex);
-            
-//            while ($tokenIndex < count($tokens)) {
-//
-//                $parsedValue =  $this->parseToken($tokens, $tokenIndex);
-//                if($tokenIndex==$startTokenIndex){
-//                    $parsedValue = ltrim($parsedValue, "\n");
-//                }
-//                
-//                if ($parsedValue === null) { // tancament del foreach
-//                    break;
-//
-//                }
-//                $result .= $parsedValue;
-//
-//                ++$tokenIndex;
-//            }
-
-            $lastTokenIndex = $tokenIndex;
-
-        }
-
-        $tokenIndex = $lastTokenIndex;
 
 
         return $result;
     }
     
     protected function parseTokensOfItem($tokens, &$tokenIndex){
-        $retsul = '';
+        $result = '';
         while ($tokenIndex < count($tokens)) {
 
             $parsedValue =  $this->parseToken($tokens, $tokenIndex);

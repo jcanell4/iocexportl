@@ -26,13 +26,12 @@ class WiocclParser
         '##}' => [
             'state' => 'close_field',
         ],
-        '{#_.*?_#}' => [
+        '{#_' => [
             'state' => 'open_function',
         ],
-//        '_#}' => [
-//            'state' => 'close_function',
-//        ],
-
+        '_#}' => [
+            'state' => 'close_function',
+        ],
         '<WIOCCL:IF .*?>' => [
             'state' => 'open_if',
         ],
@@ -76,8 +75,8 @@ class WiocclParser
         '</WIOCCL:SUBSET>' => ['state' => 'close_subset', 'type' => 'subset', 'action' => 'close'],
         '{##' => ['state' => 'open_field', 'type' => 'field', 'class' => 'WiocclField', 'action' => 'open'],
         '##}' => ['state' => 'close_field', 'type' => 'field', 'action' => 'close'],
-        '{#_' => ['state' => 'open_function', 'type' => 'field', 'class' => 'WiocclFunction', 'action' => 'open'],
-        '_#}' => ['state' => 'close_function', 'type' => 'field', 'action' => 'close']
+        '{#_' => ['state' => 'open_function', 'type' => 'function', 'class' => 'WiocclFunction', 'action' => 'open'],
+        '_#}' => ['state' => 'close_function', 'type' => 'function', 'action' => 'close']
     ];
 
 
@@ -186,7 +185,11 @@ class WiocclParser
 
         while ($tokenIndex < count($tokens)) {
             $newChunk = $this->parseToken($tokens, $tokenIndex);
-            $result .= $newChunk !== null ? $newChunk : '';
+            if ($newChunk === null) { // tancament del wiocclXXX
+                break;
+            }else{
+                $result .= $newChunk ;
+            }
             ++$tokenIndex;
         }
 

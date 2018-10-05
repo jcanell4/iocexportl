@@ -7,16 +7,10 @@ class WiocclFunction extends WiocclParser
     protected $functionName = '';
     protected $arguments = [];
 
-    public function __construct($value = null, $arrays = [], $dataSource)
-    {
-        parent::__construct($value, $arrays, $dataSource);
-
-        $this->init($value);
-    }
 
     protected function init($value)
     {
-        if (preg_match('/{#_(.*?)\((.*?)\)_#}/', $value, $matches) === 0) {
+        if (preg_match('/(.*?)\((.*?)\)/s', $value, $matches) === 0) {
             throw new Exception("Incorrect function structure");
         };
 
@@ -27,12 +21,6 @@ class WiocclFunction extends WiocclParser
 
     protected function extractArgs($string)
     {
-//        $args = explode(',', $string);
-//        $extractedArgs = [];
-//
-//        foreach ($args as $arg) {
-//            $extractedArgs[] = $this->normalizeArg((new WiocclParser($arg, $this->arrays, $this->dataSource))->getValue());
-//        }
         $string = preg_replace("/'/", '"', $string);
         $string = (new WiocclParser($string, $this->arrays, $this->dataSource))->getValue();
         $string = "[" . $string . "]";
@@ -41,23 +29,33 @@ class WiocclFunction extends WiocclParser
 
         return $jsonArgs;
     }
-
-    protected function parseTokens($tokens, &$tokenIndex = 0)
+    
+    protected function parseTokens($tokens, &$tokenIndex)
     {
-        if (method_exists($this, $this->functionName)) {
-            $result = call_user_func_array(array($this, $this->functionName), $this->arguments);
-        } else {
-            $result = '[Error: Unknown function ' . $this->functionName . ']';
-        }
+        $result = '';
+        $textFunction = '';
+        while ($tokenIndex<count($tokens)) {
 
-        --$tokenIndex; // s'ha de tornar enrere perquè la funció es troba al token anterior
+            $parsedValue = $this->parseToken($tokens, $tokenIndex);
+
+            if ($parsedValue === null) { // tancament del field
+                $this->init($textFunction);
+                $result = call_user_func_array(array($this, $this->functionName), $this->arguments);
+                break;
+
+            } else {
+                $textFunction .= $parsedValue;
+            }
+
+            ++$tokenIndex;
+        }
 
         return $result;
     }
 
-    protected function DATE($date)
+    protected function DATE($date, $sep="-")
     {
-        return date('d-m-Y', strtotime($date));
+        return date("d".$sep."m".$sep."Y", strtotime(str_replace('/', '-', $date)));
     }
 
     // ALERTA: El paràmetre de la funció no ha d'anar entre cometes, ja es tracta d'un JSON vàlid
