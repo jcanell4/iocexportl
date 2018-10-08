@@ -36,25 +36,10 @@ class WiocclFor extends WiocclParser {
 
                 $result .= $this->parseTokensOfItem($tokens, $tokenIndex);
 
-    //            while ($tokenIndex < count($tokens)) {
-    //
-    //                $parsedValue =  $this->parseToken($tokens, $tokenIndex);
-    //                if($tokenIndex==$startTokenIndex){
-    //                    $parsedValue = ltrim($parsedValue, "\n");
-    //                }
-    //                
-    //                if ($parsedValue === null) { // tancament del foreach
-    //                    break;
-    //
-    //                }
-    //                $result .= $parsedValue;
-    //
-    //                ++$tokenIndex;
-    //            }
-
                 $lastTokenIndex = $tokenIndex;
 
             }
+            
             $tokenIndex = $lastTokenIndex;
         }
 
@@ -67,9 +52,6 @@ class WiocclFor extends WiocclParser {
         while ($tokenIndex < count($tokens)) {
 
             $parsedValue =  $this->parseToken($tokens, $tokenIndex);
-            if($tokenIndex==$startTokenIndex){
-                $parsedValue = ltrim($parsedValue, "\n");
-            }
 
             if ($parsedValue === null) { // tancament del foreach
                 break;

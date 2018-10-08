@@ -74,10 +74,7 @@ class WiocclForEach extends WiocclParser {
             while ($tokenIndex < count($tokens)) {
 
                 $parsedValue =  $this->parseToken($tokens, $tokenIndex);
-                if($tokenIndex==$startTokenIndex){
-                    $parsedValue = ltrim($parsedValue, "\n");
-                }
-                
+
                 if ($parsedValue === null) { // tancament del foreach
                     break;
 

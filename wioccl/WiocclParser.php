@@ -11,6 +11,8 @@ class WiocclParser
 {
 
     protected $rawValue;
+    protected $fullInstruction="";
+    protected static $instancesCounter=0;
 
 
     // TODO: El datasource es passarà al constructor del parser desde la wiki
@@ -32,28 +34,28 @@ class WiocclParser
         '_#}' => [
             'state' => 'close_function',
         ],
-        '<WIOCCL:IF .*?>' => [
+        '<WIOCCL:IF .*?>(\n)?' => [
             'state' => 'open_if',
         ],
-        '</WIOCCL:IF>' => [
+        '</WIOCCL:IF>(\n)?' => [
             'state' => 'close_if',
         ],
-        '<WIOCCL:FOREACH .*?>' => [
+        '<WIOCCL:FOREACH .*?>(\n)?' => [
             'state' => 'open_foreach',
         ],
-        '</WIOCCL:FOREACH>' => [
+        '</WIOCCL:FOREACH>(\n)?' => [
             'state' => 'close_foreach',
         ],
-        '<WIOCCL:FOR .*?>' => [
+        '<WIOCCL:FOR .*?>(\n)?' => [
             'state' => 'open_for',
         ],
-        '</WIOCCL:FOR>' => [
+        '</WIOCCL:FOR>(\n)' => [
             'state' => 'close_for',
         ],
-        '<WIOCCL:SUBSET .*?>' => [
+        '<WIOCCL:SUBSET .*?>(\n)?' => [
             'state' => 'open_subset',
         ],
-        '</WIOCCL:SUBSET>' => [
+        '</WIOCCL:SUBSET>(\n)?' => [
             'state' => 'close_subset',
         ]
 
@@ -216,8 +218,16 @@ class WiocclParser
                 break;
 
             case 'open':
+                $mark = self::$instancesCounter==0;
+                self::$instancesCounter++;
                 $item = $this->getClassForToken($currentToken);
-                $result .= $item->getTokensValue($tokens, ++$tokenIndex);
+                if($mark){
+                    $result .= $item->getTokensValue($tokens, ++$tokenIndex);
+//                    $result .= "<mark title='${$this->fullInstruction}'>".$item->getTokensValue($tokens, ++$tokenIndex)."</mark>";
+                }else{
+                    $result .= $item->getTokensValue($tokens, ++$tokenIndex);
+                }
+                self::$instancesCounter--;
                 break;
 
             case 'close':
