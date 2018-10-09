@@ -14,29 +14,6 @@ class WiocclIf extends WiocclParser
 
     }
 
-    protected function parseTokens($tokens, &$tokenIndex)
-    {
-
-        $result = '';
-
-        while ($tokenIndex < count($tokens)) {
-            $parsedValue = $this->parseToken($tokens, $tokenIndex);
-
-            if ($parsedValue === null) { // tancament del if
-                break;
-
-            } else {
-                $result .= $parsedValue;
-            }
-
-            ++$tokenIndex;
-        }
-
-
-        return ($this->condition ? $result : '');
-    }
-
-
     protected function evaluateCondition($value)
     {
 
@@ -44,11 +21,9 @@ class WiocclIf extends WiocclParser
             return false;
         }
 
-        // ALERTA! la condició es troba entre cometes: condition="
         if (preg_match('/condition="(.*?([><=]=?))(.*?)">/', $value, $matches) === 0) {
             // ALERTA: Actualment el token amb > arriba tallat perquè l'identifica com a tancament del token d'apertura
             return false;
-//            throw new Exception("Incorrect condition structure");
         };
 
         $arg1 = $this->normalizeArg(str_replace(['==', '>', '<', '=', '>=', '<=', '!='], '', $matches[1]));
@@ -84,9 +59,6 @@ class WiocclIf extends WiocclParser
                 return $arg1 && $arg2;
 
         }
-
-//        throw new Exception ("Condition " . $operator . " not supported.");
-        return false;
 
     }
 }
