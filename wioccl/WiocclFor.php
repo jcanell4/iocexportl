@@ -27,6 +27,7 @@ class WiocclFor extends WiocclParser {
         $lastTokenIndex = 0;
 
         if($this->from > $this->to){
+            $this->arrays[$this->counterName] = -1;
             $this->parseTokensOfItem($tokens, $tokenIndex);
         }else{
             for ($arrayIndex = $this->from; $arrayIndex<=$this->to; $arrayIndex+= $this->step) {

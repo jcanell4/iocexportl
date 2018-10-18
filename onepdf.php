@@ -10,11 +10,11 @@ if (!defined('DOKU_INC')) define('DOKU_INC',dirname(__FILE__).'/../../../');
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 if (!defined('DOKU_IOCEXPORTL_TEMPLATES')) define('DOKU_IOCEXPORTL_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
 if (!defined('DOKU_IOCEXPORTL_LATEX_TMP')) define('DOKU_IOCEXPORTL_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
-if(!defined('DOKU_MODEL')) define('DOKU_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
+if (!defined('WIKI_IOC_MODEL')) define('WIKI_IOC_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
 
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
-require_once DOKU_MODEL.'WikiIocModel.php';
+require_once WIKI_IOC_MODEL.'WikiIocModel.php';
 
 class onepdf implements WikiIocModel{
 

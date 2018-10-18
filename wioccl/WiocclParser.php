@@ -34,13 +34,13 @@ class WiocclParser
         '_#}' => [
             'state' => 'close_function',
         ],
-        '<WIOCCL:IF .*?>(\n)?' => [
+        '<WIOCCL:IF .*?[^\\\\]>(\n)?' => [
             'state' => 'open_if',
         ],
         '</WIOCCL:IF>(\n)?' => [
             'state' => 'close_if',
         ],
-        '<WIOCCL:FOREACH .*?>(\n)?' => [
+        '<WIOCCL:FOREACH .*?[^\\\\]>(\n)?' => [
             'state' => 'open_foreach',
         ],
         '</WIOCCL:FOREACH>(\n)?' => [
@@ -52,7 +52,7 @@ class WiocclParser
         '</WIOCCL:FOR>(\n)' => [
             'state' => 'close_for',
         ],
-        '<WIOCCL:SUBSET .*?>(\n)?' => [
+        '<WIOCCL:SUBSET .*?[^\\\\]>(\n)?' => [
             'state' => 'open_subset',
         ],
         '</WIOCCL:SUBSET>(\n)?' => [
@@ -254,7 +254,7 @@ class WiocclParser
             return intval($arg);
         } else if (is_numeric($arg)) {
             return floatval($arg);
-        } else if (preg_match("/^'(.*?)'$/", $arg, $matches) === 1) {
+        } else if (preg_match("/^''(.*?)''$/", $arg, $matches) === 1) {
             return $this->normalizeArg($matches[1]);
         } else {
             return $arg;
