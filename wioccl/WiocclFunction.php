@@ -21,7 +21,7 @@ class WiocclFunction extends WiocclParser
 
     protected function extractArgs($string)
     {
-        $string = preg_replace("/'/", '"', $string);
+        $string = preg_replace("/''/", '"', $string);
         $string = (new WiocclParser($string, $this->arrays, $this->dataSource))->getValue();
         $string = "[" . $string . "]";
 
@@ -91,6 +91,39 @@ class WiocclFunction extends WiocclParser
     protected function LAST($array, $template)
     {
         return $this->formatItem($array[count($array)-1], 'LAST', $template);
+    }
+
+    protected function SUBS($value1, $value2)
+    {
+        if(!is_numeric($value1) || !is_numeric($value2)){
+            return "[ERROR! paràmetres incorrectes ($value1, $value2)]"; //TODO: internacionalitzar
+        }
+        return $value1 - $value2;
+    }
+
+    protected function SUMA($value1, $value2)
+    {
+        if(!is_numeric($value1) || !is_numeric($value2)){
+            return "[ERROR! paràmetres incorrectes ($value1, $value2)]"; //TODO: internacionalitzar
+        }
+        return $value1 + $value2;
+    }
+
+    protected function UPPERCASE($value1, $value2, $value3=0)
+    {
+        $ret;
+        if(!is_numeric($value2) || !is_numeric($value3)){
+            return "[ERROR! paràmetres incorrectes ($value1, $value2, $value3)]"; //TODO: internacionalitzar
+        }
+        if($value3==0){
+            $value3 = $value2;
+            $value2 = 0;
+        }
+        $ret = strtoupper(substr($value1, $value2, $value3));
+        if($value3< strlen($value1)){
+            $ret .= substr($value1, $value3, strlen($value1));
+        }
+        return $ret;
     }
 
     // $template pot tenir tres formes:

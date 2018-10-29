@@ -11,12 +11,12 @@ if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 if (!defined('DOKU_IOCEXPORTL_TEMPLATES')) define('DOKU_IOCEXPORTL_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
 if (!defined('DOKU_IOCEXPORTL_TEMPLATES_HTML')) define('DOKU_IOCEXPORTL_TEMPLATES_HTML',DOKU_IOCEXPORTL_TEMPLATES.'html/');
 if (!defined('DOKU_IOCEXPORTL_LATEX_TMP')) define('DOKU_IOCEXPORTL_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
-if(!defined('DOKU_MODEL')) define('DOKU_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
+if (!defined('WIKI_IOC_MODEL')) define('WIKI_IOC_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
 
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once DOKU_INC.'inc/parser/xhtml.php';
-require_once DOKU_MODEL.'WikiIocModel.php';
+require_once WIKI_IOC_MODEL.'WikiIocModel.php';
 
 class generate_html implements WikiIocModel{
 
@@ -320,7 +320,7 @@ class generate_html implements WikiIocModel{
                             $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
                             $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
                             $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
-                            $html = preg_replace('/@IOCTOC@/', $this->getTOC($text), $html, 1); 
+                            $html = preg_replace('/@IOCTOC@/', $this->getTOC($text), $html, 1);
                             $html = preg_replace('/@IOCPATH@/', '../../../', $html);
                             $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
                             $html = $this->createrefstopages($html, $unit, $ku, $ks, $ka, '../../../');

@@ -9,7 +9,7 @@ class WiocclIf extends WiocclParser
     public function __construct($value = null, $arrays = [], $dataSource)
     {
         parent::__construct($value, $arrays, $dataSource);
-
+        $value = str_replace("\\", "", $value);
         $this->condition = $this->evaluateCondition($value);
 
     }
