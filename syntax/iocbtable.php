@@ -116,8 +116,12 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
             array_unshift($calls, array_pop($handler->calls));
         }
         foreach ($calls as $call){
-            $content = new ContentCell(ContentCell::CALL_CONTENT, $call);
-            $this->currentCell->addContent($content);                        
+            if($this->currentCell==NULL){
+                $this->tableStruct->addLine(new ExtraCall($call));
+            }else{            
+                $content = new ContentCell(ContentCell::CALL_CONTENT, $call);            
+                $this->currentCell->addContent($content);                        
+            } 
         }
         
         switch ( $state ) {
@@ -152,15 +156,23 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
 
             case DOKU_LEXER_UNMATCHED:
                 if ( trim($match) != '' ) {
-                    $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
-                    $this->currentCell->addContent($content);
+                    if($this->currentCell==NULL){
+                        $this->tableStruct->addLine(new ContentLine($match));
+                    }else{
+                        $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
+                        $this->currentCell->addContent($content);
+                    }
                 }
             break;
 
             case DOKU_LEXER_MATCHED:
                 if ( $match == ' ' ){
-                    $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
-                    $this->currentCell->addContent($content);
+                    if($this->currentCell==NULL){
+                        $this->tableStruct->addLine(new ContentLine($match));
+                    }else{
+                        $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
+                        $this->currentCell->addContent($content);
+                    }
                 } else if ( preg_match('/\|{2,}[\t ]*\n/',$match) || preg_match('/\^{2,}[\t ]*\n/',$match)) { 
                     $nlimit = strlen(trim($match));
                     for($i=1; $i<$nlimit; $i++){                    
@@ -200,8 +212,12 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                     $content = new ContentCell(ContentCell::ALLIGN_CONTENT, $match);
                     $this->currentCell->addContent($content);
                 } else if ( preg_match('/ {2,}/',$match) ) {
-                    $content = new ContentCell(ContentCell::ALLIGN_CONTENT, $match);
-                    $this->currentCell->addContent($content);
+                    if($this->currentCell==NULL){
+                        $this->tableStruct->addLine(new ContentLine($match));
+                    }else{
+                        $content = new ContentCell(ContentCell::ALLIGN_CONTENT, $match);
+                        $this->currentCell->addContent($content);
+                    }
                 } else if ( $match == "|" ) {
                     if($this->currentRow==NULL){
                         $this->currentRow = new RowStructure();
@@ -272,6 +288,10 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
 class TableStructure{
     var $rows = array();
 
+    public function addLine($l){
+        $this->addRow($l);
+    }
+    
     public function addRow($r){
         $this->rows[] =  $r;                
     }
@@ -420,4 +440,27 @@ class ContentCell{
         $this->type = $type;
         $this->data = $data;
     }    
+}
+
+class ExtraCall{
+    var $call;
+    public function ExtraCall($data){
+        $this->call = $data;
+    }
+    function render($mode, &$renderer){    
+        if(method_exists($renderer, $content->call[0])){
+            call_user_func_array(array(&$renderer, $content->call[0]), $content->call[1] ? $content->call[1] : array());
+        }        
+    }
+    
+}
+
+class ContentLine{
+    var $data;
+    public function ContentLine($data){
+        $this->data = $data;
+    }
+    function render($mode, &$renderer){    
+        $renderer->doc .= $this->data;
+    }
 }

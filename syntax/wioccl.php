@@ -13,9 +13,6 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-require_once(DOKU_PLUGIN.'iocexportl/wioccl/WiocclParser.php');
-
-
 class syntax_plugin_iocexportl_wioccl extends DokuWiki_Syntax_Plugin {
 
     /**
