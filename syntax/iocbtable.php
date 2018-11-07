@@ -304,14 +304,14 @@ class TableStructure{
                 $row->render($mode, $renderer);
             }
         }elseif ($mode === 'iocexportl'){
-        }elseif ($mode === 'xhtml'){
+        }elseif ($mode === 'xhtml'
+                || $mode === 'iocxhtml'){
             $renderer->doc .= "<div class='table'>\n<table class='inline'>";
             foreach ($this->rows as $row){
                 //$doc .= $row->render($mode, $renderer);
                 $row->render($mode, $renderer);
             }
             $renderer->doc .= "</table>\n</div>";            
-        }elseif ($mode === 'iocxhtml'){
         }
         //return $doc;
     }
@@ -332,8 +332,8 @@ class RowStructure{
 //                $doc .= $cell->render($mode, $renderer);
                 $cell->render($mode, $renderer);
             }
-        }elseif ($mode === 'iocexportl'){
-        }elseif ($mode === 'xhtml'){
+        }elseif ($mode === 'xhtml'
+                || $mode === 'iocxhtml'){
             $class = 'row'. self::$n_renderRows++;
             $renderer->doc .= "<tr class='$class'>";
             foreach ($this->cells as $cell){
@@ -341,7 +341,7 @@ class RowStructure{
                 $cell->render($mode, $renderer);
             }
             $renderer->doc .= "</tr>";            
-        }elseif ($mode === 'iocxhtml'){
+        }elseif ($mode === 'iocexportl'){
         }
         //return $doc;
     }
@@ -384,8 +384,8 @@ class CellStructure{
             foreach ($this->content as $value){
                 $renderer->doc .= $value;
             }
-        }elseif ($mode === 'iocexportl'){
-        }elseif ($mode === 'xhtml'){
+        }elseif ($mode === 'xhtml'
+                || $mode === 'iocxhtml'){
             $rowspan = $this->rowSpan>1?"rowspan='".$this->rowSpan."'":"";
             $colspan = $this->colSpan>1?"colspan='".$this->colSpan."'":"";
             $class = 'col'.self::$n_renderCols++;
@@ -419,7 +419,7 @@ class CellStructure{
             }else{
                 $renderer->doc .= "</td>";
             }
-        }elseif ($mode === 'iocxhtml'){
+        }elseif ($mode === 'iocexportl'){
         }
         //return $doc;
     }
