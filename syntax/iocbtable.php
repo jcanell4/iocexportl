@@ -200,7 +200,13 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                         }
                         if($nrow>=0){
                             $content = new ContentCell(ContentCell::ROWSPAN_CONTENT);
-                            $this->tableStruct->rows[$nrow]->cells[$ncol]->addContent($content);
+
+                            // ALERTA[Xavi] En el cas de que hi hagi més d'una columna fusionada això el nombre de $ncol es incorrecte
+                            $fixedNCol = $this->getLastColumnFromCells($this->tableStruct->rows[$nrow]->cells, $ncol);
+
+
+//                            $this->tableStruct->rows[$nrow]->cells[$ncol]->addContent($content);
+                            $this->tableStruct->rows[$nrow]->cells[$fixedNCol]->addContent($content);
                         }
                         $content = new ContentCell(ContentCell::NON_CONTENT);                        
                         $this->currentCell->addContent($content);
@@ -243,6 +249,16 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
             break;
         }
         return array($state, $data);
+    }
+
+    // Cerca les columnes desde la última fins a la primera i retorna l'index de la primera que es trobi
+    function getLastColumnFromCells($cells, $lastNCol) {
+        for ($i = $lastNCol; $i>0; --$i) {
+            if ($cells[$i]) {
+                return $i;
+            }
+        }
+        return 0;
     }
 
     /**
