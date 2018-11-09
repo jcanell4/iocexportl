@@ -61,9 +61,11 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
             case 'ioccounter':
                 $this->renderCounter($mode, $renderer, $state, $text);
                 break;
+                // ALERTA! la taula no es renderitza amb això perque no es fa el parse de la taula, només s'afegeix un div al voltant
+//            case 'xhtml':
+//                $this->renderWiki($renderer, $state, $text);
+//                break;
             case 'xhtml':
-                $this->renderWiki($renderer, $state, $text);
-                break;
             case 'iocxhtml':
                 $this->renderHtmlExport($mode, $renderer, $state, $text);
                 break;
@@ -71,6 +73,9 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
                 $this->renderPdfExport($mode, $renderer, $state, $text);
                 break;
             default:
+//                // Alerta, aquest es al que arriba quan es carrega la visualització
+//                $this->renderHtmlExport('xhtml', $renderer, $state, $text);
+//                break;
                 return FALSE;
         }
         return TRUE;

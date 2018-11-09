@@ -13,12 +13,8 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
-
-    /**
-     * ALERTA[Xavi] Duplicat
-     */
-    protected $dataSource = null;
+class syntax_plugin_iocexportl_wiocclstr extends DokuWiki_Syntax_Plugin {
+    private $counter=0; 
 
    /**
     * Get an associative array with plugin info.
@@ -34,16 +30,16 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    function getType(){ return 'container'; }
+    function getType(){ return 'substition'; }
     function getPType(){ return 'normal'; }
 
     //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
     function getAllowedTypes() {
-        return array('formatting', 'protected');
+        return array('container', "substition", "protected");
     }
 
     function getSort(){
-        return 40;
+        return 500;
     }
 
 
@@ -51,55 +47,80 @@ class syntax_plugin_iocexportl_wiocclfield extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('{##.*?##}', $mode, 'plugin_iocexportl_wiocclfield');
+/*        $this->Lexer->addEntryPattern('<WIOCCL:.*?>', $mode, 'plugin_iocexportl_wiocclstr');*/
     }
     
+    function postConnect() {
+        //aliniació
+/*        $this->Lexer->addExitPattern('</WIOCCL:.*?>', 'plugin_iocexportl_wiocclstr');*/
+    }
     /**
      * Handle the match
      */
 
-    function handle($match, $state, $pos, &$handler){
-        // $state es un nombre, en aquest cas no ens interessa
-        // $match es la coincidencia, per exemple: {##tipusModulBloc##}
-        // auquests valors arriban com a index 0 = $state y 1 = $match al $data del render
+    function handle($matchOrig, $state, $pos, &$handler){
+        //$data = array("command" => self::SKIP);
+        
+        $match = str_replace(array("<", ">", "/"), array("","", ""), $matchOrig);
+        switch ( $state ) {
+            case DOKU_LEXER_ENTER:
+                $data = array("state" => "ENTER", "text" =>$match, "level" => ++$this->counter);
+                break;
 
-        return array($state, $match, true);
+            case DOKU_LEXER_EXIT:        
+                $data = array("state" => "EXIT", "text" =>$match, "level" => $this->counter--);
+                break;
+
+            case DOKU_LEXER_UNMATCHED:
+                $data = array("state" => "UNMATCHED", "text" =>$match, "level" => $this->counter);
+                break;
+
+            case DOKU_LEXER_MATCHED:
+                $data = array("state" => "MATCHED", "text" =>$match, "level" => $this->counter);
+                break;
+        }
+        return array($state, $data);        
+
+//        return array($state, $match, true);
     }
 
    /**
     * output
     * ALERTA[XAVI] Duplicat
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, &$renderer, $dataHandler) {
 
 
         if ($mode === 'xhtml') {
-            $htmlText="<mark title='@TITLE@'>@VALUE@</mark>";
+//            $htmlText="<mark title='@TITLE@'>@VALUE@</mark>";
         }else if ($mode === 'iocxhtml') {
-            $htmlText="@VALUE@";
+//            $htmlText="@VALUE@";
         }else {
             return FALSE;
         }
+        
+        list ($state, $data) = $dataHandler;
+        $renderer->doc .= "<mark>".$data["state"]."(((".$data["text"].")))-".$data["level"]."-</mark><br>";
 
-        $dataSource = $this->getDataSource();
-
-        if ($dataSource == null || !$data[2]) {
-
-
-
-            $renderer->doc .= str_replace("@TITLE@", "", str_replace("@VALUE@", $data[1], $htmlText));
-
-            return true;
-        } else {
-            $renderedString = $this->getRenderString($data[1], $mode);
-            if (strlen($renderedString)>0) {
-
-
-                $text = $this->getRenderString($data[1], $mode);
-//                $renderer->doc .= $text;
-                $renderer->doc .= str_replace("@TITLE@", $data[1], str_replace("@VALUE@", $text, $htmlText));
-            }
-        }
+//        $dataSource = $this->getDataSource();
+//
+//        if ($dataSource == null || !$data[2]) {
+//
+//
+//
+//            $renderer->doc .= str_replace("@TITLE@", "", str_replace("@VALUE@", $data[1], $htmlText));
+//
+//            return true;
+//        } else {
+//            $renderedString = $this->getRenderString($data[1], $mode);
+//            if (strlen($renderedString)>0) {
+//
+//
+//                $text = $this->getRenderString($data[1], $mode);
+////                $renderer->doc .= $text;
+//                $renderer->doc .= str_replace("@TITLE@", $data[1], str_replace("@VALUE@", $text, $htmlText));
+//            }
+//        }
 
 
         return true;

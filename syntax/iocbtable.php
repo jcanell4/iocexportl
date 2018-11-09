@@ -116,8 +116,12 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
             array_unshift($calls, array_pop($handler->calls));
         }
         foreach ($calls as $call){
-            $content = new ContentCell(ContentCell::CALL_CONTENT, $call);
-            $this->currentCell->addContent($content);                        
+            if($this->currentCell==NULL){
+                $this->tableStruct->addLine(new ExtraCall($call));
+            }else{            
+                $content = new ContentCell(ContentCell::CALL_CONTENT, $call);            
+                $this->currentCell->addContent($content);                        
+            } 
         }
         
         switch ( $state ) {
@@ -152,15 +156,23 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
 
             case DOKU_LEXER_UNMATCHED:
                 if ( trim($match) != '' ) {
-                    $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
-                    $this->currentCell->addContent($content);
+                    if($this->currentCell==NULL){
+                        $this->tableStruct->addLine(new ContentLine($match));
+                    }else{
+                        $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
+                        $this->currentCell->addContent($content);
+                    }
                 }
             break;
 
             case DOKU_LEXER_MATCHED:
                 if ( $match == ' ' ){
-                    $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
-                    $this->currentCell->addContent($content);
+                    if($this->currentCell==NULL){
+                        $this->tableStruct->addLine(new ContentLine($match));
+                    }else{
+                        $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
+                        $this->currentCell->addContent($content);
+                    }
                 } else if ( preg_match('/\|{2,}[\t ]*\n/',$match) || preg_match('/\^{2,}[\t ]*\n/',$match)) { 
                     $nlimit = strlen(trim($match));
                     for($i=1; $i<$nlimit; $i++){                    
@@ -188,7 +200,13 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                         }
                         if($nrow>=0){
                             $content = new ContentCell(ContentCell::ROWSPAN_CONTENT);
-                            $this->tableStruct->rows[$nrow]->cells[$ncol]->addContent($content);
+
+                            // ALERTA[Xavi] En el cas de que hi hagi més d'una columna fusionada això el nombre de $ncol es incorrecte
+                            $fixedNCol = $this->getLastColumnFromCells($this->tableStruct->rows[$nrow]->cells, $ncol);
+
+
+//                            $this->tableStruct->rows[$nrow]->cells[$ncol]->addContent($content);
+                            $this->tableStruct->rows[$nrow]->cells[$fixedNCol]->addContent($content);
                         }
                         $content = new ContentCell(ContentCell::NON_CONTENT);                        
                         $this->currentCell->addContent($content);
@@ -200,8 +218,12 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                     $content = new ContentCell(ContentCell::ALLIGN_CONTENT, $match);
                     $this->currentCell->addContent($content);
                 } else if ( preg_match('/ {2,}/',$match) ) {
-                    $content = new ContentCell(ContentCell::ALLIGN_CONTENT, $match);
-                    $this->currentCell->addContent($content);
+                    if($this->currentCell==NULL){
+                        $this->tableStruct->addLine(new ContentLine($match));
+                    }else{
+                        $content = new ContentCell(ContentCell::ALLIGN_CONTENT, $match);
+                        $this->currentCell->addContent($content);
+                    }
                 } else if ( $match == "|" ) {
                     if($this->currentRow==NULL){
                         $this->currentRow = new RowStructure();
@@ -227,6 +249,16 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
             break;
         }
         return array($state, $data);
+    }
+
+    // Cerca les columnes desde la última fins a la primera i retorna l'index de la primera que es trobi
+    function getLastColumnFromCells($cells, $lastNCol) {
+        for ($i = $lastNCol; $i>0; --$i) {
+            if ($cells[$i]) {
+                return $i;
+            }
+        }
+        return 0;
     }
 
     /**
@@ -272,6 +304,10 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
 class TableStructure{
     var $rows = array();
 
+    public function addLine($l){
+        $this->addRow($l);
+    }
+    
     public function addRow($r){
         $this->rows[] =  $r;                
     }
@@ -284,14 +320,14 @@ class TableStructure{
                 $row->render($mode, $renderer);
             }
         }elseif ($mode === 'iocexportl'){
-        }elseif ($mode === 'xhtml'){
+        }elseif ($mode === 'xhtml'
+                || $mode === 'iocxhtml'){
             $renderer->doc .= "<div class='table'>\n<table class='inline'>";
             foreach ($this->rows as $row){
                 //$doc .= $row->render($mode, $renderer);
                 $row->render($mode, $renderer);
             }
             $renderer->doc .= "</table>\n</div>";            
-        }elseif ($mode === 'iocxhtml'){
         }
         //return $doc;
     }
@@ -312,8 +348,8 @@ class RowStructure{
 //                $doc .= $cell->render($mode, $renderer);
                 $cell->render($mode, $renderer);
             }
-        }elseif ($mode === 'iocexportl'){
-        }elseif ($mode === 'xhtml'){
+        }elseif ($mode === 'xhtml'
+                || $mode === 'iocxhtml'){
             $class = 'row'. self::$n_renderRows++;
             $renderer->doc .= "<tr class='$class'>";
             foreach ($this->cells as $cell){
@@ -321,7 +357,7 @@ class RowStructure{
                 $cell->render($mode, $renderer);
             }
             $renderer->doc .= "</tr>";            
-        }elseif ($mode === 'iocxhtml'){
+        }elseif ($mode === 'iocexportl'){
         }
         //return $doc;
     }
@@ -364,8 +400,8 @@ class CellStructure{
             foreach ($this->content as $value){
                 $renderer->doc .= $value;
             }
-        }elseif ($mode === 'iocexportl'){
-        }elseif ($mode === 'xhtml'){
+        }elseif ($mode === 'xhtml'
+                || $mode === 'iocxhtml'){
             $rowspan = $this->rowSpan>1?"rowspan='".$this->rowSpan."'":"";
             $colspan = $this->colSpan>1?"colspan='".$this->colSpan."'":"";
             $class = 'col'.self::$n_renderCols++;
@@ -399,7 +435,7 @@ class CellStructure{
             }else{
                 $renderer->doc .= "</td>";
             }
-        }elseif ($mode === 'iocxhtml'){
+        }elseif ($mode === 'iocexportl'){
         }
         //return $doc;
     }
@@ -420,4 +456,27 @@ class ContentCell{
         $this->type = $type;
         $this->data = $data;
     }    
+}
+
+class ExtraCall{
+    var $call;
+    public function ExtraCall($data){
+        $this->call = $data;
+    }
+    function render($mode, &$renderer){    
+        if(method_exists($renderer, $content->call[0])){
+            call_user_func_array(array(&$renderer, $content->call[0]), $content->call[1] ? $content->call[1] : array());
+        }        
+    }
+    
+}
+
+class ContentLine{
+    var $data;
+    public function ContentLine($data){
+        $this->data = $data;
+    }
+    function render($mode, &$renderer){    
+        $renderer->doc .= $this->data;
+    }
 }
