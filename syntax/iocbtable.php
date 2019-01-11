@@ -266,13 +266,24 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, &$renderer, $data) {        
         switch ($mode){
+            case 'wikiiocmodel_psdom':                
+                list ($state, $toProcess) = $data;
+                if($toProcess['command'] == self::PROCESS) {
+//                    $aux = $renderer->doc;
+//                    $renderer->doc = "";
+                    $toProcess['table']->render($mode, $renderer);
+//                    $renderer->doc = $aux;
+                }
+                $ret = TRUE;
+                break;
             case 'ioccounter':
             case 'iocexportl':
             case 'xhtml':
             case 'iocxhtml':
                 list ($state, $toProcess) = $data;
                 if($toProcess['command'] == self::PROCESS) {
-                   $renderer->doc .= $toProcess['table']->render($mode, $renderer); 
+                   //$renderer->doc .= $toProcess['table']->render($mode, $renderer); 
+                   $toProcess['table']->render($mode, $renderer); 
                 }
                 break;
                 $ret = TRUE;
@@ -319,6 +330,19 @@ class TableStructure{
                 //$doc .= $row->render($mode, $renderer);
                 $row->render($mode, $renderer);
             }
+        }elseif ($mode === 'wikiiocmodel_psdom'){
+            if(is_callable(array($renderer, "isBorderTypeTable"))){
+                $isBorderType = $renderer->isBorderTypeTable();
+            }else{
+                $isBorderType = FALSE;
+            }
+            $node = new TableNodeDoc(TableNodeDoc::TABLE_TYPE, $isBorderType);
+            $renderer->getCurrentNode()->addContent($node);
+            $renderer->setCurrentNode($node);                                                
+            foreach ($this->rows as $row){
+                $row->render($mode, $renderer);
+            }
+            $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner()); 
         }elseif ($mode === 'iocexportl'){
         }elseif ($mode === 'xhtml'
                 || $mode === 'iocxhtml'){
@@ -348,6 +372,15 @@ class RowStructure{
 //                $doc .= $cell->render($mode, $renderer);
                 $cell->render($mode, $renderer);
             }
+        }elseif ($mode === 'wikiiocmodel_psdom'){
+            $node = new StructuredNodeDoc(StructuredNodeDoc::TABLEROW_TYPE);
+            $renderer->getCurrentNode()->addContent($node);
+            $renderer->setCurrentNode($node);
+             foreach ($this->cells as $cell){
+//                $doc .= $cell->render($mode, $renderer);
+                $cell->render($mode, $renderer);
+            }
+            $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());             
         }elseif ($mode === 'xhtml'
                 || $mode === 'iocxhtml'){
             $class = 'row'. self::$n_renderRows++;
@@ -400,6 +433,40 @@ class CellStructure{
             foreach ($this->content as $value){
                 $renderer->doc .= $value;
             }
+        }elseif ($mode === 'wikiiocmodel_psdom'){
+            if(is_callable(array($renderer, "isBorderTypeTable"))){
+                $isBorderType = $renderer->isBorderTypeTable();
+            }else{
+                $isBorderType = FALSE;
+            }
+            $align = "";
+            if($this->content[0]->type == ContentCell::ALLIGN_CONTENT){
+                unset($this->content[0]);
+                $align = ' right';
+            }
+            if(end($this->content)->type == ContentCell::ALLIGN_CONTENT){
+                array_pop($this->content);
+                $align = $align == ' right'?' center':' left';
+            }
+            if($this->type== CellStructure::T_HEADER){
+                $type = CellNodeDoc::TABLEHEADER_TYPE;
+            }else{
+                $type = CellNodeDoc::TABLECELL_TYPE;
+            }
+            $node = new CellNodeDoc($type, $this->colSpan, $align, $this->rowSpan, $isBorderType);
+            $renderer->getCurrentNode()->addContent($node);
+            $renderer->setCurrentNode($node); 
+            
+            foreach ($this->content as $content){
+                if($content->type == ContentCell::CDATA_CONTENT){
+                    $renderer->getCurrentNode()->addContent(new TextNodeDoc(TextNodeDoc::PLAIN_TEXT_TYPE, $content->data));
+                }elseif($content->type == ContentCell::CALL_CONTENT){
+                    if(method_exists($renderer, $content->data[0])){
+                      call_user_func_array(array(&$renderer, $content->data[0]), $content->data[1] ? $content->data[1] : array());
+                    }
+                }
+            }
+            $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());            
         }elseif ($mode === 'xhtml'
                 || $mode === 'iocxhtml'){
             $rowspan = $this->rowSpan>1?"rowspan='".$this->rowSpan."'":"";

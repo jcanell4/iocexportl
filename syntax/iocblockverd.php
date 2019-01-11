@@ -75,7 +75,10 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode === 'ioccounter'){
+        if ($mode == 'wikiiocmodel_psdom'){
+            //[TODO]
+            return TRUE;
+        }else if ($mode === 'ioccounter'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -90,7 +93,8 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'iocexportl'){
+        }elseif ($mode === 'iocexportl'
+                || $mode === 'iocxhtml'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -111,19 +115,6 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = p_get_instructions($text);
                     $renderer->doc .= p_render($mode, $instructions, $info);
-                    break;
-                case DOKU_LEXER_EXIT :
-                    break;
-            }
-            return TRUE;
-        }elseif ($mode === 'iocxhtml'){
-            list ($state, $text) = $data;
-            switch ($state) {
-                case DOKU_LEXER_ENTER :
-                    break;
-                case DOKU_LEXER_UNMATCHED :
-                    $instructions = get_latex_instructions($text);
-                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :
                     break;

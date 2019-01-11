@@ -56,7 +56,13 @@ class syntax_plugin_iocexportl_iocreference extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if ($mode === 'ioccounter'){
+        if ($mode === 'wikiiocmodel_psdom'){
+            if(preg_match('/:figure:(.*?):/',$data,$matches)){
+                $renderer->getCurrentNode()->addContent(new ReferenceNodeDoc(trim($matches[1]), ReferenceNodeDoc::REF_FIGURE_TYPE));
+            }elseif(preg_match('/:table:(.*?):/',$data,$matches)){
+                $renderer->getCurrentNode()->addContent(new ReferenceNodeDoc(trim($matches[1]), ReferenceNodeDoc::REF_TABLE_TYPE));
+            }            
+        }elseif ($mode === 'ioccounter'){
             preg_match('/:(figure|table):([^:]+):/',$data, $matches);
             $renderer->doc .= $matches[2];
             return TRUE;

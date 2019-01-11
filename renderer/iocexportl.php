@@ -16,9 +16,12 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
  * The Renderer
  */
 class renderer_plugin_iocexportl extends Doku_Renderer {
+    const BORDER_TYPES = ["pt_taula"];
 
     var $code = FALSE;
     var $col_colspan;
+    var $has_rowspan = FALSE;
+    var $str_hhline="";
     var $col_num = 1;
     static $convert = FALSE;//convert images to $imgext
     var $endimg = FALSE;
@@ -35,6 +38,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $tableheader_count = 0;//Only one header per table
     var $tableheader_end = FALSE;
     var $tmp_dir = 0;//Value of temp dir
+    private $isBorderTypeTable = false;
 
 
     /**
@@ -626,7 +630,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->col_num = 1;
         $this->table_align = array();
         $this->doc .= '\fonttable'.DOKU_LF;
-        $border = ($_SESSION['accounting'])?'|':'';
+        $this->isBorderTypeTable = $this->_isBorderTypeTable($_SESSION["table_types"]);
+        $border = ($_SESSION['accounting'] || $this->isBorderTypeTable)?'|':'';
         $large = '';
         $csetup = '';
         $col_width = '-1,';
@@ -667,6 +672,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $this->doc .= $border;
             } elseif($_SESSION['accounting']) {
                 $col_width = '-1,';
+            } elseif(!empty ($border) && $i===0) {
+                $this->doc .= $border;
             }
             $this->doc .= 'X['.$col_width.'l] '.$border;
         }
@@ -753,9 +760,17 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $this->doc .= '\hline'.DOKU_LF;
             }elseif($_SESSION['accounting']){
                 $this->doc .= '\hline'.DOKU_LF;
+            }elseif($this->isBorderTypeTable){
+                if($this->has_rowspan){
+                    $this->doc .= '\hhline{'.$this->str_hhline.'}'.DOKU_LF;
+                }else{
+                    $this->doc .= '\hline'.DOKU_LF;
+                }
             }
         }
         $this->tableheader_end = FALSE;
+        $this->str_hhline = "";
+        $this->has_rowspan=FALSE;        
     }
 
     function tableheader_open($colspan = 1, $align = NULL, $rowspan = 1){
@@ -825,6 +840,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $this->doc .= '\multicolumn{'.$colspan.'}{'.$position.'}{';
             }
             $this->col_colspan = $colspan;
+            if($rowspan>1){
+                $this->doc .= '\multirow{'.$rowspan.'}{*}{';
+            }
+            $this->has_rowspan = $this->has_rowspan || $rowspan>1;
             if (!$_SESSION['table_small']){
                 $this->doc .= '\raisebox{-\height}{';
             }
@@ -846,6 +865,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tablecell_close(){
+        //Cal afegir la comanda \hhline{~~--~~--} on ~ = no línia (colspan>1) i - = linia (colspan=1)
+        if($this->col_colspan>1){
+            for($i=0; $i<$this->col_colspan; $i++){
+                $this->str_hhline .= "~";
+            }            
+        }else{
+            $this->str_hhline .= "-";
+        }
         if ($_SESSION['accounting'] && $this->col_colspan >= 3){
             $this->col_num += $this->col_colspan;
         }else{
@@ -1311,5 +1338,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->listitem_close();
         }
         $this->listu_close();
+    }
+    
+    private function _isBorderTypeTable($types){
+        return count(array_intersect($types, self::BORDER_TYPES))!=0;
     }
 }

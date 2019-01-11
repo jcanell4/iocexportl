@@ -100,7 +100,10 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode == 'iocexportl'){
+        if ($mode == 'wikiiocmodel_psdom'){
+            //[TODO]
+            return TRUE;
+        }else if ($mode == 'iocexportl'){
             list ($state, $content) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :

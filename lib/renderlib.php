@@ -243,7 +243,7 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
      * @param array $instructions
      * @param array $info
      */
-    function p_latex_render($mode,$instructions,&$info){
+    function p_latex_render($mode,$instructions,&$info, $strict=FALSE){
 
         if(is_null($instructions)) return '';
 
@@ -257,7 +257,13 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
           $Renderer = new $class;
         }
 
-        if (is_null($Renderer)) return null;
+        if(is_null($Renderer) && !$strict){
+            $Renderer = p_get_renderer($mode);
+        }
+        
+        if (is_null($Renderer)){ 
+            return null;            
+        }
 
         $Renderer->reset();
 

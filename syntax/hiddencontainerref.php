@@ -54,9 +54,14 @@ class syntax_plugin_iocexportl_hiddencontainerref extends DokuWiki_Syntax_Plugin
     * output
     */
     function render($mode, &$renderer, $data) {
-        if ($mode === 'iocexportl'){
+        if ($mode == 'wikiiocmodel_psdom'){
+            //[TODO]
+            return TRUE;
+        }else if ($mode === 'iocexportl'){
+            //[TODO]
             return TRUE;
         }elseif ($mode === 'ioccounter'){
+            //[TODO]
             return TRUE;
         }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
             list($state, $num, $title, $pos) = $data;

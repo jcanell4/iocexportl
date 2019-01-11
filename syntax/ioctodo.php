@@ -17,32 +17,32 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
         return array(
             'name' => 'IOC TODO syntax plugin',
             'desc' => 'Plugin to parse TODO tag: mark yellow text background',
-            'sintax' => '[[TODO: text]]',
+            'sintax' => '[##TODO: text##]',
             'url'  => 'http://ioc.gencat.cat/'
         );
     }
 
     function getType(){
-        return 'container'; //tipo de sintaxis (container,substition,formatting,protected,paragraphs)
+        return 'substition'; //tipo de sintaxis (container,substition,formatting,protected,paragraphs)
     }
 
     function getPType(){
-        return 'stack';  //tipo de párrafo (stack, block, normal)
+        return 'normal';  //tipo de párrafo (stack, block, normal)
     }
 
     function getSort(){
-        return 40; //dokuwiki has 320 priority
+        return 40; 
     }
 
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern("(?:\[TODO:).*?(?=.*?\])", $mode, 'plugin_iocexportl_ioctodo');
+        $this->Lexer->addEntryPattern("(?:\[##TODO\:).*?(?=.*?##\])", $mode, 'plugin_iocexportl_ioctodo');
     }
 
     function postConnect() {
-        $this->Lexer->addExitPattern("\]", 'plugin_iocexportl_ioctodo');
+        $this->Lexer->addExitPattern("##\]", 'plugin_iocexportl_ioctodo');
     }
 
     /**
@@ -79,15 +79,15 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
         list ($state, $text) = $data;
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                $renderer->doc .= '<div class="ioctodogroc">';
-                $renderer->doc .= '<span class="ioctodoboldgroc">[TODO:</span>';
+                $renderer->doc .= '<span class="ioctodogroc">';
+                $renderer->doc .= '<span class="ioctodoboldgroc">(TODO:</span>';
                 break;
             case DOKU_LEXER_UNMATCHED:
                 $renderer->doc .= str_replace("\\\\", "<br>", $text);
                 break;
             case DOKU_LEXER_EXIT :
-                $renderer->doc .= '<span class="ioctodoboldgroc">]</span>';
-                $renderer->doc .= "</div>\n";
+                $renderer->doc .= '<span class="ioctodoboldgroc">)</span>';
+                $renderer->doc .= "</span>\n";
                 break;
         }
     }
