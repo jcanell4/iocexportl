@@ -254,35 +254,35 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
         $class = "renderer_plugin_".$mode;
 
         if (class_exists($class)) {
-          $Renderer = new $class;
+          $renderer = new $class;
         }
 
-        if(is_null($Renderer) && !$strict){
-            $Renderer = p_get_renderer($mode);
+        if(is_null($renderer) && !$strict){
+            $renderer = p_get_renderer($mode);
         }
         
-        if (is_null($Renderer)){ 
+        if (is_null($renderer)){ 
             return null;            
         }
 
-        $Renderer->reset();
+        $renderer->reset();
 
-        $Renderer->smileys = getSmileys();
-        $Renderer->entities = getEntities();
-        $Renderer->acronyms = getAcronyms();
-        $Renderer->interwiki = getInterwiki();
+        $renderer->smileys = getSmileys();
+        $renderer->entities = getEntities();
+        $renderer->acronyms = getAcronyms();
+        $renderer->interwiki = getInterwiki();
 
         // Loop through the instructions
         foreach ( $instructions as $instruction ) {
             // Execute the callback against the Renderer
-            call_user_func_array(array(&$Renderer, $instruction[0]),$instruction[1]);
+            call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
         }
 
         //set info array
-        $info = $Renderer->info;
+        $info = $renderer->info;
 
         // Post process and return the output
-        $data = array($mode,& $Renderer->doc);
+        $data = array($mode,& $renderer->doc);
         trigger_event('RENDERER_CONTENT_POSTPROCESS',$data);
-        return $Renderer->doc;
+        return $renderer->doc;
     }
