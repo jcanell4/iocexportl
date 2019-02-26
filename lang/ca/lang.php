@@ -21,3 +21,4 @@ $lang['text_btn']  = 'Incloure la sintaxis de text';
 $lang['textlarge_btn']  = 'Incloure la sintaxis de text large';
 $lang['toolbar_btn']  = 'Estils IOC';
 $lang['fullScreenMessage']  = 'Cliqueu aquí per veure en pantalla complerta';
+$lang['imageNotFoundExporting'] = "No s'ha trobat la imatge %s a %s";

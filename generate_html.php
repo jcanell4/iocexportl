@@ -110,6 +110,7 @@ class generate_html implements WikiIocModel{
         $_SESSION['latex_images'] = array();
         $_SESSION['media_files'] = array();
         $_SESSION['graphviz_images'] = array();
+        $_SESSION['gif_images'] = array();
         if (!file_exists(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir)){
             mkdir(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir, 0775, TRUE);
         }
@@ -260,9 +261,12 @@ class generate_html implements WikiIocModel{
 
                  //Attach media files
                  foreach($_SESSION['media_files'] as $f){
-                     resolve_mediaid(getNS($f),$f,$exists);
+                     $this->_resolve_mediaid(getNS($f),$f,$exists);
                      if ($exists){
                          $zip->addFile(mediaFN($f), 'media/'.basename(mediaFN($f)));
+                     }else{
+                         $text = sprintf(WikiIocLangManager::getLang("imageNotFoundExporting", "iocexportl"), $f, "la introducció");
+                         throw new ImageNotFoundException($f, $text);
                      }
                  }
                  $_SESSION['media_files'] = array();
@@ -351,10 +355,13 @@ class generate_html implements WikiIocModel{
                 }
                 //Attach media files
                 foreach($_SESSION['media_files'] as $f){
-                    resolve_mediaid(getNS($f),$f,$exists);
+                    $this->_resolve_mediaid(getNS($f),$f,$exists);
                     if ($exists){
                         $zip->addFile(mediaFN($f), $this->web_folder.'/'.$ku.'/media/'.basename(mediaFN($f)));
-                    }
+                     }else{
+                         $text = sprintf(WikiIocLangManager::getLang("imageNotFoundExporting", "iocexportl"), $f, "la unitat ".$ku);
+                         throw new ImageNotFoundException($f, $text);
+                     }
                 }
                 $_SESSION['media_files'] = array();
 
@@ -915,17 +922,23 @@ class generate_html implements WikiIocModel{
     private function addMetaMedia($data, &$zip){
         if (isset($data['familypic'])){
             preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$data['familypic'],$matches);
-            resolve_mediaid(getNS($matches[1]),$matches[1],$exists);
+            $this->_resolve_mediaid(getNS($matches[1]),$matches[1],$exists);
             if ($exists){
                 $zip->addFile(mediaFN($matches[1]), 'img/portada.png');
+            }else{
+                $text = sprintf(WikiIocLangManager::getLang("imageNotFoundExporting", "iocexportl"), $f, " la tapa (familypic)");
+                throw new ImageNotFoundException($f, $text);
             }
         }
 
         if (isset($data['copylogo'])){
             preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$data['copylogo'],$matches);
-            resolve_mediaid(getNS($matches[1]),$matches[1],$exists);
+            $this->_resolve_mediaid(getNS($matches[1]),$matches[1],$exists);
             if ($exists){
                 $zip->addFile(mediaFN($matches[1]), 'img/license.png');
+            }else{
+                $text = sprintf(WikiIocLangManager::getLang("imageNotFoundExporting", "iocexportl"), $f, " la tapa (logo CC)");
+                throw new ImageNotFoundException($f, $text);
             }
         }
 
@@ -1187,7 +1200,12 @@ class generate_html implements WikiIocModel{
     public function isDenied() {
         return FALSE;
     }
-
+    
+    private function _resolve_mediaid($ns,&$page,&$exists){
+        $page   = resolve_id($ns,$page);
+        $file   = mediaFN($page);
+        $exists = !@is_dir($file) && @file_exists($file);
+    }
 }
 
 if(!isset($_GET["call"])){
