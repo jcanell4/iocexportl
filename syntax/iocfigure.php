@@ -98,7 +98,38 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode === 'ioccounter'){
+        if ($mode === 'wikiiocmodel_psdom'){
+            list ($state, $text, $id, $params) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    $renderer->setTableTypes("");
+                    $id = trim($id);
+                    $node = new FigureFrame(FigureFrame::FRAME_TYPE_FIGURE, $id);
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+                    break;
+                case DOKU_LEXER_UNMATCHED:
+                    if (!empty($params)) {
+                        $node = $renderer->getCurrentNode();
+                        $node->setNodeParams($params['title'], $params['footer'], $renderer->isBorderTypeTable());
+                    }
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    // Loop through the instructions
+                    foreach ( $instructions as $instruction ) {
+                        // Execute the callback against the Renderer
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT :
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                    $renderer->setTableTypes("");
+                    break;
+            }
+            return TRUE;
+        }elseif ($mode === 'ioccounter'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER : break;
