@@ -3,7 +3,6 @@
  * Latex Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
-
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
@@ -25,24 +24,18 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
-    
-    /**
-     * What kind of syntax are we?
-     */
+
+    // tipus de sintaxi: 'container', 'baseonly', 'formatting', 'substition', 'protected', 'disabled', 'paragraphs'
     function getType(){
         return 'paragraphs';
     }
 
-    /**
-     * What about paragraphs?
-     */
+    // tipus de paràgraf: 'normal', 'block', 'stack'
     function getPType(){
         return 'stack';
     }
 
-    /**
-     * Where to sort in?
-     */
+    // ordre (invers) de prioritat en la seqüencia d'anàlisi
     function getSort(){
         return 513;
     }
@@ -61,7 +54,6 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-
     function handle($match, $state, $pos, &$handler){
         return array($state, $match);
     }
@@ -70,7 +62,29 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode === 'ioccounter'){
+        if ($mode == 'wikiiocmodel_psdom'){
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER:
+                    $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::NEWCONTENT_TYPE);
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+                    break;
+                case DOKU_LEXER_UNMATCHED:
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    foreach ( $instructions as $instruction ) {
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT:
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                    break;
+            }
+            return TRUE;
+        }else if ($mode === 'ioccounter'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :

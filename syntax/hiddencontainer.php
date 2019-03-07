@@ -32,23 +32,17 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    /**
-     * What kind of syntax are we?
-     */
+    // Tipus de sintaxi
     function getType(){
         return 'container';
     }
 
-    /**
-     * What about paragraphs?
-     */
+    // Tipus de paràgraf
     function getPType(){
         return 'block';
     }
 
-    /**
-     * Where to sort in?
-     */
+    // On s'ordena
     function getSort(){
         return 513;
     }
@@ -57,7 +51,7 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
     function getAllowedTypes() {
         return array('formatting', 'substition', 'disabled', 'protected', 'paragraphs', 'container');
     }
-    
+
     /**
      * Connect pattern to lexer
      */
@@ -73,7 +67,6 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-
     function handle($match, $state, $pos, &$handler){
         switch ($state) {
             case DOKU_LEXER_ENTER :
@@ -100,8 +93,27 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode == 'wikiiocmodel_psdom'){
-            //[TODO]
+        if ($mode === 'wikiiocmodel_psdom'){
+            list($state, $text, $type) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER:
+                    $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::HIDDENCONTAINER_TYPE);
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+                    break;
+                case DOKU_LEXER_UNMATCHED:
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    foreach ( $instructions as $instruction ) {
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT:
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                    break;
+            }
             return TRUE;
         }else if ($mode == 'iocexportl'){
             list ($state, $content) = $data;
@@ -160,11 +172,11 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
                     $renderer->doc .= "</div>";
                     break;
             }
-            return TRUE;            
+            return TRUE;
         }
         return FALSE;
     }
-    
+
     function handlerHeader($match, $state, $pos) {
         // get level and title
         $title = trim($match);
@@ -181,12 +193,12 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
         return $headerCalls;
     }
 
-    
+
     function renderHeader($mode, &$renderer, $text, $level, $pos, $containerId) {
         if(!$text) return; //skip empty headlines
 
         $hid = sectionID($text, $this->headers);
-        
+
         // write the header
         $className = 'sectionedit' . $this->sectionCounter++;
         $renderer->doc .= DOKU_LF.'<h'.$level;
@@ -205,5 +217,5 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
     function section_close($mode, &$renderer) {
         $renderer->doc .= DOKU_LF.'</div>'.DOKU_LF;
     }
-    
+
 }

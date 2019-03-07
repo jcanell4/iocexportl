@@ -22,7 +22,7 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
             'date'   => '2011-02-24',
             'name'   => 'IOC verd tags Plugin',
             'desc'   => 'Plugin to parse verd tags',
-            'url'    => 'http://ioc.gencat.cat/',
+            'url'    => 'http://ioc.gencat.cat/'
         );
     }
 
@@ -66,7 +66,6 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-
     function handle($match, $state, $pos, &$handler){
         return array($state, $match);
     }
@@ -76,7 +75,26 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, &$renderer, $data) {
         if ($mode == 'wikiiocmodel_psdom'){
-            //[TODO]
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER:
+                    $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::BLOCVERD_TYPE);
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+                    break;
+                case DOKU_LEXER_UNMATCHED:
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    foreach ( $instructions as $instruction ) {
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT:
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                    break;
+            }
             return TRUE;
         }else if ($mode === 'ioccounter'){
             list ($state, $text) = $data;

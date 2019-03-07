@@ -71,7 +71,14 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if ($mode === "ioccounter"){
+        if ($mode === 'wikiiocmodel_psdom'){
+            list ($syntax, $title, $width, $ns, $pageid, $file) = $data;
+            $ns = trim($ns);
+            $node = new ImageNodeDoc("$ns:$file", $title, NULL, $width);
+            $renderer->getCurrentNode()->addContent($node);
+            return TRUE;
+
+        }elseif ($mode === "ioccounter"){
             list($type, $title) = $data;
             $renderer->doc .= $title;
 
