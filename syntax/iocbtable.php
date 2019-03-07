@@ -110,18 +110,18 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
     function handle($match, $state, $pos, &$handler){
         $data = array("command" => self::SKIP);
 
-        $calls = array();
-        while(!empty($handler->calls) && !$this->isCallMine(end($handler->calls))){
-            array_unshift($calls, array_pop($handler->calls));
-        }
-        foreach ($calls as $call){
-            if ($this->currentCell==NULL){
-                if ($this->tableStruct) {
-                    $this->tableStruct->addLine(new ExtraCall($call));
+        if ($this->tableStruct) {
+            $calls = array();
+            while(!empty($handler->calls) && !$this->isCallMine(end($handler->calls))){
+                array_unshift($calls, array_pop($handler->calls));
+            }
+            foreach ($calls as $call){
+                if ($this->currentCell==NULL){
+                        $this->tableStruct->addLine(new ExtraCall($call));
+                }else{
+                    $content = new ContentCell(ContentCell::CALL_CONTENT, $call);
+                    $this->currentCell->addContent($content);
                 }
-            }else{
-                $content = new ContentCell(ContentCell::CALL_CONTENT, $call);
-                $this->currentCell->addContent($content);
             }
         }
 
