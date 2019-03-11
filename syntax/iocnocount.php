@@ -57,7 +57,8 @@ class syntax_plugin_iocexportl_iocnocount extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if($mode !== 'iocexportl' && $mode !== 'ioccounter') return FALSE;
+        if ($mode !== 'iocexportl' && $mode !== 'ioccounter' && $mode !== 'wikiiocmodel_psdom')
+            return FALSE;
         return TRUE;
     }
 }

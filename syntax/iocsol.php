@@ -1,22 +1,16 @@
 <?php
 /**
  * Iocsol tag Syntax Plugin
- *
  * @author     Marc Català <mcatala@ioc.cat>
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
-
 if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-
 class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
 
-   /**
-    * Get an associative array with plugin info.
-    */
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -28,17 +22,9 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    function getType(){
-        return 'protected';
-    }
-
-    function getPType(){
-        return 'normal';
-    } //stack, block, normal
-
-    function getSort(){
-        return 513;
-    }
+    function getType()  {return 'protected';}
+    function getPType() {return 'normal';} //stack, block, normal
+    function getSort()  {return 513;}
 
     /**
      * Connect pattern to lexer
@@ -53,7 +39,6 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-
     function handle($match, $state, $pos, &$handler){
         return array($state, $match);
     }
@@ -62,8 +47,34 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if($mode === 'ioccounter'){
-            list($state, $text) = $data;
+        list($state, $text) = $data;
+
+        if ($mode === 'wikiiocmodel_psdom') {
+            switch ($state) {
+                case DOKU_LEXER_ENTER:
+                    $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::SOL_TYPE);
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+                    break;
+                case DOKU_LEXER_UNMATCHED:
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    //delete p_open and p_close instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    foreach ( $instructions as $instruction ) {
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT:
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                    break;
+            }
+            return TRUE;
+
+        }elseif ($mode === 'ioccounter'){
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   break;
@@ -75,8 +86,8 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
                   break;
             }
             return TRUE;
-        }elseif($mode === 'iocexportl'){
-            list($state, $text) = $data;
+
+        }elseif ($mode === 'iocexportl'){
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   break;
@@ -97,8 +108,8 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
                   break;
             }
             return TRUE;
-        }elseif($mode === 'xhtml' || $mode === 'iocxhtml'){
-            list($state, $text) = $data;
+
+        }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   break;

@@ -67,7 +67,11 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, &$renderer, $data) {
         global $symbols;
-        if ($mode === 'ioccounter'){
+        if ($mode == 'wikiiocmodel_psdom'){
+            list ($state, $text) = $data;
+            //TODO
+            return TRUE;
+        }elseif ($mode === 'ioccounter'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :

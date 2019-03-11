@@ -87,6 +87,9 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
                     //delete document_start and document_end instructions
                     array_shift($instructions);
                     array_pop($instructions);
+                    //delete p_open and p_close instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
                     foreach ( $instructions as $instruction ) {
                         call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
                     }

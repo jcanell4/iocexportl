@@ -57,7 +57,6 @@ class syntax_plugin_iocexportl_iocnoweb extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-
     function handle($match, $state, $pos, &$handler){
         return array($state, $match);
     }
@@ -65,8 +64,9 @@ class syntax_plugin_iocexportl_iocnoweb extends DokuWiki_Syntax_Plugin {
    /**
     * output
     */
-    function render($mode, &$renderer, $indata) {
-        if ($mode !== 'iocexportl' && $mode !== 'ioccounter') return FALSE;
+    function render($mode, &$renderer, $data) {
+        if ($mode !== 'iocexportl' && $mode !== 'ioccounter' && $mode !== 'wikiiocmodel_psdom')
+            return FALSE;
         return TRUE;
     }
 

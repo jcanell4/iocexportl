@@ -28,18 +28,12 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
             'url'    => 'http://ioc.gencat.cat/',        );
     }
 
-    //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
-    function getType(){ return 'container'; }
-    function getPType(){ return 'stack'; }
-    
-    //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
+    function getType() { return 'container'; }
+    function getPType() { return 'stack'; }
     function getAllowedTypes() {
         return array('container','substition','protected','disabled','formatting','paragraphs');
     }
-    
-    function getSort(){
-        return 40;
-    }
+    function getSort() { return 40; }
 
 
     /**
@@ -48,15 +42,14 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
     function connectTo($mode) {
         $this->Lexer->addEntryPattern(":###", $mode, 'plugin_iocexportl_iocprotectedcontent');
     }
-    
+
     function postConnect() {
-        $this->Lexer->addExitPattern('###:', 'plugin_iocexportl_iocprotectedcontent');         
+        $this->Lexer->addExitPattern('###:', 'plugin_iocexportl_iocprotectedcontent');
     }
-    
+
     /**
      * Handle the match
      */
-
     function handle($match, $state, $pos, &$handler){
         return array($state, $match);
     }
@@ -65,37 +58,55 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
     * output
     */
     function render($mode, &$renderer, $data) {
-        global $symbols;
-        if ($mode === 'ioccounter'){
-            $this->renderCounter($mode, $renderer, $data);
+        if ($mode === 'wikiiocmodel_psdom') {
+            $this->renderPsdom($renderer, $data);
+            return TRUE;
+        }elseif ($mode === 'ioccounter' ||
+                 $mode === 'iocxhtml' ||
+                 $mode === 'iocexportl') {
+            $this->renderGeneral($renderer, $data);
             return TRUE;
         }elseif ($mode === 'xhtml'){
-            $this->renderWiki($mode, $renderer, $data);
-            return TRUE;
-        }elseif ($mode === 'iocxhtml'){
-            $this->renderHtmlExport($mode, $renderer, $data);
-            return TRUE;
-        }elseif ($mode === 'iocexportl'){
-            $this->renderPdfExport($mode, $renderer, $data);
+            $this->renderWiki($renderer, $data);
             return TRUE;
         }
         return FALSE;
     }
-    
-    function renderPdfExport($mode, &$renderer, $data) {
-        
+
+    function renderPsdom(&$renderer, $data) {
+        list($state, $text) = $data;
+        switch ($state) {
+            case DOKU_LEXER_ENTER :
+                $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::PROTECTED_TYPE);
+                $renderer->getCurrentNode()->addContent($node);
+                $renderer->setCurrentNode($node);
+                break;
+            case DOKU_LEXER_UNMATCHED:
+                $instructions = get_latex_instructions($text);
+                //delete document_start and document_end instructions
+                array_shift($instructions);
+                array_pop($instructions);
+                //delete p_open and p_close instructions
+                array_shift($instructions);
+                array_pop($instructions);
+                foreach ( $instructions as $instruction ) {
+                    call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                }
+                break;
+            case DOKU_LEXER_EXIT:
+                $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                break;
+        }
     }
-    
-    function renderHtmlExport($mode, &$renderer, $data) {
-        
+
+    function renderGeneral(&$renderer, $data) {
+        list ($state, $text) = $data;
+        if ($state === DOKU_LEXER_UNMATCHED) {
+            $renderer->doc .= $text;
+        }
     }
-    
-    function renderCounter($mode, &$renderer, $data) {
-        
-    }
-    
-    function renderWiki($mode, &$renderer, $data) {
-        global $symbols;
+
+    function renderWiki(&$renderer, $data) {
         list ($state, $text) = $data;
         switch ($state) {
             case DOKU_LEXER_ENTER :
