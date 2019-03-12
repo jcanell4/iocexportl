@@ -15,9 +15,6 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
     static $soundcloud = 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/@ID@?secret_token=@TOKEN@&color=%230066cc&inverse=false&auto_play=false&show_user=true';
     //<iframe width="100%" height="20" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/341144902?secret_token=s-PNOVW&color=%230066cc&inverse=false&auto_play=false&show_user=true"></iframe>
 
-   /**
-    * Get an associative array with plugin info.
-    */
     function getInfo(){
         return array(
             'name'   => 'IOC sound Plugin',
@@ -25,15 +22,12 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
-
     function getType(){
         return 'substition';
     }
-
     function getPType(){
         return 'block';  //stack, block, normal
     }
-
     function getSort(){
         return 318; //{{uri}} dokuwiki has 320 priority
     }
@@ -50,15 +44,11 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
      */
     function handle($match, $state, $pos, &$handler){
         // Ejemplo de $match: {{soundcloud>341144902:s-PNOVW|sonido de nivel 3}}
-
         $command = substr($match,2,-2);     //remove {{ }}
-
         list($command, $title) = explode('|', $command);
         $title = trim($title);
-
         $command = trim($command);
         list($type, $param) = explode('>', $command);
-
         list($id, $token) = explode(':', $param);
 
         return array($type, $title, $id, $token);
@@ -68,7 +58,14 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if ($mode === 'iocexportl'){
+        if ($mode === 'wikiiocmodel_psdom'){
+            list($type, $title, $id, $token) = $data;
+            $url = preg_replace('/@ID@/', $id, self::$soundcloud);
+            $url = preg_replace('/@TOKEN@/', $token, $url);
+            $renderer->getCurrentNode()->addContent(new TextNodeDoc(TextNodeDoc::PLAIN_TEXT_TYPE, $url));
+            return TRUE;
+
+        }elseif ($mode === 'iocexportl'){
             list($type, $title, $id, $token) = $data;
             if ($type==='soundcloud' || $type==='soundcloud'){
                 $_SESSION['qrcode'] = TRUE;
@@ -82,9 +79,11 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
                 qrcode_media_url($renderer, $url, $title, $type);
             }
             return TRUE;
+
         }elseif ($mode === 'ioccounter'){
             list($site, $url, $title) = $data;
             $renderer->doc .= $title;
+
         }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
             list($type, $title, $id, $token) = $data;
             if ($type==='soundcloud' || $type==='soundcloud'){

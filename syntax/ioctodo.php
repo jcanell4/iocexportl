@@ -21,18 +21,9 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
             'url'  => 'http://ioc.gencat.cat/'
         );
     }
-
-    function getType(){
-        return 'substition'; //tipo de sintaxis (container,substition,formatting,protected,paragraphs)
-    }
-
-    function getPType(){
-        return 'normal';  //tipo de párrafo (stack, block, normal)
-    }
-
-    function getSort(){
-        return 40; 
-    }
+    function getType()  {return 'substition';}  //tipo de sintaxis (container,substition,formatting,protected,paragraphs)
+    function getPType() {return 'normal';}      //tipo de párrafo (stack, block, normal)
+    function getSort()  {return 40;}
 
     /**
      * Connect pattern to lexer
@@ -56,23 +47,53 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
+        $ret = TRUE;
         switch ($mode) {
+            case 'wikiiocmodel_psdom':
             case 'ioccounter':
-                $this->renderCounter($mode, $renderer, $data);
+            case 'iocxhtml':
+            case 'iocexportl':
                 break;
             case 'xhtml':
                 $this->renderWiki($renderer, $data);
                 break;
-            case 'iocxhtml':
-                $this->renderHtmlExport($mode, $renderer, $data);
-                break;
-            case 'iocexportl':
-                $this->renderPdfExport($mode, $renderer, $data);
-                break;
             default:
-                return FALSE;
+                $ret = FALSE;
         }
-        return TRUE;
+        return $ret;
+    }
+
+    function renderPsdom(&$renderer, $data) {
+        list($state, $text) = $data;
+        switch ($state) {
+            case DOKU_LEXER_ENTER :
+                $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::PROTECTED_TYPE);
+                $renderer->getCurrentNode()->addContent($node);
+                $renderer->setCurrentNode($node);
+                break;
+            case DOKU_LEXER_UNMATCHED:
+                $instructions = get_latex_instructions($text);
+                //delete document_start and document_end instructions
+                array_shift($instructions);
+                array_pop($instructions);
+                //delete p_open and p_close instructions
+                array_shift($instructions);
+                array_pop($instructions);
+                foreach ( $instructions as $instruction ) {
+                    call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                }
+                break;
+            case DOKU_LEXER_EXIT:
+                $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                break;
+        }
+    }
+
+    function renderGeneral(&$renderer, $data) {
+        list ($state, $text) = $data;
+        if ($state === DOKU_LEXER_UNMATCHED) {
+            $renderer->doc .= $text;
+        }
     }
 
     function renderWiki(&$renderer, $data) {
@@ -90,15 +111,6 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
                 $renderer->doc .= "</span>\n";
                 break;
         }
-    }
-
-    function renderPdfExport($mode, &$renderer, $data) {
-    }
-
-    function renderHtmlExport($mode, &$renderer, $data) {
-    }
-
-    function renderCounter($mode, &$renderer, $data) {
     }
 
 }
