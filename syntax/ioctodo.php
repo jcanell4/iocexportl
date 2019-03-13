@@ -100,15 +100,20 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
         list ($state, $text) = $data;
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                $renderer->doc .= '<span class="ioctodogroc">';
+                $renderer->doc .= '<div><span class="ioctodogroc">';
                 $renderer->doc .= '<span class="ioctodoboldgroc">(TODO:</span>';
                 break;
             case DOKU_LEXER_UNMATCHED:
-                $renderer->doc .= str_replace("\\\\", "<br>", $text);
+                $instructions = p_get_instructions(str_replace("\\\\", "<br>", $text));           
+                array_shift($instructions);
+                array_shift($instructions);
+                array_pop($instructions);
+                array_pop($instructions);
+                $renderer->doc .= p_render("xhtml", $instructions, $info);
                 break;
             case DOKU_LEXER_EXIT :
                 $renderer->doc .= '<span class="ioctodoboldgroc">)</span>';
-                $renderer->doc .= "</span>\n";
+                $renderer->doc .= "</span></div>\n";
                 break;
         }
     }
