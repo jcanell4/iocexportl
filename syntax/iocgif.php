@@ -98,7 +98,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
             array_push($_SESSION['gif_images'], "$ns:$gif");
 
             if ($_SESSION['alternateAddress']) {
-                $src = ($data['media_address']) ? $data['media_address'] : "../media/";
+                $src = ($data['media_address']) ? $data['media_address'] : "img/";
                 $src.= $rutagif;
             }else {
                 $src = "//".self::DOKU_IOC_XTEC.$rutagif;

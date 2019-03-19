@@ -23,7 +23,7 @@ class syntax_plugin_iocexportl_hiddencontainerref extends DokuWiki_Syntax_Plugin
         return 'substition';
     }
     function getSort(){
-        return 318; //{{uri}} dokuwiki has 320 priority
+        return 318; //dokuwiki has 320 priority
     }
 
     /**
@@ -51,17 +51,17 @@ class syntax_plugin_iocexportl_hiddencontainerref extends DokuWiki_Syntax_Plugin
     * output
     */
     function render($mode, &$renderer, $data) {
-        if ($mode == 'wikiiocmodel_psdom'){
-            list($state, $num, $title, $pos) = $data;
-            $renderer->getCurrentNode()->addContent(new TextNodeDoc(TextNodeDoc::PLAIN_TEXT_TYPE, $title));
+        if ($mode == 'wikiiocmodel_psdom' || $mode === 'iocxhtml') {
+//            list($state, $num, $title, $pos) = $data;
+//            $renderer->getCurrentNode()->addContent(new TextNodeDoc(TextNodeDoc::PLAIN_TEXT_TYPE, $title));
             return TRUE;
-        }else if ($mode === 'iocexportl'){
+        }else if ($mode === 'iocexportl') {
             //[TODO]
             return TRUE;
-        }elseif ($mode === 'ioccounter'){
+        }elseif ($mode === 'ioccounter') {
             //[TODO]
             return TRUE;
-        }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
+        }elseif ($mode === 'xhtml') {
             list($state, $num, $title, $pos) = $data;
             $renderer->doc .= "<a href='#";
             $renderer->doc .= $title;

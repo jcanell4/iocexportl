@@ -52,8 +52,12 @@ class syntax_plugin_iocexportl_iocmarkkey extends DokuWiki_Syntax_Plugin {
                 $renderer->getCurrentNode()->addContent(new TextNodeDoc(TextNodeDoc::PLAIN_TEXT_TYPE, $text));
                 $ret = TRUE;
                 break;
-            case 'ioccounter':
             case 'iocxhtml':
+                $text = trim($text, "@");
+                $renderer->doc .= $text;
+                $ret = TRUE;
+                break;
+            case 'ioccounter':
             case 'iocexportl':
                 $renderer->doc .= $text;
                 $ret = TRUE;

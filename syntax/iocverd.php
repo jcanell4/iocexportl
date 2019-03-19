@@ -19,17 +19,14 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
             'desc'   => 'Plugin to parse <verd> tags'
         );
     }
-
     // tipus de sintaxi: 'container', 'baseonly', 'formatting', 'substition', 'protected', 'disabled', 'paragraphs'
     function getType(){
         return 'formatting';
     }
-
     // tipus de paràgraf: 'normal', 'block', 'stack'
     function getPType(){
         return 'normal';
     }
-
     // ordre (invers) de prioritat en la seqüencia d'anàlisi
     function getSort(){
         return 520;
@@ -61,8 +58,10 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
+
+        list($state, $text) = $data;
+
         if ($mode === 'wikiiocmodel_psdom'){
-            list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER:
                     $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::VERD_TYPE);
@@ -87,8 +86,29 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+
+        }elseif ($mode === "iocxhtml") {
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    //delete p_open and p_close instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    $renderer->doc .= '<span style="background-color:lightgreen;">';
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    $renderer->doc .= '</span>';
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return TRUE;
+
         }elseif ($mode === 'ioccounter'){
-            list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     $renderer->doc .= '::IOCVERDINICI::';
@@ -102,8 +122,8 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+
         }elseif ($mode === 'iocexportl'){
-            list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     break;
@@ -115,14 +135,22 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+
         }elseif ($mode === 'xhtml'){
-            list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = p_get_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    //delete p_open and p_close instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    $renderer->doc .= '<span style="background-color:lightgreen;">';
                     $renderer->doc .= p_render($mode, $instructions, $info);
+                    $renderer->doc .= '</span>';
                     break;
                 case DOKU_LEXER_EXIT :
                     break;

@@ -1180,7 +1180,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }
             //add image tag
             if ($_SESSION['export_html']){
-                $ret .= '<img src="'.$path.'media/'.basename(str_replace(':', '/', $src)).'"';
+                if ($_SESSION['dir_images']) {
+                    $ret .= '<img src="'.$_SESSION['dir_images'].str_replace(':', '/', $src).'"';
+                }else {
+                    $ret .= '<img src="'.$path.'media/'.basename(str_replace(':', '/', $src)).'"';
+                }
             }else{
                 $ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
             }

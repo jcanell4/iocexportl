@@ -129,7 +129,39 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'ioccounter'){
+        }
+        elseif ($mode === 'iocxhtml'){
+            list ($state, $text, $id, $params) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    $renderer->doc .= '<div class="iocfigure">';
+                    $renderer->doc .= '<a name="'.$id.'"></a>';
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    if (isset($params['title'])){
+                        $instructions = get_latex_instructions($params['title']);
+                        $_SESSION['fig_title'] = preg_replace('/(<p>)(.*?)(<\/p>)/s', '$2', p_latex_render($mode, $instructions, $info));
+                    }
+                    $_SESSION['figure'] = TRUE;
+                    $_SESSION['figfooter'] = (isset($params['footer'])) ? $params['footer'] : '';
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    $_SESSION['figure'] = FALSE;
+                    $_SESSION['fig_title'] = '';
+                    if (isset($params['footer'])){
+                        $renderer->doc .= '<div class="footfigure">'.$params['footer'].'</div>';
+                    }
+                    break;
+                case DOKU_LEXER_EXIT :
+                    $renderer->doc .= '</div>';
+                    break;
+            }
+            return TRUE;
+        }
+        elseif ($mode === 'ioccounter'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER : break;
@@ -198,34 +230,6 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     $renderer->doc .= '</div>';
                     $instructions = p_get_instructions($text);
                     $renderer->doc .= p_render($mode, $instructions, $info);
-                    break;
-                case DOKU_LEXER_EXIT :
-                    $renderer->doc .= '</div>';
-                    break;
-            }
-            return TRUE;
-        }
-        elseif ($mode === 'iocxhtml'){
-            list ($state, $text, $id, $params) = $data;
-            switch ($state) {
-                case DOKU_LEXER_ENTER :
-                    $renderer->doc .= '<div class="iocfigure">';
-                    $renderer->doc .= '<a name="'.$id.'"></a>';
-                    break;
-                case DOKU_LEXER_UNMATCHED :
-                    if (isset($params['title'])){
-                        $instructions = get_latex_instructions($params['title']);
-                        $_SESSION['fig_title'] = preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info));
-                    }
-                    $this->footer = (isset($params['footer']))?$params['footer']:'';
-                    $_SESSION['figure'] = TRUE;
-                    $instructions = get_latex_instructions($text);
-                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                    $_SESSION['figure'] = FALSE;
-                    $_SESSION['fig_title'] = '';
-                    if (!empty($this->footer)){
-                        $renderer->doc .= '<div class="footfigure">'.$this->footer.'</div>';
-                    }
                     break;
                 case DOKU_LEXER_EXIT :
                     $renderer->doc .= '</div>';

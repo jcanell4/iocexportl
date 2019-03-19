@@ -74,6 +74,25 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
             }
             return TRUE;
 
+        }elseif ($mode === "iocxhtml") {
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    //delete p_open and p_close instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return TRUE;
+
         }elseif ($mode === 'ioccounter'){
             switch ($state) {
               case DOKU_LEXER_ENTER :
@@ -109,7 +128,7 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
             }
             return TRUE;
 
-        }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
+        }elseif ($mode === 'xhtml'){
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   break;
