@@ -3,8 +3,7 @@
  * Latex Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
-
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
@@ -12,9 +11,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
 
     var $type;
-    /**
-     * return some info
-     */
+
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -46,7 +43,6 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
     function getSort(){
         return 510;
     }
-
 
     /**
      * Connect pattern to lexer
@@ -98,7 +94,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                 $renderer->doc .= '$'.filter_tex_sanitize_formula($text).'$';
             }
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
+        }elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             if(!$this->reservedWords($data)){
                 $lpath = '../';
                 if($_SESSION['iocintro']){

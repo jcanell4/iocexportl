@@ -3,12 +3,10 @@
  * Latex Syntax Plugin
  * @author     Josep Cañellas <jcanell4@ioc.cat>
  */
-
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
-if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-require_once(DOKU_PLUGIN.'syntax.php');
-require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
-
+if(!defined('DOKU_INC')) die();
+if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN', DOKU_INC."lib/plugins/");
+require_once(DOKU_PLUGIN."syntax.php");
+require_once(DOKU_PLUGIN."iocexportl/lib/renderlib.php");
 
 class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
     var $isHeaderOpened=false;
@@ -18,9 +16,6 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
     var $headers = array();
     var $containerId="";
 
-    /**
-     * return some info
-     */
     function getInfo(){
         return array(
             'author' => 'Josep Cañellas',
@@ -118,6 +113,7 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+
         }else if ($mode == 'iocexportl'){
             list ($state, $content) = $data;
             switch ($state) {
@@ -132,6 +128,7 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+
         }else if($mode == 'ioccounter'){
             list ($state, $content) = $data;
             switch ($state) {
@@ -145,7 +142,8 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }else if($mode == 'xhtml' || $mode == 'iocxhtml'){
+
+        }else if (strpos("xhtml/iocxhtml/wikiiocmodel_ptxhtml", $mode)!==FALSE ) {
             list ($state, $content, $containerId) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :

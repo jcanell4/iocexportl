@@ -108,7 +108,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
         }elseif ($mode === 'ioccounter'){
             list($site, $url, $title) = $data;
             $renderer->doc .= $title;
-        }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
+        }elseif (strpos("xhtml/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
             list($site, $params, $title, $width, $height) = $data;
             if($site === 'dailymotion' || $site === 'vimeo'
                     || $site === 'youtube'){

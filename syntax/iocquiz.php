@@ -1,23 +1,18 @@
 <?php
 /**
  * Iocquiz tag Syntax Plugin
- *
  * @author     Marc Català <mcatala@ioc.cat>
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
-
 if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-
 class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
 
     var $class;
-   /**
-    * Get an associative array with plugin info.
-    */
+
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -74,7 +69,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if($mode === 'ioccounter'){
+        if ($mode === 'ioccounter'){
             list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
@@ -87,7 +82,8 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
                   break;
             }
             return TRUE;
-        }elseif($mode === 'iocexportl'){
+        }
+        elseif ($mode === 'iocexportl'){
             list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
@@ -117,7 +113,8 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
                   break;
             }
             return TRUE;
-        }elseif($mode === 'xhtml' || $mode === 'iocxhtml'){
+        }
+        elseif (strpos("xhtml/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
             list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
@@ -262,12 +259,12 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= '<tr>';
             $renderer->doc .= '<td>'.($k+1).'</td>';
             if ($mode === 'xhtml') {
-			          $_SESSION['xhtml_latex_quiz'] = TRUE;
+		$_SESSION['xhtml_latex_quiz'] = TRUE;
             }
             $instructions = get_latex_instructions($m);
             $renderer->doc .=  '<td>'.p_latex_render('iocxhtml', $instructions, $info).'</td>';
             if ($mode === 'xhtml') {
-			          $_SESSION['xhtml_latex_quiz'] = FALSE;
+		$_SESSION['xhtml_latex_quiz'] = FALSE;
             }
             if ($this->class === 'complete' || $this->class === 'relations'){
                 preg_match_all('/@IOCDROPDOWN@/', $renderer->doc, $match);

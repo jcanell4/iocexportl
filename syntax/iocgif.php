@@ -90,7 +90,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
             qrcode_media_url($renderer, $href, $title, $type);
             return TRUE;
 
-        }elseif ($mode === "iocxhtml") {
+        }elseif ($mode === "iocxhtml" || $mode === 'wikiiocmodel_ptxhtml') {
             list($type, $title, $width, $ns, $id, $gif) = $data;
             $rutagif = str_replace(":", "/", $ns)."/$gif";
 

@@ -84,7 +84,7 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
             list($site, $url, $title) = $data;
             $renderer->doc .= $title;
 
-        }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
+        }elseif (strpos("xhtml/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
             list($type, $title, $id, $token) = $data;
             if ($type==='soundcloud' || $type==='soundcloud'){
                 if ($type === 'soundcloud'){

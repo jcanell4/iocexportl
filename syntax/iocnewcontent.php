@@ -3,7 +3,7 @@
  * Latex Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
@@ -11,9 +11,6 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
 
-    /**
-     * return some info
-     */
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -87,7 +84,8 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }else if ($mode === 'ioccounter'){
+        }
+        else if ($mode === 'ioccounter'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -102,7 +100,8 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'iocexportl'){
+        }
+        elseif ($mode === 'iocexportl'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -115,7 +114,8 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'xhtml'){
+        }
+        elseif ($mode === 'xhtml'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -130,13 +130,17 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
+        }
+        elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :

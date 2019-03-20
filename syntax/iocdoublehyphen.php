@@ -62,8 +62,8 @@ class syntax_plugin_iocexportl_iocdoublehyphen extends DokuWiki_Syntax_Plugin {
         }elseif ($mode === 'xhtml'){
             $renderer->doc .= '--';
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
-            $renderer->doc .= '--';
+        }elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
+            $renderer->doc .= '&mdash;';
             return TRUE;
         }elseif ($mode === 'iocexportl'){
             $renderer->doc .= '$\\texttt{-{}-}$';

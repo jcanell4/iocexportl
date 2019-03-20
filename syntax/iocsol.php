@@ -74,7 +74,7 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
             }
             return TRUE;
 
-        }elseif ($mode === "iocxhtml") {
+        }elseif ($mode === "iocxhtml" || $mode === 'wikiiocmodel_ptxhtml') {
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     break;

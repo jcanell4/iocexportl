@@ -38,12 +38,9 @@ class syntax_plugin_iocexportl_hiddencontainerref extends DokuWiki_Syntax_Plugin
      */
     function handle($match, $state, $pos, &$handler){
         $this->refCounter++;
-
-        $command = substr($match,2,-2);     //remove {{ }}
-
+        $command = substr($match, 2, -2);   //remove {{ }}
         list( , $title) = explode('>', $command);
         $title = trim($title);
-
         return array($state, $this->refCounter, $title, $pos);
     }
 
@@ -51,7 +48,7 @@ class syntax_plugin_iocexportl_hiddencontainerref extends DokuWiki_Syntax_Plugin
     * output
     */
     function render($mode, &$renderer, $data) {
-        if ($mode == 'wikiiocmodel_psdom' || $mode === 'iocxhtml') {
+        if (strpos("wikiiocmodel_psdom/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE ) {
 //            list($state, $num, $title, $pos) = $data;
 //            $renderer->getCurrentNode()->addContent(new TextNodeDoc(TextNodeDoc::PLAIN_TEXT_TYPE, $title));
             return TRUE;

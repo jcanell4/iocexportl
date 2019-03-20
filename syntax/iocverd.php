@@ -3,12 +3,10 @@
  * Latex Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
-
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();  //must be run within Dokuwiki
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
-
 
 class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
 
@@ -87,7 +85,7 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
             }
             return TRUE;
 
-        }elseif ($mode === "iocxhtml") {
+        }elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml') {
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     break;

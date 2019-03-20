@@ -3,7 +3,7 @@
  * Table Syntax Plugin
  * @author     Josep Cañellas <jcanell4@ioc.cat>
  */
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
@@ -244,6 +244,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
             case 'iocexportl':
             case 'xhtml':
             case 'iocxhtml':
+            case 'wikiiocmodel_ptxhtml':
                 list ($state, $toProcess) = $data;
                 if ($toProcess['command'] == self::PROCESS) {
                    $toProcess['table']->render($mode, $renderer);
@@ -309,6 +310,7 @@ class TableStructure{
                 break;
             case 'xhtml':
             case 'iocxhtml':
+            case 'wikiiocmodel_ptxhtml':
                 $renderer->doc .= "<div class='table'>\n<table class='inline'>";
                 foreach ($this->rows as $row){
                     $row->render($mode, $renderer);
@@ -347,6 +349,7 @@ class RowStructure{
                 break;
             case 'xhtml':
             case 'iocxhtml':
+            case 'wikiiocmodel_ptxhtml':
                 $class = 'row'. self::$n_renderRows++;
                 $renderer->doc .= "<tr class='$class'>";
                 foreach ($this->cells as $cell){
@@ -435,35 +438,36 @@ class CellStructure{
                 break;
             case 'xhtml':
             case 'iocxhtml':
-                $rowspan = $this->rowSpan>1?"rowspan='".$this->rowSpan."'":"";
-                $colspan = $this->colSpan>1?"colspan='".$this->colSpan."'":"";
+            case 'wikiiocmodel_ptxhtml':
+                $rowspan = $this->rowSpan>1 ? "rowspan='".$this->rowSpan."'" : "";
+                $colspan = $this->colSpan>1 ? "colspan='".$this->colSpan."'" : "";
                 $class = 'col'.self::$n_renderCols++;
                 $align = "";
-                if($this->content[0]->type == ContentCell::ALLIGN_CONTENT){
+                if ($this->content[0]->type == ContentCell::ALLIGN_CONTENT){
                     unset($this->content[0]);
                     $align = ' rightalign';
                 }
-                if(end($this->content)->type == ContentCell::ALLIGN_CONTENT){
+                if (end($this->content)->type == ContentCell::ALLIGN_CONTENT){
                     array_pop($this->content);
-                    $align = $align == ' rightalign'?' centeralign':' leftalign';
+                    $align = $align==' rightalign' ? ' centeralign' : ' leftalign';
                 }
 
                 $class .= $align;
-                if($this->type== CellStructure::T_HEADER){
+                if ($this->type== CellStructure::T_HEADER){
                     $renderer->doc .= "<th class='$class' $colspan $rowspan>";
                 }else{
-                    $renderer->doc .= "<td  class='$class' $colspan $rowspan>";
+                    $renderer->doc .= "<td class='$class' $colspan $rowspan>";
                 }
                 foreach ($this->content as $content){
-                    if($content->type == ContentCell::CDATA_CONTENT){
+                    if ($content->type == ContentCell::CDATA_CONTENT){
                         $renderer->doc .= $content->data;
                     }elseif($content->type == ContentCell::CALL_CONTENT){
-                        if(method_exists($renderer, $content->data[0])){
+                        if (method_exists($renderer, $content->data[0])){
                           call_user_func_array(array(&$renderer, $content->data[0]), $content->data[1] ? $content->data[1] : array());
                         }
                     }
                 }
-                if($this->type== CellStructure::T_HEADER){
+                if ($this->type== CellStructure::T_HEADER){
                     $renderer->doc .= "</th>";
                 }else{
                     $renderer->doc .= "</td>";

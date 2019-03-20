@@ -186,7 +186,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         break;
             }
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
+        }elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             list($state, $data, $params) = $indata;
             switch ($state) {
                     case DOKU_LEXER_ENTER :

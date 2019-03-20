@@ -1,20 +1,16 @@
 <?php
 /**
  * Block verd tag Syntax Plugin
- *
  * @author     Marc Català <mcatala@ioc.cat>
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
-
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
-    /**
-     * return some info
-     */
+
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -99,6 +95,28 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+
+        }elseif ($mode === "iocxhtml" || $mode === "wikiiocmodel_ptxhtml") {
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    //delete p_open and p_close instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    $renderer->doc .= '<span style="background-color:lightgreen;">';
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    $renderer->doc .= '</span>';
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return TRUE;
+
         }else if ($mode === 'ioccounter'){
             list ($state, $text) = $data;
             switch ($state) {
@@ -114,8 +132,8 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'iocexportl'
-                || $mode === 'iocxhtml'){
+
+        }elseif ($mode === 'iocexportl'){
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -128,6 +146,7 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+
         }elseif ($mode === 'xhtml'){
             list ($state, $text) = $data;
             switch ($state) {

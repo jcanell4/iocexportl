@@ -67,6 +67,7 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
 //                break;
             case 'xhtml':
             case 'iocxhtml':
+            case 'wikiiocmodel_ptxhtml':
                 $this->renderHtmlExport($mode, $renderer, $state, $text);
                 break;
             case 'iocexportl':

@@ -49,7 +49,7 @@ class syntax_plugin_iocexportl_wiocclval extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addEntryPattern('{@@', $mode, 'plugin_iocexportl_wiocclval');
 //        $this->Lexer->addEntryPattern('{#[#@]', $mode, 'plugin_iocexportl_wiocclval');
     }
-    
+
     function postConnect() {
         //aliniació
 //        $this->Lexer->addExitPattern('@@}', 'plugin_iocexportl_wiocclfield');
@@ -61,13 +61,13 @@ class syntax_plugin_iocexportl_wiocclval extends DokuWiki_Syntax_Plugin {
 
     function handle($match, $state, $pos, &$handler){
         //$data = array("command" => self::SKIP);
-        
+
         switch ( $state ) {
             case DOKU_LEXER_ENTER:
                 $data = array("state" => "ENTER", "text" =>$match);
                 break;
 
-            case DOKU_LEXER_EXIT:        
+            case DOKU_LEXER_EXIT:
                 $data = array("state" => "EXIT", "text" =>$match);
                 break;
 
@@ -79,7 +79,7 @@ class syntax_plugin_iocexportl_wiocclval extends DokuWiki_Syntax_Plugin {
                 $data = array("state" => "MATCHED", "text" =>$match);
                 break;
         }
-        return array($state, $data);        
+        return array($state, $data);
 
 //        return array($state, $match, true);
     }
@@ -93,12 +93,12 @@ class syntax_plugin_iocexportl_wiocclval extends DokuWiki_Syntax_Plugin {
 
         if ($mode === 'xhtml') {
 //            $htmlText="<mark title='@TITLE@'>@VALUE@</mark>";
-        }else if ($mode === 'iocxhtml') {
+        }else if ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml') {
 //            $htmlText="@VALUE@";
         }else {
             return FALSE;
         }
-        
+
          list ($state, $data) = $data;
         $renderer->doc .= "<mark>".$data["state"]."(((".$data["text"].")))-</mark>";
 

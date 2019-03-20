@@ -9,7 +9,7 @@
       :large: (bool)
 	:::
  */
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();  //must be run within Dokuwiki
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
@@ -20,9 +20,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
     var $id;
     var $type;
     var $vertical;
-    /**
-     * return some info
-     */
+
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -56,7 +54,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
     function postConnect() {
         $this->Lexer->addExitPattern('^:::', 'plugin_iocexportl_ioctable');
     }
-
 
     /**
      * Handle the match
@@ -92,33 +89,33 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     $renderer->setTableTypes($params['type']);
-                    
+
                     $id = trim($id);
                     preg_match('/::([^:]*):/', $text, $matches);
                     $type = (isset($matches[1]))?$matches[1]:'';
                     if($type === "accounting"){
-                        $node = new TableFrame(TableFrame::TABLEFRAME_TYPE_ACCOUNTING, 
-                                                    $id, 
-                                                    $params["title"], 
-                                                    $params["footer"], 
-                                                    $params["widths"], 
-                                                    $params['type'], 
+                        $node = new TableFrame(TableFrame::TABLEFRAME_TYPE_ACCOUNTING,
+                                                    $id,
+                                                    $params["title"],
+                                                    $params["footer"],
+                                                    $params["widths"],
+                                                    $params['type'],
                                                     $renderer->isBorderTypeTable());
                     }else{
-                        $node = new TableFrame(TableFrame::TABLEFRAME_TYPE_TABLE, 
-                                                    $id, 
-                                                    $params["title"], 
-                                                    $params["footer"], 
-                                                    $params["widths"], 
-                                                    $params['type'], 
+                        $node = new TableFrame(TableFrame::TABLEFRAME_TYPE_TABLE,
+                                                    $id,
+                                                    $params["title"],
+                                                    $params["footer"],
+                                                    $params["widths"],
+                                                    $params['type'],
                                                     $renderer->isBorderTypeTable());
                     }
                     $renderer->getCurrentNode()->addContent($node);
-                    $renderer->setCurrentNode($node);                      
+                    $renderer->setCurrentNode($node);
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
-                    //delete document_start and document_end instructions                    
+                    //delete document_start and document_end instructions
                     array_shift($instructions);
                     array_pop($instructions);
                     // Loop through the instructions
@@ -129,12 +126,13 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
 //                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :
-                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());                      
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
                     $renderer->setTableTypes("");
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'ioccounter'){
+        }
+        elseif ($mode === 'ioccounter'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -149,7 +147,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'iocexportl'){
+        }
+        elseif ($mode === 'iocexportl'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -223,7 +222,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'xhtml'){
+        }
+        elseif ($mode === 'xhtml'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
@@ -267,7 +267,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         break;
                 }
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
+        }
+        elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                     case DOKU_LEXER_ENTER :

@@ -5,19 +5,13 @@
  * @author     Marc Català <mcatala@ioc.cat>
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
-
-// must be run within Dokuwiki
-if(!defined('DOKU_INC')) die();
-
+if(!defined('DOKU_INC')) die();  // must be run within Dokuwiki
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugin {
 
-   /**
-    * Get an associative array with plugin info.
-    */
     function getInfo(){
         return array(
             'author' => 'Josep Cañellas',
@@ -34,7 +28,6 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
         return array('container','substition','protected','disabled','formatting','paragraphs');
     }
     function getSort() { return 40; }
-
 
     /**
      * Connect pattern to lexer
@@ -61,9 +54,7 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
         if ($mode === 'wikiiocmodel_psdom') {
             $this->renderPsdom($renderer, $data);
             return TRUE;
-        }elseif ($mode === 'ioccounter' ||
-                 $mode === 'iocxhtml' ||
-                 $mode === 'iocexportl') {
+        }elseif (strpos("ioccounter/iocexportl/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
             $this->renderGeneral($renderer, $data);
             return TRUE;
         }elseif ($mode === 'xhtml'){

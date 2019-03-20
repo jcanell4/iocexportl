@@ -3,7 +3,7 @@
  * Syntax iocgrave: Plugin to parse grave accents syntax in pdf and html
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
-if(!defined('DOKU_INC')) die();
+if(!defined('DOKU_INC')) die();  //must be run within Dokuwiki
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
@@ -49,14 +49,8 @@ class syntax_plugin_iocexportl_iocgrave extends DokuWiki_Syntax_Plugin {
         if ($mode === 'wikiiocmodel_psdom'){
             $renderer->getCurrentNode()->addContent(new LeafNodeDoc(LeafNodeDoc::GRAVE_TYPE));
             return TRUE;
-        }elseif ($mode === 'ioccounter'){
+        }elseif (strpos("ioccounter/xhtml/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
             $renderer->doc .=  '`';
-            return TRUE;
-        }elseif ($mode === 'xhtml'){
-            $renderer->doc .= '`';
-            return TRUE;
-        }elseif ($mode === 'iocxhtml'){
-            $renderer->doc .= '`';
             return TRUE;
         }elseif ($mode === 'iocexportl'){
             $renderer->doc .= filter_tex_sanitize_formula("$\grave{\:}$");

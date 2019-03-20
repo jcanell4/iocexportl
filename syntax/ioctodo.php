@@ -52,6 +52,7 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
             case 'wikiiocmodel_psdom':
             case 'ioccounter':
             case 'iocxhtml':
+            case 'wikiiocmodel_ptxhtml':
             case 'iocexportl':
                 break;
             case 'xhtml':
@@ -104,7 +105,7 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
                 $renderer->doc .= '<span class="ioctodoboldgroc">(TODO:</span>';
                 break;
             case DOKU_LEXER_UNMATCHED:
-                $instructions = p_get_instructions(str_replace("\\\\", "<br>", $text));           
+                $instructions = p_get_instructions(str_replace("\\\\", "<br>", $text));
                 array_shift($instructions);
                 array_shift($instructions);
                 array_pop($instructions);

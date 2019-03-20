@@ -100,7 +100,7 @@ class syntax_plugin_iocexportl_iocsolucio extends DokuWiki_Syntax_Plugin {
             }
             return TRUE;
 
-        }elseif ($mode === 'iocxhtml'){
+        }elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   break;
@@ -110,7 +110,7 @@ class syntax_plugin_iocexportl_iocsolucio extends DokuWiki_Syntax_Plugin {
                   $renderer->doc .= '<form action="">';
                   $renderer->doc .= '<div class="solution ioccontent">';
                   $instructions = get_latex_instructions($text);
-                  $renderer->doc .= p_latex_render('iocxhtml', $instructions, $info);
+                  $renderer->doc .= p_latex_render($mode, $instructions, $info);
                   $renderer->doc .= '</div>';
                   $renderer->doc .= '<input class="btn_solution3" type="button" value="'.$value.'"></input>';
                   $renderer->doc .= '</form>';

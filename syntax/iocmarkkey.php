@@ -53,6 +53,7 @@ class syntax_plugin_iocexportl_iocmarkkey extends DokuWiki_Syntax_Plugin {
                 $ret = TRUE;
                 break;
             case 'iocxhtml':
+            case 'wikiiocmodel_ptxhtml':
                 $text = trim($text, "@");
                 $renderer->doc .= $text;
                 $ret = TRUE;

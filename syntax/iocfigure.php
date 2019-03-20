@@ -9,19 +9,15 @@
   	  :license:
 	:::
  */
-
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-
 class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
 
     var $footer;
-    /**
-     * return some info
-     */
+
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -130,7 +126,7 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
             }
             return TRUE;
         }
-        elseif ($mode === 'iocxhtml'){
+        elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -143,9 +139,11 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                         $_SESSION['fig_title'] = preg_replace('/(<p>)(.*?)(<\/p>)/s', '$2', p_latex_render($mode, $instructions, $info));
                     }
                     $_SESSION['figure'] = TRUE;
-                    $_SESSION['figfooter'] = (isset($params['footer'])) ? $params['footer'] : '';
                     $instructions = get_latex_instructions($text);
                     //delete document_start and document_end instructions
+                    array_shift($instructions);
+                    array_pop($instructions);
+                    //delete p_open and p_close instructions
                     array_shift($instructions);
                     array_pop($instructions);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
