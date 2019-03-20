@@ -101,7 +101,7 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
         list ($state, $text) = $data;
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                $renderer->doc .= "<div class='iocprotectedcontent'>\n";
+                $renderer->doc .= "<div title='Contingut protegit' class='iocprotectedcontent'>\n";
                 break;
             case DOKU_LEXER_UNMATCHED :
                 $renderer->doc .= $text;
