@@ -1341,6 +1341,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
     
     private function _isBorderTypeTable($types){
-        return count(array_intersect($types, self::BORDER_TYPES))!=0;
+        $ret = false;
+        if(is_array($types)){
+            $ret = count(array_intersect($types, self::BORDER_TYPES))!=0;
+        }
+        return $ret;
     }
 }
