@@ -60,6 +60,37 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
         $renderer->doc .= '}';
         $renderer->doc .= '\end{mediaurl}';
     }
+    
+    function get_ioc_instructions($text, $modesToavoid=array()){
+        $allmodes = p_get_parsermodes();
+        
+        $modes = array();
+        
+        foreach ($allmodes as $mod){
+            if(!in_array($mod["mode"], $modesToavoid)){
+                $modes []= $mod;
+            }
+        }
+        
+
+        // Create the parser
+        $Parser = new Doku_Parser();
+
+        // Add the Handler
+        $Parser->Handler = new Doku_Handler();
+
+        //add modes to parser
+        foreach($modes as $mode){
+            $Parser->addMode($mode['mode'],$mode['obj']);
+        }
+
+        // Do the parsing
+        trigger_event('PARSER_WIKITEXT_PREPROCESS', $text);
+        $p = $Parser->parse($text);
+        //  dbg($p);
+        return $p;
+        
+    }
 
     /**
      *
