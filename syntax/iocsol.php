@@ -79,6 +79,9 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_ENTER :
                     break;
                 case DOKU_LEXER_UNMATCHED :
+                    if (!isset($_SESSION['quizsol'])) {
+                        $_SESSION['quizsol'] = array();
+                    }
                     $instructions = get_latex_instructions($text);
                     //delete document_start and document_end instructions
                     array_shift($instructions);
@@ -86,7 +89,11 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
                     //delete p_open and p_close instructions
                     array_shift($instructions);
                     array_pop($instructions);
-                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    $sol = p_latex_render($mode, $instructions, $info);
+                    array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
+                    if ($_SESSION['quizmode'] !== 'relations') {
+                        $renderer->doc .= '@IOCDROPDOWN@';
+                    }
                     break;
                 case DOKU_LEXER_EXIT :
                     break;
@@ -95,58 +102,58 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
 
         }elseif ($mode === 'ioccounter'){
             switch ($state) {
-              case DOKU_LEXER_ENTER :
-                  break;
-              case DOKU_LEXER_UNMATCHED :
-                  $instructions = get_latex_instructions($text);
-                  $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                  break;
-              case DOKU_LEXER_EXIT :
-                  break;
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
             }
             return TRUE;
 
         }elseif ($mode === 'iocexportl'){
             switch ($state) {
-              case DOKU_LEXER_ENTER :
-                  break;
-              case DOKU_LEXER_UNMATCHED :
-                  if (!isset($_SESSION['quizsol'])){
-                      $_SESSION['quizsol'] = array();
-                  }
-                  $instructions = get_latex_instructions($text);
-                  $sol = p_latex_render($mode, $instructions, $info);
-                  array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
-                  if($_SESSION['quizmode'] !== 'relations'){
-                      $renderer->doc .= '\quizrule{'.min(20,strlen($text)).'em}';
-                  }else{
-                      $renderer->doc .= ' (\hspace{5mm})';
-                  }
-                  break;
-              case DOKU_LEXER_EXIT :
-                  break;
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    if (!isset($_SESSION['quizsol'])){
+                        $_SESSION['quizsol'] = array();
+                    }
+                    $instructions = get_latex_instructions($text);
+                    $sol = p_latex_render($mode, $instructions, $info);
+                    array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
+                    if($_SESSION['quizmode'] !== 'relations'){
+                        $renderer->doc .= '\quizrule{'.min(20,strlen($text)).'em}';
+                    }else{
+                        $renderer->doc .= ' (\hspace{5mm})';
+                    }
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
             }
             return TRUE;
 
         }elseif ($mode === 'xhtml'){
             switch ($state) {
-              case DOKU_LEXER_ENTER :
-                  break;
-              case DOKU_LEXER_UNMATCHED :
-                  if (!isset($_SESSION['quizsol'])){
-                      $_SESSION['quizsol'] = array();
-                  }
-                  $instructions = get_latex_instructions($text);
-                  $sol = p_latex_render($mode, $instructions, $info);
-                  array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
-                  if($_SESSION['quizmode'] !== 'relations'){
-                      $renderer->doc .= '@IOCDROPDOWN@';
-                  }else{
-                      $renderer->doc .= '';
-                  }
-                  break;
-              case DOKU_LEXER_EXIT :
-                  break;
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    if (!isset($_SESSION['quizsol'])){
+                        $_SESSION['quizsol'] = array();
+                    }
+                    $instructions = get_latex_instructions($text);
+                    $sol = p_latex_render($mode, $instructions, $info);
+                    array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
+                    if($_SESSION['quizmode'] !== 'relations'){
+                        $renderer->doc .= '@IOCDROPDOWN@';
+                    }else{
+                        $renderer->doc .= '';
+                    }
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
             }
             return TRUE;
         }
