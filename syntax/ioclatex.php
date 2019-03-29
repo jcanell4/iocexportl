@@ -22,7 +22,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
-
+    
     /**
      * What kind of syntax are we?
      */
@@ -41,7 +41,8 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
      * Where to sort in?
      */
     function getSort(){
-        return 510;
+        return 210;
+//        return 510;
     }
 
     /**
@@ -64,21 +65,33 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
     function render($mode, &$renderer, $data) {
         global $symbols;
         if ($mode == 'wikiiocmodel_psdom'){
-            list ($state, $text) = $data;
-            //TODO
+            if(!$this->reservedWords($data)){
+                $xhtml = p_render("xhtml", get_ioc_instructions($data, array("plugin_iocexportl_ioclatex")), $info);
+                if ($_SESSION['xhtml_latex_quiz']) {
+                    //afegir un noda amb el valor retornat a $xhtml;
+                }else{
+                    if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
+                        $path = mediaFN($match[2]);
+                    } else {
+                        $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
+                    }                    
+                    $node = new LatexMathNodeDoc(basename($path), "");
+                    $renderer->getCurrentNode()->addContent($node);
+//                    if (!isset($_SESSION['latex_images'])){
+//                        $_SESSION['latex_images'] = array();
+//                    }
+//                    array_push($_SESSION['latex_images'],$path);
+//                    $renderer->doc .= '<span class="'.$class.'"><img src="'.$lpath.'media/'.basename($match[1]).'" /></span>';
+                    //afegir un node amb la informació necessària per imprimir la imatge de la fórmula
+                    
+                }
+            }            
             return TRUE;
         }elseif ($mode === 'ioccounter'){
-            list ($state, $text) = $data;
-            switch ($state) {
-                case DOKU_LEXER_ENTER :
-                    break;
-                case DOKU_LEXER_UNMATCHED :
-                    $renderer->doc .= $text;
-                    break;
-                case DOKU_LEXER_EXIT :
-                    break;
-            }
+             $renderer->doc .= $data;
             return TRUE;
+        }elseif ($mode === 'xhtml'){
+            $renderer->doc .= p_render($mode, get_ioc_instructions($data, array("plugin_iocexportl_ioclatex")), $info);
         }elseif ($mode === 'iocexportl'){
             if(preg_match('/<latex>(.*?)<\/latex>/', $data, $matches)){
                 $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
@@ -102,8 +115,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                 }
                 $block = preg_match('/^\${2}/', $data);
                 $class = ($block)?'blocklatex':'inlinelatex';
-                $render = new Doku_Renderer_xhtml();
-                $xhtml = $render->render($data);
+                $xhtml = p_render("xhtml", get_ioc_instructions($data, array("plugin_iocexportl_ioclatex")), $info);
                 //Inside quiz and xhtml wiki required
                 if ($_SESSION['xhtml_latex_quiz']) {
                     $renderer->doc .= $xhtml;
