@@ -55,6 +55,8 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                 }else{
                     if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
                         $path = mediaFN($match[2]);
+                    }elseif (preg_match('/<img src="(.*?)"/', $xhtml, $match)) {
+                        $path = realpath(DOKU_INC . ".." . $match[1]);
                     } else {
                         $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
                     }
@@ -105,7 +107,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                         $path = mediaFN($match[2]);
                     } else {
                         if (preg_match('/<img (.*?src="(.*?))"/', $xhtml, $match)) {
-                            $path = DOKU_INC . "../" . $match[2];
+                            $path = realpath(DOKU_INC . ".." . $match[2]);
                         }else {
                             $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
                         }
