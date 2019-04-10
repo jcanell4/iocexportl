@@ -317,7 +317,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         $class = ($this->type === 'table') ? "ioctable" : "iocaccounting";
         $type = str_replace(",", " ", $type);
         $divclass = trim('<div class="' . $class . ' '. $type . '">');
-        $divclass .= '">';
         return $divclass;
     }
 }
