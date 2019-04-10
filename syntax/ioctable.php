@@ -88,18 +88,19 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-                    $renderer->setTableTypes($params['type']);
-
+                    $styletype = ($params['type']) ? $params['type'] : $_SESSION['styletype'];
+                    $renderer->setTableTypes($styletype);
                     $id = trim($id);
+
                     preg_match('/::([^:]*):/', $text, $matches);
-                    $type = (isset($matches[1]))?$matches[1]:'';
-                    if($type === "accounting"){
+                    $tabletype = (isset($matches[1])) ? $matches[1] : '';
+                    if ($tabletype === "accounting"){
                         $node = new TableFrame(TableFrame::TABLEFRAME_TYPE_ACCOUNTING,
                                                     $id,
                                                     $params["title"],
                                                     $params["footer"],
                                                     $params["widths"],
-                                                    $params['type'],
+                                                    $styletype,
                                                     $renderer->isBorderTypeTable());
                     }else{
                         $node = new TableFrame(TableFrame::TABLEFRAME_TYPE_TABLE,
@@ -107,7 +108,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                                                     $params["title"],
                                                     $params["footer"],
                                                     $params["widths"],
-                                                    $params['type'],
+                                                    $styletype,
                                                     $renderer->isBorderTypeTable());
                     }
                     $renderer->getCurrentNode()->addContent($node);
@@ -123,7 +124,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         // Execute the callback against the Renderer
                         call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
                     }
-//                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :
                     $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
@@ -273,8 +273,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             switch ($state) {
                     case DOKU_LEXER_ENTER :
                         preg_match('/::([^:]*):/', $text, $matches);
-                        $this->type = (isset($matches[1]))?$matches[1]:'';
-                        $renderer->doc .= $this->_getDivClass($params['type']);
+                        $this->type = (isset($matches[1])) ? $matches[1] : '';
+                        $styletype = ($params['type']) ? $params['type'] : $_SESSION['styletype'];
+                        $renderer->doc .= $this->_getDivClass($styletype);
                         $this->footer = (isset($params['footer'])) ?$params['footer'] : '';
                         if (isset($params['widths']) && isset($params['force_widths'])){
                             $e = explode(',', $params['widths']);
@@ -315,8 +316,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
     function _getDivClass($type=NULL){
         $class = ($this->type === 'table') ? "ioctable" : "iocaccounting";
         $type = str_replace(",", " ", $type);
-        $divclass = trim('<div class="' . $class . ' '. $type);
-        //$divclass .= '" style="width:30% !important;';
+        $divclass = trim('<div class="' . $class . ' '. $type . '">');
         $divclass .= '">';
         return $divclass;
     }
