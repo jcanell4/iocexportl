@@ -275,7 +275,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         preg_match('/::([^:]*):/', $text, $matches);
                         $this->type = (isset($matches[1])) ? $matches[1] : '';
                         $styletype = ($params['type']) ? $params['type'] : $_SESSION['styletype'];
-                        $renderer->doc .= $this->_getDivClass($styletype);
+                        $renderer->doc .= $this->_getDivClass($styletype).DOKU_LF;
                         $this->footer = (isset($params['footer'])) ?$params['footer'] : '';
                         if (isset($params['widths']) && isset($params['force_widths'])){
                             $e = explode(',', $params['widths']);
@@ -287,14 +287,13 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                                 $_SESSION['table_widths'][$i] = $e[$i] * 100 / $t;
                             }
                         }
-                        $renderer->doc .= '<div class="titletable"><a name="'.$id.'">';
-                        $renderer->doc .= '<span>Taula</span>';
-                        $renderer->doc .= '</a>';
+                        $renderer->doc .= '<div class="titletable">';
+                        $renderer->doc .= '<a name="'.$id.'"><span>Taula: </span></a>';
                         if (isset($params['title'])){
                             $instructions = get_latex_instructions($params['title']);
-                            $renderer->doc .= preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info));
+                            $renderer->doc .= trim(preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info)));
                         }
-                        $renderer->doc .= '</div>';
+                        $renderer->doc .= '</div>'.DOKU_LF;
                         break;
                     case DOKU_LEXER_UNMATCHED :
                         $instructions = get_latex_instructions($text);
