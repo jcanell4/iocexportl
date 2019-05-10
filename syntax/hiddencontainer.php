@@ -147,7 +147,7 @@ class syntax_plugin_iocexportl_hiddencontainer extends DokuWiki_Syntax_Plugin {
             list ($state, $content, $containerId) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-                    $type = split(":", $content)[0];
+                    $type = explode(":", $content)[0];
                     $renderer->doc .= "<a id='$content' class='imploded hiddenContainer' data-container-type='$type' href='#'>$content</a>";
                     $renderer->doc .= "<div class='imploded' data-container-id='$containerId'>";
                     break;
