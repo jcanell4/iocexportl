@@ -115,7 +115,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             if ($formType==2){
                 $event->data["ajaxCmdResponseGenerator"]->addExtraContentStateResponse(
                     $event->data["responseData"]["structure"]["id"],
-                    "ftpSendButton",
+                    ProjectKeys::KEY_FTPSEND_BUTTON,
                     TRUE
                     );
             }
