@@ -433,7 +433,9 @@ class CellStructure{
                 break;
             case 'ioccounter':
                 foreach ($this->content as $value){
-                    $renderer->doc .= $value;
+                    if ($value->type == ContentCell::CDATA_CONTENT){
+                        $renderer->doc .= $value->data;
+                    }
                 }
                 break;
             case 'xhtml':
