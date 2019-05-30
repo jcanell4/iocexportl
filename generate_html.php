@@ -459,33 +459,34 @@ class generate_html implements WikiIocModel{
      * @param string $directory
      */
     private function removeDir($directory) {
-        if(!file_exists($directory) || !is_dir($directory)) {
-            return FALSE;
-        } elseif(!is_readable($directory)) {
-            return FALSE;
-        } else {
-            $directoryHandle = opendir($directory);
-
-            while ($contents = readdir($directoryHandle)) {
-                if($contents != '.' && $contents != '..') {
-                    $path = $directory . "/" . $contents;
-
-                    if(is_dir($path)) {
-                        $this->removeDir($path);
-                    } else {
-                        unlink($path);
-                    }
-                }
-            }
-            closedir($directoryHandle);
-
-            if(file_exists($directory)) {
-                if(!rmdir($directory)) {
-                    return FALSE;
-                }
-            }
-            return TRUE;
-        }
+        IocCommon::removeDir($directory);
+//        if(!file_exists($directory) || !is_dir($directory)) {
+//            return FALSE;
+//        } elseif(!is_readable($directory)) {
+//            return FALSE;
+//        } else {
+//            $directoryHandle = opendir($directory);
+//
+//            while ($contents = readdir($directoryHandle)) {
+//                if($contents != '.' && $contents != '..') {
+//                    $path = $directory . "/" . $contents;
+//
+//                    if(is_dir($path)) {
+//                        $this->removeDir($path);
+//                    } else {
+//                        unlink($path);
+//                    }
+//                }
+//            }
+//            closedir($directoryHandle);
+//
+//            if(file_exists($directory)) {
+//                if(!rmdir($directory)) {
+//                    return FALSE;
+//                }
+//            }
+//            return TRUE;
+//        }
     }
 
     /**
