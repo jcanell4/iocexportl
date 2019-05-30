@@ -348,7 +348,7 @@ class onepdf implements WikiIocModel{
 //                }
 //            }
 //            return TRUE;
-        }
+//        }
     }
 
     /**
