@@ -131,7 +131,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                 $renderer->doc .= $tpl;
             }else{
                 $renderer->doc .='<iframe height="'.$height.'px" width="'.$width.'px" src="'.$url.'"></iframe>';
-                $tagMessage = 'Cliqueu aquí per veure en pantalla completa';
+                $tagMessage = WikiIocLangManager::getLang("showInFullScreen", "iocexportl");
                 $renderer->doc .= "<p><a target=_blank href='$url'>$tagMessage</a></p>";
             }
             $renderer->doc .= '</div>';
