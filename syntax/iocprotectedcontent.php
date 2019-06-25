@@ -33,10 +33,12 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
      * Connect pattern to lexer
      */
     function connectTo($mode) {
+        $this->Lexer->addEntryPattern("\n:###\n", $mode, 'plugin_iocexportl_iocprotectedcontent');
         $this->Lexer->addEntryPattern(":###", $mode, 'plugin_iocexportl_iocprotectedcontent');
     }
 
     function postConnect() {
+        $this->Lexer->addExitPattern('\n###:\n', 'plugin_iocexportl_iocprotectedcontent');
         $this->Lexer->addExitPattern('###:', 'plugin_iocexportl_iocprotectedcontent');
     }
 
@@ -55,7 +57,7 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
             $this->renderPsdom($renderer, $data);
             return TRUE;
         }elseif (strpos("ioccounter/iocexportl/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
-            $this->renderGeneral($renderer, $data);
+            $this->renderGeneral($renderer, $data, $mode);
             return TRUE;
         }elseif ($mode === 'xhtml'){
             $this->renderWiki($renderer, $data);
@@ -90,10 +92,12 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
         }
     }
 
-    function renderGeneral(&$renderer, $data) {
+    function renderGeneral(&$renderer, $data, $mode) {
         list ($state, $text) = $data;
         if ($state === DOKU_LEXER_UNMATCHED) {
-            $renderer->doc .= $text;
+            $instructions = get_latex_instructions($text);
+            $renderer->doc .= p_latex_render($mode, $instructions, $info);
+//            $renderer->doc .= $text;
         }
     }
 
@@ -104,7 +108,9 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
                 $renderer->doc .= "<div title='Contingut protegit' class='iocprotectedcontent'>\n";
                 break;
             case DOKU_LEXER_UNMATCHED :
-                $renderer->doc .= $text;
+                $instructions = p_get_instructions($params['title']);
+                $renderer->doc .= p_render("xhtml", $instructions, $info);
+//                $renderer->doc .= $text;
                 break;
             case DOKU_LEXER_EXIT :
                 $renderer->doc .= "</div>\n";
