@@ -101,7 +101,7 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
         list ($state, $text) = $data;
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                $renderer->doc .= '<div><span class="ioctodogroc">';
+                $renderer->doc .= '<span class="ioctodogroc">';
                 $renderer->doc .= '<span class="ioctodoboldgroc">(TODO:</span>';
                 break;
             case DOKU_LEXER_UNMATCHED:
@@ -114,7 +114,7 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
                 break;
             case DOKU_LEXER_EXIT :
                 $renderer->doc .= '<span class="ioctodoboldgroc">)</span>';
-                $renderer->doc .= "</span></div>\n";
+                $renderer->doc .= "</span>\n";
                 break;
         }
     }

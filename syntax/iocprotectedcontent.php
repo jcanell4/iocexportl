@@ -96,6 +96,12 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
         list ($state, $text) = $data;
         if ($state === DOKU_LEXER_UNMATCHED) {
             $instructions = get_latex_instructions($text);
+            //delete document_start and document_end instructions
+            array_shift($instructions);
+            array_pop($instructions);
+            //delete p_open and p_close instructions
+            array_shift($instructions);
+            array_pop($instructions);
             $renderer->doc .= p_latex_render($mode, $instructions, $info);
 //            $renderer->doc .= $text;
         }
@@ -109,6 +115,12 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
                 break;
             case DOKU_LEXER_UNMATCHED :
                 $instructions = p_get_instructions($text);
+                //delete document_start and document_end instructions
+                array_shift($instructions);
+                array_pop($instructions);
+                //delete p_open and p_close instructions
+                array_shift($instructions);
+                array_pop($instructions);
                 $renderer->doc .= p_render("xhtml", $instructions, $info);
 //                $renderer->doc .= $text;
                 break;
