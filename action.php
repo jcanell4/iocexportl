@@ -38,7 +38,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     var $id = '';
     var $language = 'CA';
 
-    function register(&$controller) {
+    function register(Doku_Event_Handler $controller) {
         global $ACT;
         $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'handle_dokuwiki_started');
         $controller->register_hook('WIOC_AJAX_COMMAND_STARTED', 'AFTER', $this, 'handle_dokuwiki_started');
