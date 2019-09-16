@@ -22,24 +22,24 @@ class syntax_plugin_iocexportl_iocprotectedcontent extends DokuWiki_Syntax_Plugi
             'url'    => 'http://ioc.gencat.cat/',        );
     }
 
-    function getType() { return 'container'; }
-    function getPType() { return 'stack'; }
-    function getAllowedTypes() {
-        return array('container','substition','protected','disabled','formatting','paragraphs');
-    }
-    function getSort() { return 40; }
+//    function getType() { return 'container'; }
+//    function getPType() { return 'stack'; }
+//    function getAllowedTypes() {
+//        return array('container','substition','protected','disabled','formatting','paragraphs');
+//    }
+//    function getSort() { return 40; }
 
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern(":###\n", $mode, 'plugin_iocexportl_iocprotectedcontent');
-        $this->Lexer->addEntryPattern(":###", $mode, 'plugin_iocexportl_iocprotectedcontent');
+//        $this->Lexer->addEntryPattern(":###\n", $mode, 'plugin_iocexportl_iocprotectedcontent');
+//        $this->Lexer->addEntryPattern(":###", $mode, 'plugin_iocexportl_iocprotectedcontent');
     }
 
     function postConnect() {
-        $this->Lexer->addExitPattern('\n###:', 'plugin_iocexportl_iocprotectedcontent');
-        $this->Lexer->addExitPattern('###:', 'plugin_iocexportl_iocprotectedcontent');
+//        $this->Lexer->addExitPattern('\n###:', 'plugin_iocexportl_iocprotectedcontent');
+//        $this->Lexer->addExitPattern('###:', 'plugin_iocexportl_iocprotectedcontent');
     }
 
     /**
