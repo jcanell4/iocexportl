@@ -52,6 +52,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $controller->register_hook('ADD_TPL_CONTROL_SCRIPTS', "AFTER", $this, "addControlScripts", array());
         $controller->register_hook('WIOC_PROCESS_RESPONSE_page', "AFTER", $this, "setExtraState", array());
         $controller->register_hook('WIOC_PROCESS_RESPONSE_cancel', "AFTER", $this, "setExtraState", array());
+//        $controller->register_hook('WIOC_PROCESS_RESPONSE_ftpsend', "AFTER", $this, "setExtraMeta", array());        
         $controller->register_hook('CALLING_EXTRA_COMMANDS', "AFTER", $this, "addCommands", array());
     }
 
@@ -125,6 +126,14 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                     WikiIocLangManager::getLang("metadata_export_title"),
                     $strForm
                     );
+            if($formType==2){
+                $event->data["ajaxCmdResponseGenerator"]->addExtraMetadata(
+                        $event->data["responseData"]["structure"]["id"],
+                        $event->data["responseData"]["structure"]["id"]."_ftpsend",
+                        WikiIocLangManager::getLang("metadata_ftpsend_title"),
+                        $event->data['responseData']['ftpsend_html']
+                );
+            }
             $event->data["ajaxCmdResponseGenerator"]->addProcessDomFromFunction(
                     $event->data["responseData"]["structure"]["id"],
                     TRUE,
