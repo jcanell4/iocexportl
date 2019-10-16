@@ -1110,6 +1110,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $ret .= $link['suf'];
         return $ret;
     }
+    
+    function _isMediaFile($src){
+        $pos = strrpos((string)$src,':');
+        $ret = $pos!==false;
+        return $ret;
+    }
 
     /**
      * Renders internal and external media
@@ -1137,7 +1143,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $path = '../';
         }
         //attach url media file
-        array_push($_SESSION['media_files'], $src);
+        if($this->_isMediaFile($src)){
+            array_push($_SESSION['media_files'], $src);
+        }
 
         list($ext,$mime,$dl) = mimetype($src);
         if(substr($mime,0,5) == 'image'){
