@@ -906,7 +906,7 @@ class generate_html implements WikiIocModel{
     */
     private function createMetaBR($data){
 
-        $meta .= '&copy; Departament d&#39;Ensenyament<br />';
+        $meta .= '&copy; Departament d&#39;Educació<br />';
         $meta .= $this->lang['firstediton'].': <strong>'.(isset($data['data'])?$data['data']:'').'</strong>';
         if (isset($data['legal'])){
             $meta .= '&nbsp;&#47;&nbsp;'.$this->lang['legaldeposit'].': <strong>'.$data['legal'].'</strong>';
