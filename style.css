@@ -367,3 +367,7 @@ div.iocContainer{
     background-color:#FEEFB3;
     color: #444444
 }
+
+div#content .dokuwiki pre.ioctodogroc{
+    background-color: yellow;
+}

@@ -101,21 +101,43 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
         list ($state, $text) = $data;
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                $renderer->doc .= '<span class="ioctodogroc">';
-                $renderer->doc .= '<span class="ioctodoboldgroc">(TODO:</span>';
+                $renderer->doc .= '<span class="ioctodogroc"><span class="ioctodoboldgroc">(TODO:</span></span>';
                 break;
             case DOKU_LEXER_UNMATCHED:
-                $instructions = p_get_instructions(str_replace("\\\\", "<br>", $text));
-                array_shift($instructions);
-                array_shift($instructions);
-                array_pop($instructions);
-                array_pop($instructions);
-                $renderer->doc .= p_render("xhtml", $instructions, $info);
+                preg_match_all("/(\[\[EX[AE]MPLE).*?(EX[AE]MPLE\]\])/s", $text, $matches, PREG_OFFSET_CAPTURE);
+                $pos = 0;
+                for($i=0; $i<count($matches[0]);$i++){
+                    $len = $matches[1][$i][1]-$pos;
+                    $stexti = substr($text, $pos, $len);
+                    $this->_renderHhtml($renderer, $stexti);
+                    $pos += $len + 9;
+                    $len = $matches[2][$i][1]-$pos;
+                    $stexto = substr($text, $pos, $len);
+                    $renderer->doc .= '<pre class="ioctodogroc">';
+                    $renderer->doc .= $stexto;
+                    $renderer->doc .= '</pre>';
+                    $pos += $len + 9;
+                }
+                $stexti = substr($text, $pos, strlen($text)-$pos);
+                $this->_renderHhtml($renderer, $stexti);
                 break;
             case DOKU_LEXER_EXIT :
-                $renderer->doc .= '<span class="ioctodoboldgroc">)</span>';
+                $renderer->doc .= '<span class="ioctodogroc"><span class="ioctodoboldgroc">)</span>';
                 $renderer->doc .= "</span>\n";
                 break;
+        }
+    }
+    
+    private function _renderHhtml(&$renderer, $texti){
+        if($texti){
+            $instructions = p_get_instructions(str_replace("\\\\", "<br>", $texti));
+            array_shift($instructions);
+            array_shift($instructions);
+            array_pop($instructions);
+            array_pop($instructions);
+            $renderer->doc .= '<span class="ioctodogroc">';        
+            $renderer->doc .= p_render("xhtml", $instructions, $info);        
+            $renderer->doc .= '</span>';        
         }
     }
 
