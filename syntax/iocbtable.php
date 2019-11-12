@@ -52,8 +52,8 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
      */
     function connectTo($mode) {
         //inici de taula
-        $this->Lexer->addEntryPattern('[\t ]*\n[\t ]*\[\^', $mode, 'plugin_iocexportl_iocbtable');
-        $this->Lexer->addEntryPattern('[\t ]*\n[\t ]*\[\|', $mode, 'plugin_iocexportl_iocbtable');
+        $this->Lexer->addEntryPattern('[\t ]*\n[\t ]*\[\n?\^', $mode, 'plugin_iocexportl_iocbtable');
+        $this->Lexer->addEntryPattern('[\t ]*\n[\t ]*\[\n?\|', $mode, 'plugin_iocexportl_iocbtable');
     }
 
     function postConnect() {
@@ -62,8 +62,8 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addPattern('[\t ]+', 'plugin_iocexportl_iocbtable');
 
         //final de taula
-        $this->Lexer->addExitPattern('\^+\][\t ]*\n', 'plugin_iocexportl_iocbtable');
-        $this->Lexer->addExitPattern('\|+\][\t ]*\n', 'plugin_iocexportl_iocbtable');
+        $this->Lexer->addExitPattern('\^+\n?\][\t ]*\n', 'plugin_iocexportl_iocbtable');
+        $this->Lexer->addExitPattern('\|+\n?\][\t ]*\n', 'plugin_iocexportl_iocbtable');
 
         //final
         $this->Lexer->addPattern('\^+[\t ]*\n', 'plugin_iocexportl_iocbtable');
@@ -100,7 +100,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
 
         switch ( $state ) {
             case DOKU_LEXER_ENTER:
-                if ( trim($match) == '[^' ) {
+                if ( substr(trim($match),-1) == '^' ) {
                     $this->currentCell = new CellStructure(CellStructure::T_HEADER);
                 }else{
                     $this->currentCell = new CellStructure(CellStructure::T_CELL);
@@ -110,7 +110,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                 break;
 
             case DOKU_LEXER_EXIT:
-                if(preg_match('/\^{2,}\][\t ]*\n/', $match) || preg_match('/\|{2,}\][\t ]*\n/', $match)){
+                if(preg_match('/\^{2,}\n?\][\t ]*\n/', $match) || preg_match('/\|{2,}\n?\][\t ]*\n/', $match)){
                     $nlimit = strlen(trim($match));
                     for($i=2; $i<$nlimit; $i++){
                         $content = new ContentCell(ContentCell::COLSPAN_CONTENT);
