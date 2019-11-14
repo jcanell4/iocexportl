@@ -147,7 +147,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                         $content = new ContentCell(ContentCell::CDATA_CONTENT, $match);
                         $this->currentCell->addContent($content);
                     }
-                } else if ( preg_match('/\|{2,}[\t ]*\n/',$match) || preg_match('/\^{2,}[\t ]*\n/',$match)) {
+                } else if ( preg_match('/\|{2,}\n/',$match) || preg_match('/\^{2,}\n/',$match)) {
                     $nlimit = strlen(trim($match));
                     for($i=1; $i<$nlimit; $i++){
                         $content = new ContentCell(ContentCell::COLSPAN_CONTENT);
@@ -157,12 +157,19 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                     $this->currentCell = NULL;
                     $this->tableStruct->addRow($this->currentRow);
                     $this->currentRow = NULL;
+                } else if (preg_match ('/\^\n/', $match) || preg_match ('/\|\n/', $match)){
+                    $this->currentRow->addColumn($this->currentCell);
+                    $this->currentCell = NULL;
+                    $this->tableStruct->addRow($this->currentRow);
+                    $this->currentRow = NULL;
                 } else if ( preg_match('/\|{2,}/',$match) || preg_match('/\^{2,}/',$match) ||
-                            preg_match('/\n\|{2,}/',$match) || preg_match('/\n\^{2,}/',$match) ) {
+                            preg_match('/\n\|{2,}/',$match) || preg_match('/\n\^{2,}/',$match) ||
+                            preg_match('/\|{2,}[\t ]*\n/',$match) || preg_match('/\^{2,}[\t ]*\n/',$match)) {
                     if($this->currentRow==NULL){
                         $this->currentRow = new RowStructure();
-                    }
-                    for($i=1; $i<strlen($match); $i++){
+                    }                  
+                    $nlimit = strlen(trim($match));
+                    for($i=1; $i<$nlimit; $i++){
                         $content = new ContentCell(ContentCell::COLSPAN_CONTENT);
                         $this->currentCell->addContent($content);
                     }
@@ -187,6 +194,22 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                         $content = new ContentCell(ContentCell::CDATA_CONTENT, ' '.trim($match).' ');
                         $this->currentCell->addContent($content);
                     }
+                } else if ( $match == "|" || preg_match('/\n\s*\|/', $match) || preg_match ('/\|[\t ]*\n/', $match)) {
+                    if($this->currentRow==NULL){
+                        $this->currentRow = new RowStructure();
+                        $this->currentCell=new CellStructure(CellStructure::T_CELL);
+                    }else{
+                        $this->currentRow->addColumn($this->currentCell);
+                        $this->currentCell=new CellStructure(CellStructure::T_CELL);
+                    }
+                } else if ( $match == "^" || preg_match('/\n\s*\^/', $match) || preg_match ('/\^[\t ]*\n/', $match)) {
+                    if($this->currentRow==NULL){
+                        $this->currentRow = new RowStructure();
+                        $this->currentCell=new CellStructure(CellStructure::T_HEADER);
+                    }else{
+                        $this->currentRow->addColumn($this->currentCell);
+                        $this->currentCell=new CellStructure(CellStructure::T_HEADER);
+                    }
                 } else if ( preg_match('/\t+/',$match) ) {
                     $content = new ContentCell(ContentCell::ALLIGN_CONTENT, $match);
                     $this->currentCell->addContent($content);
@@ -197,27 +220,6 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                         $content = new ContentCell(ContentCell::ALLIGN_CONTENT, $match);
                         $this->currentCell->addContent($content);
                     }
-                } else if ( $match == "|" || preg_match('/\n\s*\|/', $match) ) {
-                    if($this->currentRow==NULL){
-                        $this->currentRow = new RowStructure();
-                        $this->currentCell=new CellStructure(CellStructure::T_CELL);
-                    }else{
-                        $this->currentRow->addColumn($this->currentCell);
-                        $this->currentCell=new CellStructure(CellStructure::T_CELL);
-                    }
-                } else if ( $match == "^" || preg_match('/\n\s*\^/', $match)) {
-                    if($this->currentRow==NULL){
-                        $this->currentRow = new RowStructure();
-                        $this->currentCell=new CellStructure(CellStructure::T_HEADER);
-                    }else{
-                        $this->currentRow->addColumn($this->currentCell);
-                        $this->currentCell=new CellStructure(CellStructure::T_HEADER);
-                    }
-                } else if (preg_match ('/\^[\t ]*\n/', $match) || preg_match ('/\|[\t ]*\n/', $match)){
-                    $this->currentRow->addColumn($this->currentCell);
-                    $this->currentCell = NULL;
-                    $this->tableStruct->addRow($this->currentRow);
-                    $this->currentRow = NULL;
                 }
                 break;
         }
