@@ -51,7 +51,7 @@ if (!checkPerms(getID())) return FALSE;
                 @array_shift($contentArray);
                 foreach ($contentArray as $p){
                     if(!preg_match("/^".$contentPage."$|:"
-                                        .$contentPage."$/i", $p)){
+                                        .$contentPage."$/i", trim($p))){
                         $pathFile = wikiFN($ns.":".$p);
                         _countCharactersOfDocument($pathFile, $result);
                     }
