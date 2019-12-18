@@ -117,11 +117,12 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
                     //delete document_start and document_end instructions
-                    array_shift($instructions);
-                    array_pop($instructions);
+                    if ($instructions[0][0] === "document_start") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
                     // Loop through the instructions
                     foreach ( $instructions as $instruction ) {
-                        // Execute the callback against the Renderer
                         call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
                     }
                     break;

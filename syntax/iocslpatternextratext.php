@@ -48,20 +48,30 @@ class syntax_plugin_iocexportl_iocslpatternextratext extends DokuWiki_Syntax_Plu
         if ($mode === 'wikiiocmodel_psdom') {
             $instructions = get_latex_instructions($data);
             //delete document_start and document_end instructions
-            array_shift($instructions);
-            array_pop($instructions);
+            if ($instructions[0][0] === "document_start") {
+                array_shift($instructions);
+                array_pop($instructions);
+            }
             //delete p_open and p_close instructions
-            array_shift($instructions);
-            array_pop($instructions);
+            if ($instructions[0][0] === "p_open") {
+                array_shift($instructions);
+                array_pop($instructions);
+            }
             foreach ( $instructions as $instruction ) {
                 call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
             }
         }else {
             $instructions = p_get_instructions( $data);
-            array_shift($instructions);
-            array_shift($instructions);
-            array_pop($instructions);
-            array_pop($instructions);
+            //delete document_start and document_end instructions
+            if ($instructions[0][0] === "document_start") {
+                array_shift($instructions);
+                array_pop($instructions);
+            }
+            //delete p_open and p_close instructions
+            if ($instructions[0][0] === "p_open") {
+                array_shift($instructions);
+                array_pop($instructions);
+            }
             $renderer->doc .= p_latex_render($mode, $instructions, $info);
         }
         return FALSE;

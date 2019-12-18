@@ -111,8 +111,10 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     }
                     $instructions = get_latex_instructions($text);
                     //delete document_start and document_end instructions
-                    array_shift($instructions);
-                    array_pop($instructions);
+                    if ($instructions[0][0] === "document_start") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
                     // Loop through the instructions
                     foreach ( $instructions as $instruction ) {
                         // Execute the callback against the Renderer
@@ -141,11 +143,15 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     $_SESSION['figure'] = TRUE;
                     $instructions = get_latex_instructions($text);
                     //delete document_start and document_end instructions
-                    array_shift($instructions);
-                    array_pop($instructions);
+                    if ($instructions[0][0] === "document_start") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
                     //delete p_open and p_close instructions
-                    array_shift($instructions);
-                    array_pop($instructions);
+                    if ($instructions[0][0] === "p_open") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     $_SESSION['figure'] = FALSE;
                     $_SESSION['fig_title'] = '';
