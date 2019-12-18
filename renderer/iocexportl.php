@@ -642,7 +642,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $csetup = '\tablelargecaption';
 
         }elseif($_SESSION['table_small']){
-            $this->doc .= '\addtocounter{table}{-1}\caption{'.$_SESSION['table_title'].
+//            $this->doc .= '\addtocounter{table}{-1}\caption{'.$_SESSION['table_title'].
+            $this->doc .= '\addtocounter{table}{0}\caption{'.$_SESSION['table_title'].
             			  '\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
             $large = ' spread 0pt';
             $tablecaption = '\tablesmallcaption{'.$maxcols.'}';
