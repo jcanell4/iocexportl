@@ -65,6 +65,9 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
 //            case 'xhtml':
 //                $this->renderWiki($renderer, $state, $text);
 //                break;
+            case 'wikiiocmodel_psdom':
+                $this->renderPsdomExport($mode, $renderer, $state, $text);
+                break;
             case 'xhtml':
             case 'iocxhtml':
             case 'wikiiocmodel_ptxhtml':
@@ -116,6 +119,34 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
             case DOKU_LEXER_UNMATCHED :
                 $instructions = p_get_instructions($text);
                 $renderer->doc .= p_render($mode, $instructions, $info);
+                break;
+            case DOKU_LEXER_EXIT :
+                break;
+        }
+    }
+
+    function renderPsdomExport($mode, &$renderer, $state, $text) {
+        switch ($state) {
+            case DOKU_LEXER_ENTER :
+                $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::EDITTABLE_TYPE);
+                $renderer->getCurrentNode()->addContent($node);
+                $renderer->setCurrentNode($node);
+                break;
+            case DOKU_LEXER_UNMATCHED :
+                $instructions = p_get_instructions($text);
+                //delete document_start and document_end instructions
+                if ($instructions[0][0] == "document_start") {
+                    array_shift($instructions);
+                    array_pop($instructions);
+                }
+                //delete p_open and p_close instructions
+                if ($instructions[0][0] == "p_open") {
+                    array_shift($instructions);
+                    array_pop($instructions);
+                }
+                foreach ( $instructions as $instruction ) {
+                    call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                }
                 break;
             case DOKU_LEXER_EXIT :
                 break;
