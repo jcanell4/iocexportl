@@ -1210,7 +1210,7 @@ class generate_html implements WikiIocModel{
 }
 
 if(!isset($_GET["call"])){
-    //Initialize params
+   //Initialize params
     $params = array();
     $params['id'] = getID();
     $params['mode'] = $_POST['mode'];

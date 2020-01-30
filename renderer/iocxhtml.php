@@ -692,8 +692,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
           $link['class'] .= ' wikilink2';
 
         //output formatted
-        //if ($linking == 'nolink' || $noLink) $this->doc .= $link['name'];
-        //else $this->doc .= $this->_formatLink($link);
+//        if ($linking == 'nolink' || $noLink){ 
+//            $this->doc .= $link['name'];
+//        }else{
+//            $this->doc .= $this->_formatLink($link);
+//        }
         $this->doc .= $link['name'];
     }
 
