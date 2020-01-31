@@ -133,7 +133,7 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
                 $renderer->setCurrentNode($node);
                 break;
             case DOKU_LEXER_UNMATCHED :
-                $instructions = p_get_instructions($text);
+                $instructions = get_latex_instructions($text);
                 //delete document_start and document_end instructions
                 if ($instructions[0][0] == "document_start") {
                     array_shift($instructions);
