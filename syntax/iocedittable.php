@@ -149,6 +149,7 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
                 }
                 break;
             case DOKU_LEXER_EXIT :
+                $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
                 break;
         }
     }
