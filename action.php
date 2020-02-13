@@ -93,20 +93,15 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
     function setExtraMeta(&$event, $param){
 
-        $ftpsend_html = $event->data['responseData']['ftpsend_html'];
-        $id = ($event->data["responseData"]["structure"]["id"]) ? $event->data["responseData"]["structure"]["id"] : $this->id;
-
-        if (empty($ftpsend_html)) {
-            if (!empty($this->conf['ftp_config']['materials_fp'])) {
-                $rUrl = $this->conf['ftp_config']['materials_fp']['remoteUrl'];
-                $rDir = str_replace(':', '_', str_replace("htmlindex", "", $this->id));
-                $ftpsend_html = $this->get_ftpsend_html($rUrl, $rDir);
-            }
+        if (!empty($this->conf['ftp_config']['materials_fp'])) {
+            $rUrl = $this->conf['ftp_config']['materials_fp']['remoteUrl'];
+            $rDir = str_replace(':', '_', str_replace("htmlindex", "", $this->id));
+            $ftpsend_html = $this->get_ftpsend_html($rUrl, $rDir);
         }
 
         $event->data["ajaxCmdResponseGenerator"]->addExtraMetadata(
-                $id,
-                "${id}_ftpsend",
+                $this->id,
+                "{$this->id}_ftpsend",
                 WikiIocLangManager::getLang("metadata_ftpsend_title"),
                 $ftpsend_html
         );
@@ -173,9 +168,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                     $strForm
                     );
             if ($formType==2){
-                if (empty($event->data['responseData']['ftpsend_html'])) {
-                    $this->setExtraMeta($event, $param);
-                }
+                $this->setExtraMeta($event, $param);
             }
             $event->data["ajaxCmdResponseGenerator"]->addProcessDomFromFunction(
                     $event->data["responseData"]["structure"]["id"],
