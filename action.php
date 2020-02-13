@@ -52,7 +52,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $controller->register_hook('ADD_TPL_CONTROL_SCRIPTS', "AFTER", $this, "addControlScripts", array());
         $controller->register_hook('WIOC_PROCESS_RESPONSE_page', "AFTER", $this, "setExtraState", array());
         $controller->register_hook('WIOC_PROCESS_RESPONSE_cancel', "AFTER", $this, "setExtraState", array());
-//        $controller->register_hook('WIOC_PROCESS_RESPONSE_ftpsend', "AFTER", $this, "setExtraMeta", array());        
+//        $controller->register_hook('WIOC_PROCESS_RESPONSE_ftpsend', "AFTER", $this, "setExtraMeta", array());
         $controller->register_hook('CALLING_EXTRA_COMMANDS', "AFTER", $this, "addCommands", array());
     }
 
@@ -91,6 +91,52 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
     }
 
+    function setExtraMeta(&$event, $param){
+
+        $ftpsend_html = $event->data['responseData']['ftpsend_html'];
+        $id = ($event->data["responseData"]["structure"]["id"]) ? $event->data["responseData"]["structure"]["id"] : $this->id;
+
+        if (empty($ftpsend_html)) {
+            if (!empty($this->conf['ftp_config']['materials_fp'])) {
+                $rUrl = $this->conf['ftp_config']['materials_fp']['remoteUrl'];
+                $rDir = str_replace(':', '_', str_replace("htmlindex", "", $this->id));
+                $ftpsend_html = $this->get_ftpsend_html($rUrl, $rDir);
+            }
+        }
+
+        $event->data["ajaxCmdResponseGenerator"]->addExtraMetadata(
+                $id,
+                "${id}_ftpsend",
+                WikiIocLangManager::getLang("metadata_ftpsend_title"),
+                $ftpsend_html
+        );
+    }
+
+    function get_ftpsend_html($rUrl, $rDir) {
+
+        $html = '<div>';
+        $html.= "<p><strong>Exportació FTP</strong></p>";
+
+        if ($rUrl) {
+            $file_zip = "${rUrl}${rDir}/web.zip";
+            $file_index = "$rUrl$rDir/web/${rDir}htmlindex/index.html";
+            $file_pdf = "$rUrl$rDir/web/${rDir}htmlindex/material_pdf.html";
+
+            $html.= '<span id="ftpsend" style="word-wrap: break-word;">';
+            $html.= '<a class="media mediafile mf_txt" href="'.$file_index.'" target="_blank">index</a><br>';
+            $html.= '<a class="media mediafile mf_pdf" href="'.$file_pdf.'" target="_blank">material pdf</a><br>';
+            $html.= '<a class="media mediafile mf_zip" href="'.$file_zip.'" target="_blank">web.zip</a><br>';
+            $html.= '</span>';
+        }else{
+            $html.= '<span id="ftpsend">';
+            $html.= '<p class="media mediafile">No hi ha cap fitxer pujat al FTP</p>';
+            $html.= '</span>';
+        }
+        $html.= '</div>';
+
+        return $html;
+    }
+
     function setExtraState(&$event, $param){
         $this->getLanguage();
         $ret=TRUE;
@@ -126,13 +172,10 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                     WikiIocLangManager::getLang("metadata_export_title"),
                     $strForm
                     );
-            if($formType==2){
-                $event->data["ajaxCmdResponseGenerator"]->addExtraMetadata(
-                        $event->data["responseData"]["structure"]["id"],
-                        $event->data["responseData"]["structure"]["id"]."_ftpsend",
-                        WikiIocLangManager::getLang("metadata_ftpsend_title"),
-                        $event->data['responseData']['ftpsend_html']
-                );
+            if ($formType==2){
+                if (empty($event->data['responseData']['ftpsend_html'])) {
+                    $this->setExtraMeta($event, $param);
+                }
             }
             $event->data["ajaxCmdResponseGenerator"]->addProcessDomFromFunction(
                     $event->data["responseData"]["structure"]["id"],
