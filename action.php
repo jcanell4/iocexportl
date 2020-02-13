@@ -93,15 +93,18 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
     function setExtraMeta(&$event, $param){
 
+        $id = ($event->data["responseData"]["structure"]["id"]) ? $event->data["responseData"]["structure"]["id"] : $this->id;
+        $id = str_replace(':', '_', $id);
+
         if (!empty($this->conf['ftp_config']['materials_fp'])) {
             $rUrl = $this->conf['ftp_config']['materials_fp']['remoteUrl'];
-            $rDir = str_replace(':', '_', str_replace("htmlindex", "", $this->id));
+            $rDir = str_replace("htmlindex", "", $id);
             $ftpsend_html = $this->get_ftpsend_html($rUrl, $rDir);
         }
 
         $event->data["ajaxCmdResponseGenerator"]->addExtraMetadata(
-                $this->id,
-                "{$this->id}_ftpsend",
+                $id,
+                "${id}_ftpsend",
                 WikiIocLangManager::getLang("metadata_ftpsend_title"),
                 $ftpsend_html
         );
