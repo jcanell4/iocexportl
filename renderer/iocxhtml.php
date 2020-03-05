@@ -17,9 +17,9 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
  */
 class renderer_plugin_iocxhtml extends Doku_Renderer {
 
-	/**
-	 * 	XHTML variables
-	 */
+    /**
+     * 	XHTML variables
+     */
     // @access public
     var $doc = '';        // will contain the whole document
     var $toc = array();   // will contain the Table of Contents
@@ -77,10 +77,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         //reset some internals
         $this->toc     = array();
         $this->headers = array();
-
-		$this->id = getID();
+        $this->id = getID();
         //Check whether user can export
-		$exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
+	$exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$exportallowed && !auth_isadmin()) die;
 
         //Global variables
@@ -125,7 +124,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         return $link;
     }
 
-	/**
+    /**
      * Creates a linkid from a headline
      *
      * @param string  $title   The headline title
@@ -141,7 +140,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
     }
 
-	/**
+    /**
      * NOVA
      */
     function _initialize_globals(){
@@ -322,8 +321,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if ( array_key_exists($smiley, $this->smileys) ) {
             $title = $this->_xmlEntities($this->smileys[$smiley]);
             $this->doc .= '<img src="'.DOKU_BASE.'lib/images/smileys/'.$this->smileys[$smiley].
-                '" class="middle" alt="'.
-                    $this->_xmlEntities($smiley).'" />';
+                            '" class="middle" alt="'.$this->_xmlEntities($smiley).'" />';
         } else {
             $this->doc .= $this->_xmlEntities($smiley);
         }
@@ -446,7 +444,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     /*
      * Tables
      */
-    function table_open($maxcols = NULL, $numrows = NULL){
+    function table_open($maxcols=NULL, $numrows=NULL, $pos=NULL){
         global $lang;
         // initialize the row counter used for classes
         $this->_counter['row_counter'] = 0;
@@ -458,7 +456,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $this->table = TRUE;
     }
 
-    function table_close(){
+    function table_close($pos=NULL){
         $this->doc .= '</table></div>'.DOKU_LF;
         $this->table = FALSE;
     }
@@ -646,8 +644,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $this->doc .= '<pre class="code">' . trim($this->_xmlEntities($text),"\n\r") . '</pre>'. DOKU_LF;
     }
 
-    function file($text) {
-        $this->_highlight('file',$text,$language,$filename);
+    function file($text, $lang=NULL, $file=NULL) {
+        $this->_highlight('file',$text,$lang,$file);
     }
 
     function quote_open() {
@@ -692,7 +690,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
           $link['class'] .= ' wikilink2';
 
         //output formatted
-//        if ($linking == 'nolink' || $noLink){ 
+//        if ($linking == 'nolink' || $noLink){
 //            $this->doc .= $link['name'];
 //        }else{
 //            $this->doc .= $this->_formatLink($link);
@@ -1113,7 +1111,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $ret .= $link['suf'];
         return $ret;
     }
-    
+
     function _isMediaFile($src){
         $pos = strrpos((string)$src,':');
         $ret = $pos!==false;

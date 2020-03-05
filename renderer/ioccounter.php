@@ -111,9 +111,9 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
 
     function deleted_close() {}
 
-    function table_open($maxcols = NULL, $numrows = NULL){}
+    function table_open($maxcols=NULL, $numrows=NULL, $pos=NULL){}
 
-    function table_close(){}
+    function table_close($pos=NULL){}
 
     function tablerow_open(){}
 
@@ -203,7 +203,7 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
         $this->doc .= $text;
     }
 
-    function file($text) {
+    function file($text, $lang=NULL, $file=NULL) {
         $this->doc .= $text;
     }
 

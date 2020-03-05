@@ -621,7 +621,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     /*
      * Tables
      */
-    function table_open($maxcols = NULL, $numrows = NULL){
+    function table_open($maxcols=NULL, $numrows=NULL, $pos=NULL){
         global $conf;
 
         $this->table = TRUE;
@@ -696,7 +696,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->doc .= '\hline'.DOKU_LF;
     }
 
-    function table_close(){
+    function table_close($pos=NULL){
         $this->table = FALSE;
         if (!$_SESSION['accounting']){
             $this->doc .= '\noalign{\vspace{1mm}}'.DOKU_LF;
@@ -771,7 +771,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         $this->tableheader_end = FALSE;
         $this->str_hhline = "";
-        $this->has_rowspan=FALSE;        
+        $this->has_rowspan=FALSE;
     }
 
     function tableheader_open($colspan = 1, $align = NULL, $rowspan = 1){
@@ -870,7 +870,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if($this->col_colspan>1){
             for($i=0; $i<$this->col_colspan; $i++){
                 $this->str_hhline .= "~";
-            }            
+            }
         }else{
             $this->str_hhline .= "-";
         }
@@ -1019,7 +1019,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->doc .= '}';
     }
 
-    function file($text) {
+    function file($text, $lang=NULL, $file=NULL) {
         $this->preformatted($text);
     }
 
@@ -1340,7 +1340,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         $this->listu_close();
     }
-    
+
     private function _isBorderTypeTable($types){
         $ret = false;
         if(is_array($types)){
