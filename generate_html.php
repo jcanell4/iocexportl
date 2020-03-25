@@ -39,6 +39,7 @@ class generate_html implements WikiIocModel{
     private $toexport;
     private $tree_names;
     private $web_folder;
+    private $menuLevel3=false;
 
    /**
     * Default Constructor
@@ -74,7 +75,7 @@ class generate_html implements WikiIocModel{
         $this->max_navmenu = 70;
         $this->media_path = 'lib/exe/fetch.php?media=';
         $this->menu_html = '';
-        $this->meta_params = array('adaptacio', 'autoria', 'ciclenom', 'coordinacio', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'data', 'familia', 'familypic', 'legal');
+        $this->meta_params = array('adaptacio', 'autoria', 'ciclenom', 'coordinacio', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'data', 'familia', 'familypic', 'legal', 'menulevel3');
         $this->tree_names = array();
         $this->web_folder = 'WebContent';
         $this->meta_dcicle = 'dcicle';
@@ -109,7 +110,7 @@ class generate_html implements WikiIocModel{
         $_SESSION['tmp_dir'] = $tmp_dir;
         $_SESSION['latex_images'] = array();
         $_SESSION['media_files'] = array();
-        $_SESSION['graphviz_images'] = array();
+        $_SESSION['graphviz_images'] = array(); 
         $_SESSION['gif_images'] = array();
         if (!file_exists(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir)){
             mkdir(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir, 0775, TRUE);
@@ -120,6 +121,7 @@ class generate_html implements WikiIocModel{
         $zip = new ZipArchive;
         $res = $zip->open(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
         if ($res === TRUE) {
+            $this->menuLevel3 = preg_match("/y$|yes|s$|si|true|cert/i", $data[1]['menulevel3']);
             list($this->menu_html, $files_name) = $this->createMenu($data[0]);
             //Get build.js and add which filenames will be used to search
             $build = io_readFile(DOKU_IOCEXPORTL_TEMPLATES_HTML.'_/js/build.js');
@@ -202,6 +204,7 @@ class generate_html implements WikiIocModel{
             $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $this->menu_html);
             $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
             $menu_html_index = preg_replace('/@IOCSTARTINDEX@(.*?)@IOCENDINDEX@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCSTARTPREEXPANDER@(.*?)@IOCENDPREEXPANDER@/', '$1', $menu_html_index);
             $menu_html_index = preg_replace('/@IOCSTARTEXPANDER@(.*?)@IOCENDEXPANDER@/', '', $menu_html_index);
             $menu_html_index = preg_replace('/@IOCACTIVITYICONSTART@|@IOCACTIVITYICONEND@/', '', $menu_html_index);
             $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/', '', $menu_html_index);
@@ -662,11 +665,15 @@ class generate_html implements WikiIocModel{
                 $unit = $matches[1].'. ';
             }
             $menu_html = '<li id="'.$id.'" class="parentnode">';
-            $menu_html .= '<p><a href="'.$href.'">'.$unit.$name.'</a></p>';
+            $menu_html .= '<p><a class="unit" href="'.$href.'">'.$unit.$name.'</a></p>';
             $menu_html .= '<ul class="expander">';
         }elseif ($type === 'section'){
             $menu_html = '<li id="'.$id.'" class="tocsection">';
-            $menu_html .= '<p id="'.$id.$this->def_section_href.'"><a href="'.$href.'">'.$name.'</a>';
+            $menu_html .= '<p id=\''.$id.$this->def_section_href.'\'>';
+            if($this->menuLevel3){
+                $menu_html .= "@IOCSTARTPREEXPANDER@<span id='b_$id' class='buttonexpss cl'>&nbsp;&nbsp;&nbsp;</span>@IOCENDPREEXPANDER@";
+            }
+            $menu_html .= '<a class="section" href="'.$href.'">'.$name.'</a>';
             $menu_html .= '@IOCSTARTEXPANDER@<span class="buttonexp"></span>@IOCENDEXPANDER@';
             $menu_html .= '</p>';
             $menu_html .= '<ul>';
@@ -691,6 +698,10 @@ class generate_html implements WikiIocModel{
                 $menu_html .= '<a href="'.$href.'">'.$name.'</a>';
             }
             $menu_html .= '</li>';
+        }elseif ($type === 'closeSectionItems'){
+            $menu_html = '</ul>';
+        }elseif ($type === 'closeSection'){
+            $menu_html = '</li>';
         }else{
             $menu_html = '</ul></li>';
         }
@@ -751,7 +762,8 @@ class generate_html implements WikiIocModel{
                 $this->tree_names[$ku][$ks]['sectionname']=$section_name;
                 //Comprovar si existeix continguts.html $def_section_href i enllaçar la secció
                 $act_href = '@IOCPATH@'.$this->web_folder.'/'.$ku.'/'.$ks.'/'.$this->def_section_href.'.html';
-                $menu_html .= $this->setMenu('section', $section_name, $act_href, $ku.$ks);
+                $act_id = $ku.$ks;
+                $menu_html .= $this->setMenu('section', $section_name, $act_href, $act_id);
                 foreach ($section as $ka => $act){
                     $text = io_readFile(wikiFN($act));
                     $act_href = '@IOCPATH@'.$this->web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html';
@@ -761,12 +773,19 @@ class generate_html implements WikiIocModel{
                         $menu_html .= $this->setMenu('activity', $act_name, $act_href, $ku.$ks.$ka);
                     }else{//File continguts has a short name
                         $act_name = 'Contingut';
-                        $this->tree_names[$ku][$ks]['continguts']=$act_name;
+                        $this->tree_names[$ku][$ks]['continguts']=$act_name;  
+                        $smenu_html = $this->getTOC($text, $act_href, false, [$section_name]);
                     }
                     array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
                 }
                 //Close menu activities
                 $menu_html .= $this->setMenu();
+                //afegir subapartats aquí si level = 3. Usar getToc($text)
+                if($this->menuLevel3){
+                    $menu_html .= "<div data-parent-id='$act_id' class='tocssection hidden'>";
+                    $menu_html .= $smenu_html;
+                    $menu_html .= "</div>";
+                }
             }
             $menu_html .= $this->setMenu();
             //Link to index
@@ -818,15 +837,21 @@ class generate_html implements WikiIocModel{
      *
      * Get Table Of Contents
      */
-    private function getTOC($text){
+    private function getTOC($text, $hrefBase='', $showTitle=TRUE, $blackList = array()){
         $matches = array();
         $headers = array();
         $toc = '<div class="toc">';
-        $toc .= '<span>'.$this->lang['toc'].'</span><br /><ul>';
+        if($showTitle){
+            $toc .= '<span>'.$this->lang['toc'].'</span><br />';
+        }
+        $toc .= '<ul>';
         preg_match_all('/\={5}([^=]+)\={5}/', $text, $matches, PREG_SET_ORDER);
         foreach ($matches as $m){
+            if(in_array(trim($m[1]), $blackList)){
+                continue;
+            }
             $toc .= '<li>';
-            $toc .= '<a href="#'.sectionID($m[1],$headers).'">'.trim($m[1]).'</a>';
+            $toc .= '<a href="'.$hrefBase.'#'.sectionID($m[1],$headers).'">'.trim($m[1]).'</a>';
             $toc .= '</li>';
         }
         $toc .= '</ul></div>';
@@ -897,6 +922,7 @@ class generate_html implements WikiIocModel{
         }else{
             $meta .= '<li><strong>'.(isset($data['ciclenom'])?$data['ciclenom']:'').'</strong></li>';
         }
+        $meta .= "</ul>";
         return $meta;
     }
 

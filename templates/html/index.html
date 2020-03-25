@@ -96,6 +96,14 @@
      </div>
     </div>
   <div class="hidden infomessage">@IOCCHROME@</div>
-</div>  
+</div> 
+ <script>
+     $(".buttonexpss").click(function(){
+        var id = this.id.replace("b_", ""); 
+        $(this).toggleClass("cl");
+        $(this).toggleClass("op");
+        $("[data-parent-id="+id+"]").toggleClass("hidden");
+    });
+ </script>
 </body>
 </html>
