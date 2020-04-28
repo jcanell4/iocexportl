@@ -52,7 +52,6 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $controller->register_hook('ADD_TPL_CONTROL_SCRIPTS', "AFTER", $this, "addControlScripts", array());
         $controller->register_hook('WIOC_PROCESS_RESPONSE_page', "AFTER", $this, "setExtraState", array());
         $controller->register_hook('WIOC_PROCESS_RESPONSE_cancel', "AFTER", $this, "setExtraState", array());
-//        $controller->register_hook('WIOC_PROCESS_RESPONSE_ftpsend', "AFTER", $this, "setExtraMeta", array());
         $controller->register_hook('CALLING_EXTRA_COMMANDS', "AFTER", $this, "addCommands", array());
     }
 
