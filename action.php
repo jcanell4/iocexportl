@@ -135,7 +135,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     }
 
     function setExtraState(&$event, $param){
-        $this->getLanguage();
+        $this->id = $this->_getId($event->data);
+        $this->getLanguage($event);
         $ret=TRUE;
         $formType = $this->getFormType("show");
         if ($formType==1){
@@ -207,7 +208,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         global $conf;
         $ret = 0;
 
-	$this->id = getID();
+	$this->id = $this->_getId();
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$this->isExportPage()) return $ret;
         if ($data != 'show') return $ret;
@@ -249,7 +250,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
     function showcounts(){
         global $conf;
-        $this->id = getID();
+        $this->id = $this->_getId();
         if (!$this->isExportPage()){
             return FALSE;
         }
@@ -262,7 +263,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     function checkPerms() {
         global $ID;
         global $USERINFO;
-        $ID    = getID();
+        $ID    = $this->_getId();
         $user = $_SERVER['REMOTE_USER'];
         $groups = $USERINFO['grps'];
         $aclLevel = auth_aclcheck($ID,$user,$groups);
@@ -271,12 +272,12 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
       }
 
     function isExportPage(){
-        $this->id = getID();
+        $this->id = $this->_getId();;
         return preg_match('/^(?!talk).*?:(htmlindex|pdfindex|material_paper)$/', $this->id);
     }
 
-    function getLanguage(){
-        $this->id = getID();
+    function getLanguage(&$event){
+        $this->id = $this->_getId();;
         if (!$this->isExportPage()){
             return FALSE;
         }
@@ -292,7 +293,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         global $conf;
         $data = array();
         $data[self::DATA_TYPE]="zip";
-        //$this->id = getID();
+        //$this->id = $this->_getId();;
 
         $url = '';
         $path_filename = str_replace(':','/',$this->id);
@@ -326,7 +327,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
        global $conf;
         $data = array();
         $data[self::DATA_TYPE]="zip";
-        //$this->id = getID();
+        //$this->id = $this->_getId();;
 
         $url = '';
         $path_filename = str_replace(':','/',$this->id);
@@ -360,7 +361,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         global $conf;
         $data = array();
         $data[self::DATA_TYPE]="zip";
-        //$this->id = getID();
+        //$this->id = $this->_getId();;
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.zip';
         $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
@@ -666,5 +667,14 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                     ),
                 );
         $event->data->addWikiIocButton("WikiIocButton", $control3);
+   }
+   
+   private function _getId($data=NULL){
+       if(is_array($data) && $data["responseData"] && $data["responseData"]["structure"] && $data["responseData"]["structure"]["ns"]){
+           $this->id = $data["responseData"]["structure"]["ns"];
+       }else if(empty($this->id)){
+           $this->id = getID();
+       }
+       return $this->id;
    }
 }
