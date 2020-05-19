@@ -263,7 +263,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     function checkPerms() {
         global $ID;
         global $USERINFO;
-        $ID    = $this->_getId();
+        $ID   = $this->_getId();
         $user = $_SERVER['REMOTE_USER'];
         $groups = $USERINFO['grps'];
         $aclLevel = auth_aclcheck($ID,$user,$groups);
@@ -272,12 +272,12 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
       }
 
     function isExportPage(){
-        $this->id = $this->_getId();;
+        $this->id = $this->_getId();
         return preg_match('/^(?!talk).*?:(htmlindex|pdfindex|material_paper)$/', $this->id);
     }
 
     function getLanguage(&$event){
-        $this->id = $this->_getId();;
+        $this->id = $this->_getId();
         if (!$this->isExportPage()){
             return FALSE;
         }
@@ -293,9 +293,9 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         global $conf;
         $data = array();
         $data[self::DATA_TYPE]="zip";
-        //$this->id = $this->_getId();;
+        //$this->id = $this->_getId();
 
-        $url = '';
+        //$url = '';
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.pdf';
         $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
@@ -327,9 +327,9 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
        global $conf;
         $data = array();
         $data[self::DATA_TYPE]="zip";
-        //$this->id = $this->_getId();;
+        //$this->id = $this->_getId();
 
-        $url = '';
+        //$url = '';
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.pdf';
         $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
@@ -361,7 +361,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         global $conf;
         $data = array();
         $data[self::DATA_TYPE]="zip";
-        //$this->id = $this->_getId();;
+        //$this->id = $this->_getId();
         $path_filename = str_replace(':','/',$this->id);
         $filename = str_replace(':','_',basename($this->id)).'.zip';
         $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
@@ -390,6 +390,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     }
 
     function getform_from_data($data){
+        global $conf;
         $formId = str_replace(":", "_", $data[self::DATA_PAGEID]); //Id del node que conté la pàgina
         if (isset($data[self::DATA_FILENAME])){
             $filename = $data[self::DATA_FILENAME];
@@ -668,7 +669,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                 );
         $event->data->addWikiIocButton("WikiIocButton", $control3);
    }
-   
+
    private function _getId($data=NULL){
        if(is_array($data) && $data["responseData"] && $data["responseData"]["structure"] && $data["responseData"]["structure"]["ns"]){
            $this->id = $data["responseData"]["structure"]["ns"];
