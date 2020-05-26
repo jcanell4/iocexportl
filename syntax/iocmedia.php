@@ -10,21 +10,14 @@ if (!defined('DOKU_PLUGIN_TEMPLATES')) define('DOKU_PLUGIN_TEMPLATES', DOKU_PLUG
 require_once(DOKU_PLUGIN . 'syntax.php');
 require_once(DOKU_PLUGIN . 'iocexportl/lib/renderlib.php');
 
-if (!defined('DOKU_LIB_IOC')) define('DOKU_LIB_IOC', DOKU_INC . "lib/lib_ioc/");
-require_once DOKU_LIB_IOC . "common/SharedConstants.php";
 
 
 class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
-//    static $vimeo = 'https://player.vimeo.com/video/@VIDEO@';
-//    static $youtube = 'https://www.youtube.com/embed/@VIDEO@?controls=1';
-//    static $dailymotion = 'https://www.dailymotion.com/embed/video/@VIDEO@';
 
     static $altamarFromUrl = 'vídeo[altamar: @VIDEO@]';
     static $altamarFromId = 'vídeo[altamar: @VIDEO@]';
     static $altamarFromReq = 'vídeo[altamar: @VIDEO@]';
     static $altamarVideos = 'vídeo[altamar: @VIDEO@]';
-//    static $altamarFromUrl = 'http://bcove.me/@VIDEO@';
-//    static $altamarFromId = http://link.brightcove.com/services/player/bcpid1326284612001?bckey=AQ~~,AAABNMyTcTE~,zjiPB9Bfp4EykEGoTnvDHUfnwtGu2QvJ&bctid=@VIDEO@';
 
     /**
      * Get an associative array with plugin info.
@@ -96,19 +89,6 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
         }
 
 
-//        }elseif(strpos($param,'small') !== false){
-//            // small
-//            $width  = 255;
-//            $height = 210;
-//        }elseif(strpos($param,'large') !== false){
-//            // large
-//            $width  = 520;
-//            $height = 406;
-//        }else{
-//            // medium
-//            $width  = 425;
-//            $height = 350;
-//        }
 
         return array($site, $url, $title, $width, $height);
     }
@@ -139,19 +119,6 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                 $url = preg_replace('/\$\{id\}/', $url, $type);
             }
 
-
-//            if($site === 'dailymotion' || $site === 'vimeo'
-//                    || $site === 'youtube'){
-//                if ($site === 'dailymotion'){
-//                    $type = self::$dailymotion;
-//                }elseif($site === 'vimeo'){
-//                    $type = self::$vimeo;
-//                }else{
-//                    $type = self::$youtube;
-//                }
-//                list($url, $full) = explode(":", $params);
-//                $url = preg_replace('/@VIDEO@/', $url, $type);
-//            }
             $renderer->doc .= '<div class="mediavideo">';
 
 
@@ -183,23 +150,6 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             $type = self::$altamarVideos;
             $url = preg_replace('/@VIDEO@/', $url, $type);
         }
-
-//        if ($site === 'dailymotion') {
-//            $type = self::$dailymotion;
-//        }elseif ($site === 'vimeo') {
-//            $type = self::$vimeo;
-//        }elseif ($site === 'altamarVideos') {
-//            $type = self::$altamarVideos;
-//        }elseif ($site === 'youtube') {
-//            $type = self::$youtube;
-//        }
-
-
-//
-//        if ($type) {
-//            list($url) = explode(":", $params);
-//            $url = preg_replace('/@VIDEO@/', $url, $type);
-//        }
 
         return $url;
     }
