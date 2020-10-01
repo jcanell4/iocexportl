@@ -215,7 +215,44 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '</div>';
                         break;
             }
-       }
+            return TRUE;
+       }elseif ($mode === 'wikiiocmodel_psdom'){
+            list ($state, $data, $params) = $indata;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    $matches = array();
+                    preg_match('/::([^:]*):/', $data, $matches);
+                    $type = (isset($matches[1]))?$matches[1]:'';
+                    //TEXT LARGE
+                    if($type === 'text' && isset($params['large'])){
+                        $type = 'textl';
+                    }
+                    $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
+                    $offset = (isset($params['offset']))?$params['offset']:false;
+                    $width = (isset($params['width']))?$params['width']:false;
+                    $node = new IocElemNodeDoc($type, $title, $offset, $width);
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+                    break;
+                case DOKU_LEXER_UNMATCHED:
+                    $instructions = get_latex_instructions($data);
+                    //delete document_start and document_end instructions
+                    if ($instructions[0][0] === "document_start") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
+                    // Loop through the instructions
+                    foreach ( $instructions as $instruction ) {
+                        // Execute the callback against the Renderer
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT :
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                    break;
+            }
+            return TRUE;
+        }
        return FALSE;
     }
 
