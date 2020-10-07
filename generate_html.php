@@ -231,6 +231,7 @@ class generate_html implements WikiIocModel{
             $zip->addFromString('search.html', $html);
             //Remove menu index ,expander and icon/name tags
             $this->menu_html = preg_replace('/@IOCSTARTINDEX@|@IOCENDINDEX@/', '', $this->menu_html);
+            $this->menu_html = preg_replace('/@IOCSTARTPREEXPANDER@(.*?)@IOCENDPREEXPANDER@/', '$1', $this->menu_html);
             $this->menu_html = preg_replace('/@IOCSTARTEXPANDER@|@IOCENDEXPANDER@/', '', $this->menu_html);
             $this->menu_html = preg_replace('/@IOCACTIVITYICONSTART@(.*?)@IOCACTIVITYICONEND@/', '', $this->menu_html);
             $this->menu_html = preg_replace('/@IOCACTIVITYNAMESTART@|@IOCACTIVITYNAMEEND@/', '', $this->menu_html);
