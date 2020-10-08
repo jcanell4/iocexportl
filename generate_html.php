@@ -671,9 +671,9 @@ class generate_html implements WikiIocModel{
         }elseif ($type === 'section'){
             $menu_html = '<li id="'.$id.'" class="tocsection">';
             $menu_html .= '<p id=\''.$id.$this->def_section_href.'\'>';
-            if($this->menuLevel3){
-                $menu_html .= "@IOCSTARTPREEXPANDER@<span id='b_$id' class='buttonexpss cl'>&nbsp;&nbsp;&nbsp;</span>@IOCENDPREEXPANDER@";
-            }
+//            if($this->menuLevel3){
+//                $menu_html .= "@IOCSTARTPREEXPANDER@<span id='b_$id' class='buttonexpss cl'>&nbsp;&nbsp;&nbsp;</span>@IOCENDPREEXPANDER@";
+//            }
             $menu_html .= '<a class="section" href="'.$href.'">'.$name.'</a>';
             $menu_html .= '@IOCSTARTEXPANDER@<span class="buttonexp"></span>@IOCENDEXPANDER@';
             $menu_html .= '</p>';
