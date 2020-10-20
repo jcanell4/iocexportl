@@ -16,7 +16,10 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
  * The Renderer
  */
 class renderer_plugin_iocxhtml extends Doku_Renderer {
-
+    const UNEXISTENT_B_IOC_ELEMS_TYPE = -1;
+    const REFERRED_B_IOC_ELEMS_TYPE = 0;
+    const UNREFERRED_B_IOC_ELEMS_TYPE = 1;
+    
     /**
      * 	XHTML variables
      */
@@ -40,7 +43,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     var $monospace = FALSE;
     var $table = FALSE;
     var $tmp_dir = 0;//Value of temp dir
+    var $tmpData=array();
 
+    var $storeForElems = NULL;
+    var $bIocElems = array(array(),  array());
+    var $currentBIocElemsType = self::UNEXISTENT_B_IOC_ELEMS_TYPE;
+    var $bIocElemsRefQueue = array();
 
     /**
      * Return version info
@@ -358,10 +366,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
     function p_open(){
         $this->doc .= DOKU_LF.'<p>'.DOKU_LF;
+        $this->_openContent();
     }
 
     function p_close(){
         $this->doc .= DOKU_LF.'</p>'.DOKU_LF;
+        $this->_closeContent();
     }
 
     function header($text, $level, $pos){
@@ -549,10 +559,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
     function listcontent_open() {
         $this->doc .= '<div class="li">';
+        $this->_openContent();
     }
 
     function listcontent_close() {
         $this->doc .= '</div>'.DOKU_LF;
+        $this->_closeContent();
     }
 
     function unformatted($text) {
@@ -650,10 +662,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
     function quote_open() {
         $this->doc .= '<blockquote><div class="no">'.DOKU_LF;
+        $this->_openContent();
     }
 
     function quote_close() {
         $this->doc .= '</div></blockquote>'.DOKU_LF;
+        $this->_closeContent();
     }
 
     function code($text, $language=null, $filename=null) {
@@ -1325,4 +1339,49 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             return $highlighted_code;
         }
     }
+    
+    private function _openContent(){
+        //Permet la insercció dels iocElemns de la columna B en el següent contenidor de text, 
+        //ja que a la versió WEB No hi ha columna B. Per tal de renderitzar correctament la coluna B
+        //al render XHTML i PDF, el seu contingut es troba sempre per sobre del paràgraf al que fa referècia.
+        //És  necessari baixar-lo un paràgraf en aquest renderer.
+        if($this->tmpData["renderIocElems"]){
+            $this->tmpData["renderDefaultIocElems"] = TRUE;
+        }        
+    }
+    
+    private function _closeContent(){
+        //Permet la insercció dels iocElemns de la columna B en el següent contenidor de text, 
+        //ja que a la versió WEB No hi ha columna B. Per tal de renderitzar correctament la coluna B
+        //al render XHTML i PDF, el seu contingut es troba sempre per sobre del paràgraf l que fa referècia.
+        //És  necessari baixar-lo un paràgraf en aquest renderer.
+        if(!empty($this->bIocElemsRefQueue)){
+            while($this->bIocElemsRefQueue[0]){
+                $id = array_shift($this->bIocElemsRefQueue);
+                $text = $this->bIocElems[self::REFERRED_B_IOC_ELEMS_TYPE][$id];
+                $this->doc.=$text;
+            }
+        }
+        if(isset($this->tmpData["renderDefaultIocElems"]) && $this->tmpData["renderDefaultIocElems"]){
+            while($this->bIocElems[self::UNREFERRED_B_IOC_ELEMS_TYPE][0]){
+                $text = array_shift($this->bIocElems[self::UNREFERRED_B_IOC_ELEMS_TYPE]);
+                $this->doc.=$text;
+            }
+            $this->tmpData["renderIocElems"] = FALSE;
+            $this->tmpData["renderDefaultIocElems"]=FALSE;            
+        }        
+    }
+
+    public function storeCurrent($clean=FALSE){
+         $this->storeForElems = $this->doc;
+         if($clean)
+             $this->doc = "";
+
+     }
+
+     public function restoreCurrent($clean=FALSE){
+         $this->doc = $this->storeForElems;
+         if($clean)
+             $this->storeForElems="";
+     }
 }

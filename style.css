@@ -375,3 +375,16 @@ div.iocContainer{
 div#content .dokuwiki pre.ioctodogroc{
     background-color: yellow;
 }
+
+.highlight{
+    font-weight:bold;
+}
+
+.highlight.iocnote{
+    background-color: #eaeaea;
+}
+
+span.note_reference{
+    vertical-align: super;
+    cursor: help;
+}
