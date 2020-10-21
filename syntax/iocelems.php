@@ -203,11 +203,12 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     case DOKU_LEXER_ENTER :
                         $matches = array();
                         preg_match('/::([^:]*):/', $data, $matches);
-                        $renderer->tmpData["type"] = $type = (isset($matches[1]))?$matches[1]:'';
+                        $type = (isset($matches[1]))?$matches[1]:'';
                         //TEXT LARGE
                         if($type === 'text' && isset($params['large'])){
                             $type = 'textl';
                         }
+                        $renderer->tmpData["type"] = $type;
                         $html = '<div class="ioc'.$type.'">';
                         $html .= '<div class="ioccontent">';
                         $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
@@ -227,6 +228,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                             $renderer->doc = $html;
                         }else{
                             $renderer->doc .= $html;
+                            $renderer->openForContentB("iocelem");
                         }                    
                         break;
                     case DOKU_LEXER_UNMATCHED :
@@ -248,6 +250,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                             unset($renderer->tmpData["id"]);
                         }else{
                              $renderer->doc .= $html;
+                             $renderer->closeForContentB("iocelem");
                         }   
                         unset($renderer->tmpData["type"]);
                         break;
@@ -259,11 +262,12 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_ENTER :
                     $matches = array();
                     preg_match('/::([^:]*):/', $data, $matches);
-                    $renderer->tmpData["type"] = $type = (isset($matches[1]))?$matches[1]:'';
+                    $type = (isset($matches[1]))?$matches[1]:'';
                     //TEXT LARGE
                     if($type === 'text' && isset($params['large'])){
                         $type = 'textl';
                     }
+                    $renderer->tmpData["type"] = $type;
                     $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                     $offset = (isset($params['offset']))?$params['offset']:false;
                     $width = (isset($params['width']))?$params['width']:false;
@@ -282,6 +286,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     }else{
                         $renderer->getCurrentNode()->addContent($node);
                         $renderer->setCurrentNode($node);
+                        $renderer->openForContentB("iocelem");
                     }
                     break;
                 case DOKU_LEXER_UNMATCHED:
@@ -306,6 +311,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         unset($renderer->tmpData["id"]);
                     }else{
                         $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                        $renderer->closeForContentB("iocelem");
                     }          
                     unset($renderer->tmpData["type"]);
                     break;
