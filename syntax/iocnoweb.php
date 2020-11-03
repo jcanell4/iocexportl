@@ -65,7 +65,7 @@ class syntax_plugin_iocexportl_iocnoweb extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if ($mode !== 'iocexportl' && $mode !== 'ioccounter' && $mode !== 'wikiiocmodel_psdom')
+        if ($mode !== 'iocexportl' && $mode !== 'iocxhtml' && $mode !== 'ioccounter' && $mode !== 'wikiiocmodel_psdom' && $mode !== 'wikiiocmodel_ptxhtml')
             return FALSE;
         return TRUE;
     }
