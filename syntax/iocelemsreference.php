@@ -41,7 +41,7 @@ class syntax_plugin_iocexportl_iocelemsreference extends DokuWiki_Syntax_Plugin 
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         $matches = array();
         if (preg_match('/:(text|note|reference):(.*?):/', $match, $matches)){
             $type = trim($matches[1]);
@@ -53,7 +53,7 @@ class syntax_plugin_iocexportl_iocelemsreference extends DokuWiki_Syntax_Plugin 
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         list($match, $type, $id) = $data;
         if ($mode === 'ioccounter'){
             $renderer->doc .= "$type$id";
