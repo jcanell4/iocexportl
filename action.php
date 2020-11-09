@@ -96,7 +96,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $id = str_replace(':', '_', $id);
 
         if (!empty($this->conf['ftp_config']['materials_fp'])) {
-            $rUrl = $this->conf['ftp_config']['materials_fp']['remoteUrl'];
+            $rUrl = $this->conf['ftp_config']['materials_fp']['remoteUrl'] . $this->conf['ftp_config']['materials_fp']['remoteDir'];
             $rDir = str_replace("htmlindex", "", $id);
             $ftpsend_html = $this->get_ftpsend_html($rUrl, $rDir);
         }
