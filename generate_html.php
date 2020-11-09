@@ -39,7 +39,7 @@ class generate_html implements WikiIocModel{
     private $toexport;
     private $tree_names;
     private $web_folder;
-    private $menuLevel3=false;
+    private $menuLevel3=true;
 
    /**
     * Default Constructor
@@ -121,7 +121,7 @@ class generate_html implements WikiIocModel{
         $zip = new ZipArchive;
         $res = $zip->open(DOKU_IOCEXPORTL_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
         if ($res === TRUE) {
-            $this->menuLevel3 = preg_match("/y$|yes|s$|si|true|cert/i", $data[1]['menulevel3']);
+            $this->menuLevel3 = !preg_match("/n$|not$|no$|false$|fals$/i", $data[1]['menulevel3']);
             list($this->menu_html, $files_name) = $this->createMenu($data[0]);
             //Get build.js and add which filenames will be used to search
             $build = io_readFile(DOKU_IOCEXPORTL_TEMPLATES_HTML.'_/js/build.js');
@@ -935,9 +935,10 @@ class generate_html implements WikiIocModel{
     * Create Meta data located at the bottom right aligned
     */
     private function createMetaBR($data){
-
+        setlocale(LC_TIME, 'ca_ES.utf8');
         $meta .= '&copy; Departament d&#39;Educació<br />';
         $meta .= $this->lang['firstediton'].': <strong>'.(isset($data['data'])?$data['data']:'').'</strong>';
+        $meta .= $this->lang['lastediton'].': <strong>'.strftime("%B %Y").'</strong>';
         if (isset($data['legal'])){
             $meta .= '&nbsp;&#47;&nbsp;'.$this->lang['legaldeposit'].': <strong>'.$data['legal'].'</strong>';
         }
