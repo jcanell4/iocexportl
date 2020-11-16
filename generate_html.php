@@ -937,8 +937,8 @@ class generate_html implements WikiIocModel{
     private function createMetaBR($data){
         setlocale(LC_TIME, 'ca_ES.utf8');
         $meta .= '&copy; Departament d&#39;Educació<br />';
-        $meta .= $this->lang['firstediton'].': <strong>'.(isset($data['data'])?$data['data']:'').'</strong>';
-        $meta .= $this->lang['lastediton'].': <strong>'.strftime("%B %Y").'</strong>';
+        $meta .= $this->lang['firstediton'].': <strong>'.(isset($data['data'])?$data['data']:'').'</strong><br/>';
+        $meta .= $this->lang['lastediton'].': <strong>'.strftime("%B %Y").'</strong><br/>';
         if (isset($data['legal'])){
             $meta .= '&nbsp;&#47;&nbsp;'.$this->lang['legaldeposit'].': <strong>'.$data['legal'].'</strong>';
         }
