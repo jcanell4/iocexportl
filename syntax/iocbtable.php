@@ -40,7 +40,8 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
     }
     // prioritat
     function getSort(){
-        return 59;
+#        return 59;
+        return 30;
     }
     //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
     function getAllowedTypes() {
@@ -62,12 +63,12 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addPattern('[\t ]+', 'plugin_iocexportl_iocbtable');
 
         //final de taula
-        $this->Lexer->addExitPattern('\^+\n?\][\t ]*\n', 'plugin_iocexportl_iocbtable');
-        $this->Lexer->addExitPattern('\|+\n?\][\t ]*\n', 'plugin_iocexportl_iocbtable');
+        $this->Lexer->addExitPattern('\^+\n?\][\t ]*?\n', 'plugin_iocexportl_iocbtable');
+        $this->Lexer->addExitPattern('\|+\n?\][\t ]*?\n', 'plugin_iocexportl_iocbtable');
 
-        //final
-        $this->Lexer->addPattern('\^+[\t ]*\n', 'plugin_iocexportl_iocbtable');
-        $this->Lexer->addPattern('\|+[\t ]*\n', 'plugin_iocexportl_iocbtable');
+        //final de fila
+        $this->Lexer->addPattern('\n?[\t ]*?\^+[\t ]*?\n', 'plugin_iocexportl_iocbtable');
+        $this->Lexer->addPattern('\n?[\t ]*?\|+[\t ]*?\n', 'plugin_iocexportl_iocbtable');
 
         //inicial i intermedis
         $this->Lexer->addPattern('\^+', 'plugin_iocexportl_iocbtable');
@@ -88,12 +89,35 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
             while(!empty($handler->calls) && !$this->isCallMine(end($handler->calls))){
                 array_unshift($calls, array_pop($handler->calls));
             }
-            foreach ($calls as $call){
-                if ($this->currentCell==NULL){
-                    $this->tableStruct->addLine(new ExtraCall($call));
-                }else{
-                    $content = new ContentCell(ContentCell::CALL_CONTENT, $call);
-                    $this->currentCell->addContent($content);
+            if($calls[0][0]==="preformatted" && (substr($calls[0][1][0], -1)==="|" || substr($calls[0][1][0], -1)==="^") && $calls[1][0]==="eol"){
+                //ês un final de fila
+                $acontentCell = explode("|",$calls[0][1][0]);
+                $first=true;
+                foreach ($acontentCell as $data) {
+                    if($first){
+                        $first=false;
+                        $this->currentCell->addContent(new ContentCell(ContentCell::ALLIGN_CONTENT, $data));
+                    }else if(!empty ($data)){
+                        $this->currentRow->addColumn($this->currentCell);
+                        $this->currentCell=new CellStructure(CellStructure::T_CELL);
+                        $instructions = p_get_instructions($data);
+                        foreach ($instructions as $instruction) {
+                            $this->currentCell->addContent(new ContentCell(ContentCell::CALL_CONTENT, $instruction));
+                        }                        
+                    }
+                }
+                $this->currentRow->addColumn($this->currentCell);
+                $this->currentCell = NULL;
+                $this->tableStruct->addRow($this->currentRow);
+                $this->currentRow = NULL;
+            }else{
+                foreach ($calls as $call){
+                    if ($this->currentCell==NULL){
+                        $this->tableStruct->addLine(new ExtraCall($call));
+                    }else{
+                        $content = new ContentCell(ContentCell::CALL_CONTENT, $call);
+                        $this->currentCell->addContent($content);
+                    }
                 }
             }
         }
@@ -173,9 +197,16 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                         $content = new ContentCell(ContentCell::COLSPAN_CONTENT);
                         $this->currentCell->addContent($content);
                     }
+                    $this->currentRow->addColumn($this->currentCell);
+                    if(preg_match('/\^{2,}/',$match) || preg_match('/\n\^{2,}/',$match) 
+                            || preg_match('/\^{2,}[\t ]*\n/',$match)) {
+                        $this->currentCell=new CellStructure(CellStructure::T_HEADER);
+                    }else{
+                        $this->currentCell=new CellStructure(CellStructure::T_CELL);
+                    }
                 } else if ( preg_match('/[\t ]*:::[\t ]*/',$match) ) {
                     if(empty($this->currentCell->content)){
-                        $ncol = count($this->currentRow->cells);
+                        $ncol = $this->countColumnsFromCells($this->currentRow->cells);
                         $nrow = count($this->tableStruct->rows)-1;
                         while($nrow>=0 && $this->tableStruct->rows[$nrow]->cells[$ncol]->type== CellStructure::NON_CELL){
                             $nrow--;
@@ -228,12 +259,27 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
 
     // Cerca les columnes desde la última fins a la primera i retorna l'index de la primera que es trobi
     function getLastColumnFromCells($cells, $lastNCol) {
-        for ($i = $lastNCol; $i>0; --$i) {
-            if ($cells[$i]) {
-                return $i;
-            }
+        $cont=0;
+        $pos=0;
+        while ($pos<count($cells) && $cont<$lastNCol){
+            $cont += $cells[$pos]->colSpan;
+            $pos++;
         }
-        return 0;
+        return $pos;
+//        for ($i = $lastNCol; $i>0; --$i) {
+//            if ($cells[$i]) {
+//                return $i;
+//            }
+//        }
+//        return 0;
+    }
+
+    function countColumnsFromCells($cells) {
+        $cont=0;
+        foreach ($cells as $cell) {
+            $cont +=$cell->colSpan;
+        }
+        return $cont;
     }
 
     /**
@@ -387,6 +433,8 @@ class CellStructure{
             $this->colSpan++;
         }else if($content->type == ContentCell::NON_CONTENT){
             $this->type= CellStructure::NON_CELL;
+//            $this->colSpan=0;
+//            $this->rowSpan=0;
         }else{
             $this->content []= $content;
         }
