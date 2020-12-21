@@ -9,8 +9,7 @@
       :large: (bool)
 	:::
  */
-
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();  //must be run within Dokuwiki
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
@@ -21,9 +20,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
     var $id;
     var $type;
     var $vertical;
-    /**
-     * return some info
-     */
+
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -35,23 +32,14 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    /**
-     * What kind of syntax are we?
-     */
     function getType(){
-        return 'container';
+        return 'container'; //tipo de sintaxis (container,substition,formatting,protected,paragraphs)
     }
 
-    /**
-     * What about paragraphs?
-     */
     function getPType(){
-        return 'block';
+        return 'block';  //tipo de párrafo (stack, block, normal)
     }
 
-    /**
-     * Where to sort in?
-     */
     function getSort(){
         return 513;
     }
@@ -67,18 +55,17 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addExitPattern('^:::', 'plugin_iocexportl_ioctable');
     }
 
-
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         $matches = array();
 		$id = '';
 		$params = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
                 if (preg_match('/::(table|accounting):(.*?)\n/', $match, $matches)){
-					$id = trim($matches[2]);
+                    $id = trim($matches[2]);
                 }
                 preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
                 foreach($matches as $m){
@@ -96,8 +83,57 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($mode, &$renderer, $data) {
-        if ($mode === 'ioccounter'){
+    function render($mode, Doku_Renderer $renderer, $data) {
+        if ($mode === 'wikiiocmodel_psdom'){
+            list ($state, $text, $id, $params) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    $styletype = ($params['type']) ? $params['type'] : $_SESSION['styletype'];
+                    $renderer->setTableTypes($styletype);
+                    $id = trim($id);
+
+                    preg_match('/::([^:]*):/', $text, $matches);
+                    $tabletype = (isset($matches[1])) ? $matches[1] : '';
+                    if ($tabletype === "accounting"){
+                        $node = new TableFrame(TableFrame::TABLEFRAME_TYPE_ACCOUNTING,
+                                                    $id,
+                                                    $params["title"],
+                                                    $params["footer"],
+                                                    $params["widths"],
+                                                    $styletype,
+                                                    $renderer->isBorderTypeTable());
+                    }else{
+                        $node = new TableFrame(TableFrame::TABLEFRAME_TYPE_TABLE,
+                                                    $id,
+                                                    $params["title"],
+                                                    $params["footer"],
+                                                    $params["widths"],
+                                                    $styletype,
+                                                    $renderer->isBorderTypeTable());
+                    }
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    if ($instructions[0][0] === "document_start") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
+                    // Loop through the instructions
+                    foreach ( $instructions as $instruction ) {
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT :
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                    $renderer->setTableTypes("");
+                    break;
+            }
+            return TRUE;
+        }
+        elseif ($mode === 'ioccounter'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -112,7 +148,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'iocexportl'){
+        }
+        elseif ($mode === 'iocexportl'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
@@ -120,6 +157,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     preg_match('/::([^:]*):/', $text, $matches);
                     $this->type = (isset($matches[1]))?$matches[1]:'';
                     $_SESSION['accounting'] = ($this->type === 'accounting');
+                    $_SESSION['table'] = ($this->type === 'table');
                     $this->vertical = (isset($params['vertical']))?$params['vertical']:FALSE;
                     $_SESSION['table_title'] = (isset($params['title']))?$params['title']:'';
                     //Transform quotes
@@ -144,6 +182,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     }
                     if (isset($params['widths'])) {
                         $_SESSION['table_widths'] = explode(',', $params['widths']);
+                    }
+                    if (isset($params['type'])) {
+                        $_SESSION['table_types'] = preg_split('/(\s*,\s*)*,+(\s*,\s*)*/', trim($params['type']));
                     }
                     break;
                 case DOKU_LEXER_UNMATCHED :
@@ -177,21 +218,19 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $_SESSION['table_small'] = FALSE;
                     $_SESSION['accounting'] = FALSE;
                     $_SESSION['table_widths'] = '';
+                    $_SESSION['table_types'] = array();
                     $this->type = '';
                     break;
             }
             return TRUE;
-        }elseif ($mode === 'xhtml'){
+        }
+        elseif ($mode === 'xhtml'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
                         preg_match('/::([^:]*):/', $text, $matches);
                         $this->type = (isset($matches[1]))?$matches[1]:'';
-                        if($this->type === 'table'){
-                            $renderer->doc .= '<div class="ioctable">';
-                        }else{
-                            $renderer->doc .= '<div class="iocaccounting">';
-                        }
+                        $renderer->doc .= $this->_getDivClass($params['type']);
                         $renderer->doc .= '<div class="iocinfo">';
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
@@ -206,6 +245,16 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         }
                         if (isset($params['widths'])){
                             $renderer->doc .= '<strong>Amplada columnes:</strong> '.$params['widths'].'<br />';
+                            if (isset($params['force_widths'])){
+                                $e = explode(',', $params['widths']);
+                                $t = 0;
+                                for ($i=0; $i<count($e); $i++) {
+                                    $t += $e[$i];
+                                }
+                                for ($i=0; $i<count($e); $i++) {
+                                    $_SESSION['table_widths'][$i] = $e[$i] * 100 / $t;
+                                }
+                            }
                         }
                         $renderer->doc .= '</div>';
                         break;
@@ -219,26 +268,33 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         break;
                 }
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
+        }
+        elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
                         preg_match('/::([^:]*):/', $text, $matches);
-                        $this->type = (isset($matches[1]))?$matches[1]:'';
-                        if($this->type === 'table'){
-                            $renderer->doc .= '<div class="ioctable donthyphenate">';
-                        }else{
-                            $renderer->doc .= '<div class="iocaccounting donthyphenate">';
+                        $this->type = (isset($matches[1])) ? $matches[1] : '';
+                        $styletype = ($params['type']) ? $params['type'] : $_SESSION['styletype'];
+                        $renderer->doc .= $this->_getDivClass($styletype).DOKU_LF;
+                        $this->footer = (isset($params['footer'])) ?$params['footer'] : '';
+                        if (isset($params['widths']) && isset($params['force_widths'])){
+                            $e = explode(',', $params['widths']);
+                            $t = 0;
+                            for ($i=0; $i<count($e); $i++) {
+                                $t += $e[$i];
+                            }
+                            for ($i=0; $i<count($e); $i++) {
+                                $_SESSION['table_widths'][$i] = $e[$i] * 100 / $t;
+                            }
                         }
-                        $this->footer = (isset($params['footer']))?$params['footer']:'';
-                        $renderer->doc .= '<div class="titletable"><a name="'.$id.'">';
-                        $renderer->doc .= '<span>Taula</span>';
-                        $renderer->doc .= '</a>';
+                        $renderer->doc .= '<div class="titletable">';
+                        $renderer->doc .= '<a name="'.$id.'"><span>Taula: </span></a>';
                         if (isset($params['title'])){
                             $instructions = get_latex_instructions($params['title']);
-                            $renderer->doc .= preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info));
+                            $renderer->doc .= trim(preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info)));
                         }
-                        $renderer->doc .= '</div>';
+                        $renderer->doc .= '</div>'.DOKU_LF;
                         break;
                     case DOKU_LEXER_UNMATCHED :
                         $instructions = get_latex_instructions($text);
@@ -255,5 +311,12 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             return TRUE;
         }
         return FALSE;
+    }
+
+    function _getDivClass($type=NULL){
+        $class = ($this->type === 'table') ? "ioctable" : "iocaccounting";
+        $type = str_replace(",", " ", $type);
+        $divclass = trim('<div class="' . $class . ' '. $type . '">');
+        return $divclass;
     }
 }

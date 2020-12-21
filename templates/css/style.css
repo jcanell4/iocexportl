@@ -2887,3 +2887,42 @@ iframe {
 	height: 33px;
 	cursor: pointer;
 }
+
+.buttonexpss{
+   cursor: pointer;   
+   width:10px;
+}
+.buttonexpss.cl{
+    background: url("../../img/tocright.png") no-repeat scroll 80% transparent;
+}
+.buttonexpss.op{
+    background: url("../../img/tocdown.png") no-repeat scroll 80% transparent;   
+}
+.indexcontent .tocssection .toc ul {
+   display: table-cell;
+    padding: 10px;
+    text-align: left;
+    min-width: 100px;
+    width: 78%; 
+}
+.indexcontent .parentnode .tocssection .toc li{
+    display: table;
+    margin: 0 0 0.1em;
+    width: 100%;
+}
+
+.indextoc .parentnode .tocssection .toc ul {
+   counter-reset: subsection;
+}
+
+.indextoc .parentnode .tocsection p a::before {
+    content: counter(section) ". ";
+}
+
+.parentnode .tocssection .toc a{
+    counter-increment: subsection;
+}
+
+.parentnode .tocssection .toc a::before{
+    content: counter(section) "." counter(subsection) ". ";
+}

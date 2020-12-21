@@ -60,6 +60,37 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
         $renderer->doc .= '}';
         $renderer->doc .= '\end{mediaurl}';
     }
+    
+    function get_ioc_instructions($text, $modesToavoid=array()){
+        $allmodes = p_get_parsermodes();
+        
+        $modes = array();
+        
+        foreach ($allmodes as $mod){
+            if(!in_array($mod["mode"], $modesToavoid)){
+                $modes []= $mod;
+            }
+        }
+        
+
+        // Create the parser
+        $Parser = new Doku_Parser();
+
+        // Add the Handler
+        $Parser->Handler = new Doku_Handler();
+
+        //add modes to parser
+        foreach($modes as $mode){
+            $Parser->addMode($mode['mode'],$mode['obj']);
+        }
+
+        // Do the parsing
+        trigger_event('PARSER_WIKITEXT_PREPROCESS', $text);
+        $p = $Parser->parse($text);
+        //  dbg($p);
+        return $p;
+        
+    }
 
     /**
      *
@@ -243,7 +274,7 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
      * @param array $instructions
      * @param array $info
      */
-    function p_latex_render($mode,$instructions,&$info){
+    function p_latex_render($mode,$instructions,&$info, $strict=FALSE){
 
         if(is_null($instructions)) return '';
 
@@ -254,29 +285,35 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
         $class = "renderer_plugin_".$mode;
 
         if (class_exists($class)) {
-          $Renderer = new $class;
+          $renderer = new $class;
         }
 
-        if (is_null($Renderer)) return null;
+        if(is_null($renderer) && !$strict){
+            $renderer = p_get_renderer($mode);
+        }
+        
+        if (is_null($renderer)){ 
+            return null;            
+        }
 
-        $Renderer->reset();
+        $renderer->reset();
 
-        $Renderer->smileys = getSmileys();
-        $Renderer->entities = getEntities();
-        $Renderer->acronyms = getAcronyms();
-        $Renderer->interwiki = getInterwiki();
+        $renderer->smileys = getSmileys();
+        $renderer->entities = getEntities();
+        $renderer->acronyms = getAcronyms();
+        $renderer->interwiki = getInterwiki();
 
         // Loop through the instructions
         foreach ( $instructions as $instruction ) {
             // Execute the callback against the Renderer
-            call_user_func_array(array(&$Renderer, $instruction[0]),$instruction[1]);
+            call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
         }
 
         //set info array
-        $info = $Renderer->info;
+        $info = $renderer->info;
 
         // Post process and return the output
-        $data = array($mode,& $Renderer->doc);
+        $data = array($mode,& $renderer->doc);
         trigger_event('RENDERER_CONTENT_POSTPROCESS',$data);
-        return $Renderer->doc;
+        return $renderer->doc;
     }
