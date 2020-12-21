@@ -69,7 +69,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
      * Handle the match
      */
 
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         $matches = array();
 		$params = array();
         switch ($state) {
@@ -96,7 +96,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
    /**
     * output
     */
-    function render($mode, &$renderer, $indata) {
+    function render($mode, Doku_Renderer $renderer, $indata) {
         if($mode === 'ioccounter'){
             list($state, $text, $params) = $indata;
             switch ($state) {

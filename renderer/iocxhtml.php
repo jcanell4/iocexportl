@@ -553,7 +553,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $this->closeForContentB("ol");
     }
 
-    function listitem_open($level) {
+    function listitem_open($level, $node=false) {
         $this->doc .= '<li class="level'.$level.'">';
     }
 

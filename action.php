@@ -68,24 +68,24 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
 
-        $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/mediaScript.js');
+        $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/mediaScript.js');
 
         if (!$this->has_jquery()) {
-            $this->link_script($event, 'http://code.jquery.com/jquery.min.js');
-            $this->include_script($event, 'jQuery.noConflict();');
+            $this->link_lazyscript($event, 'http://code.jquery.com/jquery.min.js');
+            $this->include_lazyscript($event, 'jQuery.noConflict();');
         }
 
         if ($this->isExportPage() && $this->checkPerms() && $this->showcounts()){
-            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js');
+            $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js');
         }
         if ($this->isExportPage() && ($this->exportallowed || auth_ismanager())){
-            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/chooser.js');
+            $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/chooser.js');
         }
         if (!$this->isExportPage()){
-            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/numbering.js');
-            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/quiz.js');
-            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/jquery.imagesloaded.js');
-            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/render.js');
+            $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/numbering.js');
+            $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/quiz.js');
+            $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/jquery.imagesloaded.js');
+            $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/render.js');
         }
 
     }
@@ -232,16 +232,16 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         return (int) $date > 20110525;
     }
 
-    private function link_script($event, $url) {
-        array_push($event->data['script'], array(
+    private function link_lazyscript($event, $url) {
+        $event->data['lazyscript'][] = array(
             'type' => 'text/javascript',
             'charset' => 'utf-8',
             'src' => $url,
-        ));
+        );
     }
 
-    private function include_script($event, $code) {
-        $event->data['script'][] = array(
+    private function include_lazyscript($event, $code) {
+        $event->data['lazyscript'][] = array(
             'type' => 'text/javascript',
             'charset' => 'utf-8',
             '_data' => $code,

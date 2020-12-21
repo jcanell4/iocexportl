@@ -19,7 +19,7 @@ class syntax_plugin_iocexportl_iocgraphviz extends syntax_plugin_graphviz {
     /**
      * Create output
      */
-    function render($format, &$R, $data) {
+    function render($format, Doku_Renderer $R, $data) {
         if (parent::render($format, $R, $data)){
             return true;
         }

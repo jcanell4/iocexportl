@@ -57,14 +57,14 @@ class syntax_plugin_iocexportl_iocnoweb extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         return array($state, $match);
     }
 
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode !== 'iocexportl' && $mode !== 'iocxhtml' && $mode !== 'ioccounter' && $mode !== 'wikiiocmodel_psdom' && $mode !== 'wikiiocmodel_ptxhtml')
             return FALSE;
         return TRUE;

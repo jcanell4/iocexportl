@@ -42,7 +42,7 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
     /**
      * Tratamiento de la estructura $match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         // Ejemplo de $match: {{soundcloud>341144902:s-PNOVW|sonido de nivel 3}}
         $command = substr($match,2,-2);     //remove {{ }}
         list($command, $title) = explode('|', $command);
@@ -57,7 +57,7 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode === 'wikiiocmodel_psdom'){
             list($type, $title, $id, $token) = $data;
             $url = preg_replace('/@ID@/', $id, self::$soundcloud);

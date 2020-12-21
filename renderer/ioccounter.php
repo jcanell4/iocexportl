@@ -139,7 +139,7 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
 
     function listo_close() {}
 
-    function listitem_open($level) {}
+    function listitem_open($level, $node=false) {}
 
     function listitem_close() {}
 
