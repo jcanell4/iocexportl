@@ -16,10 +16,13 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
  * The Renderer
  */
 class renderer_plugin_iocxhtml extends Doku_Renderer {
-
-	/**
-	 * 	XHTML variables
-	 */
+    const UNEXISTENT_B_IOC_ELEMS_TYPE = -1;
+    const REFERRED_B_IOC_ELEMS_TYPE = 0;
+    const UNREFERRED_B_IOC_ELEMS_TYPE = 1;
+    
+    /**
+     * 	XHTML variables
+     */
     // @access public
     var $doc = '';        // will contain the whole document
     var $toc = array();   // will contain the Table of Contents
@@ -40,7 +43,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     var $monospace = FALSE;
     var $table = FALSE;
     var $tmp_dir = 0;//Value of temp dir
+    var $tmpData=array();
 
+    var $storeForElems = NULL;
+    var $bIocElems = array(array(),  array());
+    var $currentBIocElemsType = self::UNEXISTENT_B_IOC_ELEMS_TYPE;
+    var $bIocElemsRefQueue = array();
 
     /**
      * Return version info
@@ -77,10 +85,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         //reset some internals
         $this->toc     = array();
         $this->headers = array();
-
-		$this->id = getID();
+        $this->id = getID();
         //Check whether user can export
-		$exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
+	$exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$exportallowed && !auth_isadmin()) die;
 
         //Global variables
@@ -125,7 +132,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         return $link;
     }
 
-	/**
+    /**
      * Creates a linkid from a headline
      *
      * @param string  $title   The headline title
@@ -141,10 +148,13 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
     }
 
-	/**
+    /**
      * NOVA
      */
     function _initialize_globals(){
+        if (!isset($_SESSION['accounting'])){
+            $_SESSION['accounting'] = FALSE;
+        }
         if (!isset($_SESSION['activities_header'])){
             $_SESSION['activities_header'] = FALSE;
         }
@@ -186,6 +196,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
         if (!isset($_SESSION['quizmode'])){
             $_SESSION['quizmode'] = FALSE;
+        }
+        if (!isset($_SESSION['table'])){
+            $_SESSION['table'] = FALSE;
         }
         if (!isset($_SESSION['table_id'])){
             $_SESSION['table_id'] = '';
@@ -316,8 +329,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if ( array_key_exists($smiley, $this->smileys) ) {
             $title = $this->_xmlEntities($this->smileys[$smiley]);
             $this->doc .= '<img src="'.DOKU_BASE.'lib/images/smileys/'.$this->smileys[$smiley].
-                '" class="middle" alt="'.
-                    $this->_xmlEntities($smiley).'" />';
+                            '" class="middle" alt="'.$this->_xmlEntities($smiley).'" />';
         } else {
             $this->doc .= $this->_xmlEntities($smiley);
         }
@@ -354,10 +366,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
     function p_open(){
         $this->doc .= DOKU_LF.'<p>'.DOKU_LF;
+        $this->openForContentB("p");
     }
 
     function p_close(){
         $this->doc .= DOKU_LF.'</p>'.DOKU_LF;
+        $this->closeForContentB("p");
     }
 
     function header($text, $level, $pos){
@@ -440,7 +454,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     /*
      * Tables
      */
-    function table_open($maxcols = NULL, $numrows = NULL){
+    function table_open($maxcols=NULL, $numrows=NULL, $pos=NULL){
         global $lang;
         // initialize the row counter used for classes
         $this->_counter['row_counter'] = 0;
@@ -448,12 +462,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if ($_SESSION['activity']){
             $class .= ' tabminheight';
         }
-        $this->doc .= '<div class="' . $class . '"><table class="inline">' .
-                      DOKU_LF;
+        $this->doc .= '<div class="'.$class.'"><table class="inline">'.DOKU_LF;
         $this->table = TRUE;
     }
 
-    function table_close(){
+    function table_close($pos=NULL){
         $this->doc .= '</table></div>'.DOKU_LF;
         $this->table = FALSE;
     }
@@ -504,6 +517,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if ( $rowspan > 1 ) {
             $this->doc .= ' rowspan="'.$rowspan.'"';
         }
+        //Esta función no es llamada, en su lugar se usa: dokuwiki_30/inc/parser/hhtml.php
+        if (!empty($_SESSION['table_widths'])) {
+            $this->doc .= ' width="'.$_SESSION['table_widths'][0].'%"';
+            array_shift($_SESSION['table_widths']);
+        }
         $this->doc .= '>';
     }
 
@@ -517,21 +535,25 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
     function listu_open() {
         $this->doc .= '<ul>'.DOKU_LF;
+        $this->openForContentB("ul");
     }
 
     function listu_close() {
         $this->doc .= '</ul>'.DOKU_LF;
+        $this->closeForContentB("ul");
     }
 
     function listo_open() {
         $this->doc .= '<ol>'.DOKU_LF;
+        $this->openForContentB("ol");
     }
 
     function listo_close() {
         $this->doc .= '</ol>'.DOKU_LF;
+        $this->closeForContentB("ol");
     }
 
-    function listitem_open($level) {
+    function listitem_open($level, $node=false) {
         $this->doc .= '<li class="level'.$level.'">';
     }
 
@@ -636,16 +658,18 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $this->doc .= '<pre class="code">' . trim($this->_xmlEntities($text),"\n\r") . '</pre>'. DOKU_LF;
     }
 
-    function file($text) {
-        $this->_highlight('file',$text,$language,$filename);
+    function file($text, $lang=NULL, $file=NULL) {
+        $this->_highlight('file',$text,$lang,$file);
     }
 
     function quote_open() {
         $this->doc .= '<blockquote><div class="no">'.DOKU_LF;
+        $this->openForContentB("blockquote");
     }
 
     function quote_close() {
         $this->doc .= '</div></blockquote>'.DOKU_LF;
+        $this->closeForContentB("blockquote");
     }
 
     function code($text, $language=null, $filename=null) {
@@ -682,8 +706,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
           $link['class'] .= ' wikilink2';
 
         //output formatted
-        //if ($linking == 'nolink' || $noLink) $this->doc .= $link['name'];
-        //else $this->doc .= $this->_formatLink($link);
+//        if ($linking == 'nolink' || $noLink){
+//            $this->doc .= $link['name'];
+//        }else{
+//            $this->doc .= $this->_formatLink($link);
+//        }
         $this->doc .= $link['name'];
     }
 
@@ -1101,6 +1128,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         return $ret;
     }
 
+    function _isMediaFile($src){
+        $pos = strrpos((string)$src,':');
+        $ret = $pos!==false;
+        return $ret;
+    }
+
     /**
      * Renders internal and external media
      *
@@ -1127,7 +1160,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $path = '../';
         }
         //attach url media file
-        array_push($_SESSION['media_files'], $src);
+        if($this->_isMediaFile($src)){
+            array_push($_SESSION['media_files'], $src);
+        }
 
         list($ext,$mime,$dl) = mimetype($src);
         if(substr($mime,0,5) == 'image'){
@@ -1170,7 +1205,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }
             //add image tag
             if ($_SESSION['export_html']){
-                $ret .= '<img src="'.$path.'media/'.basename(str_replace(':', '/', $src)).'"';
+                if ($_SESSION['dir_images']) {
+                    $ret .= '<img src="'.$_SESSION['dir_images'].str_replace(':', '/', $src).'"';
+                }else {
+                    $ret .= '<img src="'.$path.'media/'.basename(str_replace(':', '/', $src)).'"';
+                }
             }else{
                 $ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
             }
@@ -1302,4 +1341,55 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             return $highlighted_code;
         }
     }
+    
+    public function openForContentB($origin){
+        //Permet la insercció dels iocElemns de la columna B en el següent contenidor de text, 
+        //ja que a la versió WEB No hi ha columna B. Per tal de renderitzar correctament la coluna B
+        //al render XHTML i PDF, el seu contingut es troba sempre per sobre del paràgraf al que fa referècia.
+        //És  necessari baixar-lo un paràgraf en aquest renderer.
+        if(!isset($this->tmpData["origin"])){
+            if($this->tmpData["renderIocElems"]){
+                $this->tmpData["renderDefaultIocElems"] = TRUE;
+            }        
+            $this->tmpData["origin"] = $origin;
+        }
+    }
+    
+    public function closeForContentB($origin){
+        //Permet la insercció dels iocElemns de la columna B en el següent contenidor de text, 
+        //ja que a la versió WEB No hi ha columna B. Per tal de renderitzar correctament la coluna B
+        //al render XHTML i PDF, el seu contingut es troba sempre per sobre del paràgraf l que fa referècia.
+        //És  necessari baixar-lo un paràgraf en aquest renderer.
+        if($this->tmpData["origin"]===$origin){
+            if(!empty($this->bIocElemsRefQueue)){
+                while($this->bIocElemsRefQueue[0]){
+                    $id = array_shift($this->bIocElemsRefQueue);
+                    $text = $this->bIocElems[self::REFERRED_B_IOC_ELEMS_TYPE][$id];
+                    $this->doc.=$text;
+                }
+            }
+            if(isset($this->tmpData["renderDefaultIocElems"]) && $this->tmpData["renderDefaultIocElems"]){
+                while($this->bIocElems[self::UNREFERRED_B_IOC_ELEMS_TYPE][0]){
+                    $text = array_shift($this->bIocElems[self::UNREFERRED_B_IOC_ELEMS_TYPE]);
+                    $this->doc.=$text;
+                }
+                $this->tmpData["renderIocElems"] = FALSE;
+                $this->tmpData["renderDefaultIocElems"]=FALSE;            
+            }    
+            unset($this->tmpData["origin"]);
+        }
+    }
+
+    public function storeCurrent($clean=FALSE){
+         $this->storeForElems = $this->doc;
+         if($clean)
+             $this->doc = "";
+
+     }
+
+     public function restoreCurrent($clean=FALSE){
+         $this->doc = $this->storeForElems;
+         if($clean)
+             $this->storeForElems="";
+     }
 }

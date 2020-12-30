@@ -21,7 +21,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
 
-   /**
+    /**
     * Get an associative array with plugin info.
     */
     function getInfo(){
@@ -59,7 +59,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('^::(?:text|note|reference|quote|important|example):\n(?:\s{2}:\w+:.*?\n)*(?=.*?\n:::)',$mode,'plugin_iocexportl_iocelems');
+        $this->Lexer->addEntryPattern('^::(?:text|note|reference|quote|important|example):.*?\n(?:\s{2}:\w+:.*?\n)*(?=.*?\n:::)',$mode,'plugin_iocexportl_iocelems');
     }
     function postConnect() {
         $this->Lexer->addExitPattern('^:::','plugin_iocexportl_iocelems');
@@ -69,11 +69,17 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
      * Handle the match
      */
 
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         $matches = array();
 		$params = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
+                 if (preg_match('/::(text|note|reference):(.*?)\n/', $match, $matches)){
+                    $id = trim($matches[2]);
+                    if(!empty($id)){ 
+                        $params['id'] = $id;
+                    }
+                }
                 preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
                 foreach($matches as $m){
                     $params[$m[1]] = $m[2];
@@ -90,7 +96,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
    /**
     * output
     */
-    function render($mode, &$renderer, $indata) {
+    function render($mode, Doku_Renderer $renderer, $indata) {
         if($mode === 'ioccounter'){
             list($state, $text, $params) = $indata;
             switch ($state) {
@@ -167,7 +173,12 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         if($type === 'text' && isset($params['large'])){
                             $type = 'textl';
                         }
-                        $renderer->doc .= '<div class="ioc'.$type.'">';
+                        if(isset($params["id"])){
+                            $idatt = " id={$params["id"]} ";
+                        }else{
+                            $idatt = "";
+                        }
+                        $renderer->doc .= "<div$idatt class=\"ioc$type\">";
                         $renderer->doc .= '<div class="ioccontent">';
                         $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                         if (!empty($title)){
@@ -186,7 +197,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         break;
             }
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
+        }elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             list($state, $data, $params) = $indata;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
@@ -197,25 +208,116 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         if($type === 'text' && isset($params['large'])){
                             $type = 'textl';
                         }
-                        $renderer->doc .= '<div class="ioc'.$type.'">';
-                        $renderer->doc .= '<div class="ioccontent">';
+                        $renderer->tmpData["type"] = $type;
+                        $html = '<div class="ioc'.$type.'">';
+                        $html .= '<div class="ioccontent">';
                         $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                         if (!empty($title)){
-                            $renderer->doc .= '<p class="ioctitle">'.$title.'</p>';
+                            $html.= '<p class="ioctitle">'.$title.'</p>';
                         }
+                        if($type==="text" || $type === "note" || $type === "reference"){
+                            if(isset($params["id"])){                                
+                                $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::REFERRED_B_IOC_ELEMS_TYPE;
+                                $renderer->tmpData["id"] = $params["id"];
+                            }else{
+                                $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNREFERRED_B_IOC_ELEMS_TYPE;
+                                $renderer->tmpData["id"]= count($renderer->bIocElems[$renderer->currentBIocElemsType]);
+                                $renderer->tmpData["renderIocElems"] = FALSE;
+                            }   
+                            $renderer->storeCurrent();
+                            $renderer->doc = $html;
+                        }else{
+                            $renderer->doc .= $html;
+                            $renderer->openForContentB("iocelem");
+                        }                    
                         break;
                     case DOKU_LEXER_UNMATCHED :
                         $_SESSION['iocelem'] = TRUE;
                         $instructions = get_latex_instructions($data);
-                        $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                        $html = p_latex_render($mode, $instructions, $info);
                         $_SESSION['iocelem'] = FALSE;
+                        $renderer->doc .= $html;
                         break;
                     case DOKU_LEXER_EXIT :
-                        $renderer->doc .= '</div>';
-                        $renderer->doc .= '</div>';
+                        $html =  '</div>';
+                        $html .= '</div>';
+                        if($renderer->tmpData["type"]==="text" || $renderer->tmpData["type"] === "note" || $renderer->tmpData["type"] === "reference"){                                                       
+                            $renderer->doc .= $html;
+                            $renderer->bIocElems[$renderer->currentBIocElemsType][$renderer->tmpData["id"]] = $renderer->doc;
+                            $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNEXISTENT_B_IOC_ELEMS_TYPE;
+                            $renderer->tmpData["renderIocElems"]=TRUE;
+                            $renderer->restoreCurrent();
+                            unset($renderer->tmpData["id"]);
+                        }else{
+                             $renderer->doc .= $html;
+                             $renderer->closeForContentB("iocelem");
+                        }   
+                        unset($renderer->tmpData["type"]);
                         break;
             }
-       }
+            return TRUE;
+       }elseif ($mode === 'wikiiocmodel_psdom'){
+            list ($state, $data, $params) = $indata;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    $matches = array();
+                    preg_match('/::([^:]*):/', $data, $matches);
+                    $type = (isset($matches[1]))?$matches[1]:'';
+                    //TEXT LARGE
+                    if($type === 'text' && isset($params['large'])){
+                        $type = 'textl';
+                    }
+                    $renderer->tmpData["type"] = $type;
+                    $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
+                    $offset = (isset($params['offset']))?$params['offset']:false;
+                    $width = (isset($params['width']))?$params['width']:false;
+                    $node = new IocElemNodeDoc($type, $title, $offset, $width);
+                    if($type==="text" || $type === "note" || $type === "reference"){
+                        if(isset($params["id"])){                                
+                            $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::REFERRED_B_IOC_ELEMS_TYPE;
+                            $renderer->tmpData["id"] = $params["id"];
+                        }else{
+                            $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNREFERRED_B_IOC_ELEMS_TYPE;
+                            $renderer->tmpData["id"]= count($renderer->bIocElems[$renderer->currentBIocElemsType]);
+                            $renderer->tmpData["renderIocElems"] = FALSE;
+                        }   
+                        $renderer->storeCurrent();
+                        $renderer->setCurrentNode($node);
+                    }else{
+                        $renderer->getCurrentNode()->addContent($node);
+                        $renderer->setCurrentNode($node);
+                        $renderer->openForContentB("iocelem");
+                    }
+                    break;
+                case DOKU_LEXER_UNMATCHED:
+                    $instructions = get_latex_instructions($data);
+                    //delete document_start and document_end instructions
+                    if ($instructions[0][0] === "document_start") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
+                    // Loop through the instructions
+                    foreach ( $instructions as $instruction ) {
+                        // Execute the callback against the Renderer
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT :
+                    if($renderer->tmpData["type"]==="text" || $renderer->tmpData["type"] === "note" || $renderer->tmpData["type"] === "reference"){                                                       
+                        $renderer->bIocElems[$renderer->currentBIocElemsType][$renderer->tmpData["id"]] = $renderer->getCurrentNode();
+                        $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNEXISTENT_B_IOC_ELEMS_TYPE;
+                        $renderer->tmpData["renderIocElems"]=TRUE;
+                        $renderer->restoreCurrent();
+                        unset($renderer->tmpData["id"]);
+                    }else{
+                        $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                        $renderer->closeForContentB("iocelem");
+                    }          
+                    unset($renderer->tmpData["type"]);
+                    break;
+            }
+            return TRUE;
+        }
        return FALSE;
     }
 

@@ -3,18 +3,13 @@
  * Latex Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
-
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
 
-    var $type;
-    /**
-     * return some info
-     */
     function getInfo(){
         return array(
             'author' => 'Marc Català',
@@ -26,27 +21,9 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    /**
-     * What kind of syntax are we?
-     */
-    function getType(){
-        return 'protected';
-    }
-
-    /**
-     * What about paragraphs?
-     */
-    function getPType(){
-        return 'normal';
-    }
-
-    /**
-     * Where to sort in?
-     */
-    function getSort(){
-        return 510;
-    }
-
+    function getType() { return 'protected'; }
+    function getPType(){ return 'normal'; }
+    function getSort() { return 210; }
 
     /**
      * Connect pattern to lexer
@@ -58,28 +35,48 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         return $match;
     }
 
     /**
      * Create output
      */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         global $symbols;
-        if ($mode === 'ioccounter'){
-            list ($state, $text) = $data;
-            switch ($state) {
-                case DOKU_LEXER_ENTER :
-                    break;
-                case DOKU_LEXER_UNMATCHED :
-                    $renderer->doc .= $text;
-                    break;
-                case DOKU_LEXER_EXIT :
-                    break;
+        if ($mode == 'wikiiocmodel_psdom'){
+            if (!$this->reservedWords($data)) {
+                $block = preg_match('/^\${2}/', $data);
+                $class = ($block) ? "blocklatex" : "inlinelatex";
+
+                $xhtml = p_render("xhtml", get_ioc_instructions($data, array("plugin_iocexportl_ioclatex")), $info);
+                if ($_SESSION['xhtml_latex_quiz']) {
+                    //afegir un noda amb el valor retornat a $xhtml;
+                }else{
+                    if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
+                        $path = mediaFN($match[2]);
+                    }elseif (preg_match('/<img src="(.*?)"/', $xhtml, $match)) {
+                        $path = realpath(DOKU_INC . ".." . $match[1]);
+                    } else {
+                        $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
+                    }
+                    if (preg_match('/<img src="(.*?title="(.*?))"/', $xhtml, $match)) {
+                        $title = $match[2];
+                    }
+                    $node = new LatexMathNodeDoc($path, $title, $class);
+                    $renderer->getCurrentNode()->addContent($node);
+                }
             }
             return TRUE;
-        }elseif ($mode === 'iocexportl'){
+        }
+        elseif ($mode === 'ioccounter'){
+             $renderer->doc .= $data;
+            return TRUE;
+        }
+        elseif ($mode === 'xhtml'){
+            $renderer->doc .= p_render($mode, get_ioc_instructions($data, array("plugin_iocexportl_ioclatex")), $info);
+        }
+        elseif ($mode === 'iocexportl'){
             if(preg_match('/<latex>(.*?)<\/latex>/', $data, $matches)){
                 $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
                 $text = preg_replace('/(\$)/', '\\\\$1', $text);
@@ -94,16 +91,14 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                 $renderer->doc .= '$'.filter_tex_sanitize_formula($text).'$';
             }
             return TRUE;
-        }elseif ($mode === 'iocxhtml'){
-            if(!$this->reservedWords($data)){
-                $lpath = '../';
-                if($_SESSION['iocintro']){
-                    $lpath = '';
-                }
+        }
+        elseif ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml') {
+            if (!$this->reservedWords($data)) {
+                $lpath = ($_SESSION['iocintro']) ? "" : "../";
                 $block = preg_match('/^\${2}/', $data);
-                $class = ($block)?'blocklatex':'inlinelatex';
-                $render = new Doku_Renderer_xhtml();
-                $xhtml = $render->render($data);
+                $class = ($block) ? "blocklatex" : "inlinelatex";
+
+                $xhtml = p_render("xhtml", get_ioc_instructions($data, array("plugin_iocexportl_ioclatex")), $info);
                 //Inside quiz and xhtml wiki required
                 if ($_SESSION['xhtml_latex_quiz']) {
                     $renderer->doc .= $xhtml;
@@ -111,13 +106,21 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                     if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
                         $path = mediaFN($match[2]);
                     } else {
-                        $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
+                        if (preg_match('/<img (.*?src="(.*?))"/', $xhtml, $match)) {
+                            $path = realpath(DOKU_INC . ".." . $match[2]);
+                        }else {
+                            $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
+                        }
                     }
                     if (!isset($_SESSION['latex_images'])){
                         $_SESSION['latex_images'] = array();
                     }
-                    array_push($_SESSION['latex_images'],$path);
-                    $renderer->doc .= '<span class="'.$class.'"><img src="'.$lpath.'media/'.basename($match[1]).'" /></span>';
+                    array_push($_SESSION['latex_images'], $path);
+                    if ($mode === 'iocxhtml') {
+                        $renderer->doc .= '<span class="'.$class.'"><img src="'.$lpath.'media/'.basename($match[1]).'" /></span>';
+                    }else{
+                        $renderer->doc .= '<span class="'.$class.'"><img src="img/'.basename($path).'" /></span>';
+                    }
                 }
             }
             return TRUE;

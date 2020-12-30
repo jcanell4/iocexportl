@@ -22,7 +22,7 @@
 \usepackage{ulem}
 \usepackage[font={scriptsize,bf},labelfont={scriptsize,sc},textfont={scriptsize,sf},justification=justified,singlelinecheck=false,labelsep=period]{caption}
 \usepackage{grffile}%Accept dots on filenames
-\usepackage{fixltx2e}%subscript, superscript
+%\usepackage{fixltx2e}%subscript, superscript
 \usepackage{setspace}%Control over line spacing
 \usepackage{listings}%Code environment
 \usepackage{dashrule}%Customized rules
@@ -41,12 +41,13 @@
 \usepackage{amssymb}%mathfrak symbols
 \usepackage{wasysym}%permil symbol
 \usepackage{xlop}%automatic arithmetic operations
-\usepackage{helveticaneue}
-\usepackage{monofur}
 \usepackage{comfortaa}%comfortaa font
+%\usepackage{helveticaneue} %helveticaneue font {hln}
+%\usepackage{monofur}  %monofur font {mnf} 
 \usepackage{color}
 \usepackage[tracking=true]{microtype}
-%@IOCQRCODE@ %qrcodes
+%\usepackage[letterspace=100]{microtype}
+@IOCQRCODE@%qrcodes
 
 \PrerenderUnicode{àáèéíòóúïüñçÀÁÈÉÍÒÓÚÏÜÑÇ}
 
@@ -377,6 +378,7 @@
 %Customized fonts
 \renewcommand{\textsf}{\fontfamily{phv}\selectfont}
 \newcommand{\ioctextfont}{\fontfamily{phv}\fontsize{8}{9.6}\selectfont}
+\renewcommand\UrlFont{\fontfamily{phv}\selectfont\normalsize}
 
 %Customize headings
 \newcommand{\headingnonumbers}{

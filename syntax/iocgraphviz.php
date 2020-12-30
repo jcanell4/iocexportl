@@ -3,11 +3,8 @@
  * Graphviz Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
-
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
+if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-
-
 if (!class_exists('syntax_plugin_graphviz')) return;
 
 class syntax_plugin_iocexportl_iocgraphviz extends syntax_plugin_graphviz {
@@ -22,13 +19,13 @@ class syntax_plugin_iocexportl_iocgraphviz extends syntax_plugin_graphviz {
     /**
      * Create output
      */
-    function render($format, &$R, $data) {
-        if(parent::render($format, $R, $data)){
+    function render($format, Doku_Renderer $R, $data) {
+        if (parent::render($format, $R, $data)){
             return true;
         }
-		if($format == 'iocxhtml'){
+	if ($format == 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml'){
             $lpath = '../';
-            if($_SESSION['iocintro']){
+            if ($_SESSION['iocintro']){
                 $lpath = '';
             }
             $img  = parent::_imgfile($data);

@@ -20,3 +20,4 @@ $lang['tablink_btn'] = 'Add link to table';
 $lang['text_btn']  = 'Add text syntax';
 $lang['textlarge_btn']  = 'Add text large syntax';
 $lang['toolbar_btn']  = 'IOC styles';
+$lang['imageNotFoundExporting'] = "Image %s is not found in %s";

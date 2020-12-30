@@ -1,6 +1,6 @@
 <script type="text/javascript">
     function _akdsaghj(){
-        return "http://bcove.me/@ID_VIDEO@";
+        return "https://bcove.me/@ID_VIDEO@";
     }
     if(window.location.protocol=="file:"){
         document.getElementById("@ID_DIV@").innerHTML ="<img src='" 
