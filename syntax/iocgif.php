@@ -48,7 +48,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
     /**
      * Tratamiento de la estructura $match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         global $ID;
         // Ejemplo de $match: {{iocgif>ruta_ns:archivo.gif?200|título}}
         $match = substr($match, 2, -2);     //remove {{ }}
@@ -70,7 +70,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode === 'wikiiocmodel_psdom'){
             list ($syntax, $title, $width, $ns, $pageid, $file) = $data;
             $ns = trim($ns);

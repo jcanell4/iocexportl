@@ -51,14 +51,14 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         return array($state, $match);
     }
 
     /**
      * Create output
      */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode == 'wikiiocmodel_psdom'){
             list ($state, $text) = $data;
             switch ($state) {

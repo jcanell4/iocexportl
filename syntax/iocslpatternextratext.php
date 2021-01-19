@@ -35,14 +35,14 @@ class syntax_plugin_iocexportl_iocslpatternextratext extends DokuWiki_Syntax_Plu
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         return $match;
     }
 
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         $data = preg_replace(['/<pat_extra_text>/', '/<\/pat_extra_text>/'], '', $data);
 
         if ($mode === 'wikiiocmodel_psdom') {

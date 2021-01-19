@@ -48,7 +48,7 @@ class syntax_plugin_iocexportl_wiocclstr extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($matchOrig, $state, $pos, &$handler){
+    function handle($matchOrig, $state, $pos, Doku_Handler $handler){
         //$data = array("command" => self::SKIP);
 
         $match = str_replace(array("<", ">", "/"), array("","", ""), $matchOrig);
@@ -78,7 +78,7 @@ class syntax_plugin_iocexportl_wiocclstr extends DokuWiki_Syntax_Plugin {
     * output
     * ALERTA[XAVI] Duplicat
     */
-    function render($mode, &$renderer, $dataHandler) {
+    function render($mode, Doku_Renderer $renderer, $dataHandler) {
         if ($mode === 'xhtml') {
 //            $htmlText="<mark title='@TITLE@'>@VALUE@</mark>";
         }else if ($mode === 'iocxhtml' || $mode === 'wikiiocmodel_ptxhtml') {

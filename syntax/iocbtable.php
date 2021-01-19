@@ -81,7 +81,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         $data = array("command" => self::SKIP);
 
         if ($this->tableStruct) {
@@ -285,7 +285,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         switch ($mode){
             case 'wikiiocmodel_psdom':
             case 'ioccounter':
@@ -335,7 +335,7 @@ class TableStructure{
         $this->rows[] = $r;
     }
 
-    function render($mode, &$renderer){
+    function render($mode, Doku_Renderer $renderer){
         switch ($mode){
             case 'wikiiocmodel_psdom':
                 if(is_callable(array($renderer, "isBorderTypeTable"))){
@@ -379,7 +379,7 @@ class RowStructure{
         $this->cells[] = $c;
     }
 
-    function render($mode, &$renderer){
+    function render($mode, Doku_Renderer $renderer){
         switch ($mode){
             case 'wikiiocmodel_psdom':
                 $node = new StructuredNodeDoc(StructuredNodeDoc::TABLEROW_TYPE);
@@ -440,7 +440,7 @@ class CellStructure{
         }
     }
 
-    function render($mode, &$renderer){
+    function render($mode, Doku_Renderer $renderer){
         if ($this->type === CellStructure::NON_CELL) {
             return;
         }
@@ -553,7 +553,7 @@ class ExtraCall{
     public function ExtraCall($data){
         $this->call = $data;
     }
-    function render($mode, &$renderer){
+    function render($mode, Doku_Renderer $renderer){
         if(method_exists($renderer, $this->call[0])){
             call_user_func_array(array(&$renderer, $this->call[0]), $this->call[1] ? $this->call[1] : array());
         }
@@ -566,7 +566,7 @@ class ContentLine{
     public function ContentLine($data){
         $this->data = $data;
     }
-    function render($mode, &$renderer){
+    function render($mode, Doku_Renderer $renderer){
         $renderer->doc .= $this->data;
     }
 }

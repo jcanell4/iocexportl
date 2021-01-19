@@ -47,7 +47,7 @@ class syntax_plugin_iocexportl_wioccl extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         // $state es un nombre, en aquest cas no ens interessa
         // $match es la coincidencia, per exemple: {##tipusModulBloc##}
         // auquests valors arriban com a index 0 = $state y 1 = $match al $data del render
@@ -58,7 +58,7 @@ class syntax_plugin_iocexportl_wioccl extends DokuWiki_Syntax_Plugin {
     * output
     * ALERTA[XAVI] Duplicat
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         list ($state, $text) = $data;
         if ($mode === 'xhtml') {
             $renderer->doc .= $text;

@@ -39,14 +39,14 @@ class syntax_plugin_iocexportl_ioctodo extends DokuWiki_Syntax_Plugin {
     /**
      * Tratamiento de la estructura $match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         return array($state, $match);
     }
 
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         $ret = TRUE;
         switch ($mode) {
             case 'wikiiocmodel_psdom':

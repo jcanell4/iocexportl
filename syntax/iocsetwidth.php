@@ -49,14 +49,14 @@ class syntax_plugin_iocexportl_iocsetwidth extends DokuWiki_Syntax_Plugin {
     /**
      * Tratamiento de la estructura $match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         return array($match, $state, $pos);
     }
 
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         list($typeWidth, $state, $pos) = $data;
         $output=self::NOT_OUTPUT; 
         
