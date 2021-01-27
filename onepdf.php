@@ -43,7 +43,7 @@ class onepdf implements WikiIocModel{
     *
     * @param array $params Array of parameters to pass to the constructor
     */
-    function __construct($params){
+    function __construct($params=FALSE){
         if($params){
             $this->initParams($params);
         }
