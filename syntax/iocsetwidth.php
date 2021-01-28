@@ -16,7 +16,7 @@ class syntax_plugin_iocexportl_iocsetwidth extends DokuWiki_Syntax_Plugin {
     const OPEN_EXTRA_WIDTH = 1;
     const CLOSE_EXTRA_WIDTH = 2;
     var $extraWidth = false;
-    
+
     function getInfo(){
         return array(
             'name' => 'IOC Set Widht Plugin',
@@ -49,29 +49,29 @@ class syntax_plugin_iocexportl_iocsetwidth extends DokuWiki_Syntax_Plugin {
     /**
      * Tratamiento de la estructura $match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler $handler){
         return array($match, $state, $pos);
     }
 
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         list($typeWidth, $state, $pos) = $data;
-        $output=self::NOT_OUTPUT; 
-        
+        $output=self::NOT_OUTPUT;
+
         if(!$this->extraWidth && $typeWidth=="~~EXTRA WIDTH~~"){
             $renderer->tmpData[$typeWidth]=TRUE;
             $this->extraWidth=true;
             $output = self::OPEN_EXTRA_WIDTH;
         }
-                
+
         if($this->extraWidth && $typeWidth=="~~NORMAL WIDTH~~"){
             unset($renderer->tmpData["~~EXTRA WIDTH~~"]);
             $this->extraWidth=false;
             $output = self::CLOSE_EXTRA_WIDTH;
         }
-                
+
         if ($mode === 'wikiiocmodel_psdom'){
             if($output== self::OPEN_EXTRA_WIDTH){
 //                $node = new IocExtraWidthNodeDoc($type[$output]);
