@@ -38,14 +38,14 @@ class syntax_plugin_iocexportl_iocnbspace extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, $handler){
         return array($state, $match);
     }
 
    /**
     * output
     */
-    function render($mode, &$renderer, $data) {
+    function render($mode, $renderer, $data) {
         if ($mode === 'wikiiocmodel_psdom'){
             $renderer->getCurrentNode()->addContent(new LeafNodeDoc(LeafNodeDoc::NO_BREAK_SPACE_TYPE));
             return TRUE;
