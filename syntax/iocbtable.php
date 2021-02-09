@@ -103,7 +103,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                         $instructions = p_get_instructions($data);
                         foreach ($instructions as $instruction) {
                             $this->currentCell->addContent(new ContentCell(ContentCell::CALL_CONTENT, $instruction));
-                        }                        
+                        }
                     }
                 }
                 $this->currentRow->addColumn($this->currentCell);
@@ -191,14 +191,14 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                             preg_match('/\|{2,}[\t ]*\n/',$match) || preg_match('/\^{2,}[\t ]*\n/',$match)) {
                     if($this->currentRow==NULL){
                         $this->currentRow = new RowStructure();
-                    }                  
+                    }
                     $nlimit = strlen(trim($match));
                     for($i=1; $i<$nlimit; $i++){
                         $content = new ContentCell(ContentCell::COLSPAN_CONTENT);
                         $this->currentCell->addContent($content);
                     }
                     $this->currentRow->addColumn($this->currentCell);
-                    if(preg_match('/\^{2,}/',$match) || preg_match('/\n\^{2,}/',$match) 
+                    if(preg_match('/\^{2,}/',$match) || preg_match('/\n\^{2,}/',$match)
                             || preg_match('/\^{2,}[\t ]*\n/',$match)) {
                         $this->currentCell=new CellStructure(CellStructure::T_HEADER);
                     }else{
@@ -294,6 +294,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
             case 'iocxhtml':
             case 'wikiiocmodel_ptxhtml':
                 list ($state, $toProcess) = $data;
+                //WARNING (09/02/2021): Se debe CONTROLAR cuándo $toProcess NO ES un array
                 if ($toProcess['command'] == self::PROCESS) {
                    $toProcess['table']->render($mode, $renderer);
                 }
