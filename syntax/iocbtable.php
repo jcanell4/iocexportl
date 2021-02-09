@@ -294,6 +294,7 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
             case 'iocxhtml':
             case 'wikiiocmodel_ptxhtml':
                 list ($state, $toProcess) = $data;
+                //WARNING (09/02/2021): Se debe CONTROLAR cuándo $toProcess NO ES un array
                 if ($toProcess['command'] == self::PROCESS) {
                    $toProcess['table']->render($mode, $renderer);
                 }
