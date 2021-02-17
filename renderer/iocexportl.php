@@ -702,7 +702,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->doc .= '\noalign{\vspace{1mm}}'.DOKU_LF;
             $this->doc .= '\hline'.DOKU_LF;
         }
-        if (($_SESSION['iocelem'] || $_SESSION['accounting']) && $_SESSION['table_footer']){
+        if (($_SESSION['iocelem'] || $_SESSION['accounting'] || $this->tableheader_count===0) && $_SESSION['table_footer']){
             $this->doc .='\multicolumn{'.$this->max_cols.'}{l@{\hspace{0mm}}}{\hspace{-2mm}'.$_SESSION['table_footer'].'}'.DOKU_LF;
         }
         $this->tableheader_count = 0;
