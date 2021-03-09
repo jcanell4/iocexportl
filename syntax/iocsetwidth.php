@@ -12,9 +12,7 @@ require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocsetwidth extends DokuWiki_Syntax_Plugin {
-    const NOT_OUTPUT = 0;
-    const OPEN_EXTRA_WIDTH = 1;
-    const CLOSE_EXTRA_WIDTH = 2;
+
     var $extraWidth = false;
 
     function getInfo(){
@@ -58,27 +56,25 @@ class syntax_plugin_iocexportl_iocsetwidth extends DokuWiki_Syntax_Plugin {
     */
     function render($mode, Doku_Renderer $renderer, $data) {
         list($typeWidth, $state, $pos) = $data;
-        $output=self::NOT_OUTPUT;
+        $output = "";
 
-        if(!$this->extraWidth && $typeWidth=="~~EXTRA WIDTH~~"){
+        if (!$this->extraWidth && $typeWidth=="~~EXTRA WIDTH~~"){
             $renderer->tmpData[$typeWidth]=TRUE;
-            $this->extraWidth=true;
-            $output = self::OPEN_EXTRA_WIDTH;
+            $this->extraWidth = true;
+            $output = LeafNodeDoc::EXTRA_WIDTH_TYPE;
         }
 
-        if($this->extraWidth && $typeWidth=="~~NORMAL WIDTH~~"){
+        if ($this->extraWidth && $typeWidth=="~~NORMAL WIDTH~~"){
             unset($renderer->tmpData["~~EXTRA WIDTH~~"]);
-            $this->extraWidth=false;
-            $output = self::CLOSE_EXTRA_WIDTH;
+            $this->extraWidth = false;
+            $output = LeafNodeDoc::NORMAL_WIDTH_TYPE;
         }
 
         if ($mode === 'wikiiocmodel_psdom'){
-            if($output== self::OPEN_EXTRA_WIDTH){
-//                $node = new IocExtraWidthNodeDoc($type[$output]);
-//                $renderer->getCurrentNode()->addContent($node);
-//                $renderer->setCurrentNode($node);
-            }else if($output== self::CLOSE_EXTRA_WIDTH){
-//                $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+            if ($output === LeafNodeDoc::EXTRA_WIDTH_TYPE) {
+                $renderer->getCurrentNode()->addContent(new LeafNodeDoc($output));
+            }else if($output === LeafNodeDoc::NORMAL_WIDTH_TYPE){
+                $renderer->getCurrentNode()->addContent(new LeafNodeDoc($output));
             }
             return TRUE;
         }elseif ($mode === "ioccounter"){
@@ -87,9 +83,9 @@ class syntax_plugin_iocexportl_iocsetwidth extends DokuWiki_Syntax_Plugin {
             return TRUE;
 
         }elseif ($mode === "iocxhtml" || $mode === 'wikiiocmodel_ptxhtml'|| $mode === "xhtml") {
-            if($output== self::OPEN_EXTRA_WIDTH){
+            if($output== LeafNodeDoc::EXTRA_WIDTH_TYPE){
 //                $renderer->doc .= '<div class="extrawidth">';
-            }else if($output== self::CLOSE_EXTRA_WIDTH){
+            }else if($output== LeafNodeDoc::NORMAL_WIDTH_TYPE){
 //                $renderer->doc .= '</div>';
             }
             return TRUE;
