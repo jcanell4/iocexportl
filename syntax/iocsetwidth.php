@@ -10,6 +10,7 @@ if (!defined('DOKU_PLUGIN_TEMPLATES')) define('DOKU_PLUGIN_TEMPLATES', DOKU_PLUG
 
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
+require_once(DOKU_PLUGIN.'wikiiocmodel/renderer/psdom.php');
 
 class syntax_plugin_iocexportl_iocsetwidth extends DokuWiki_Syntax_Plugin {
 
