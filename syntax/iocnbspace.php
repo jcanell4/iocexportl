@@ -1,6 +1,6 @@
 <?php
 /**
- * Syntax iocgrave: Plugin to parse grave accents syntax in pdf and html
+ * Syntax iocgrave: Plugin to parse nobreak space syntax in pdf and html
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
 if(!defined('DOKU_INC')) die();  //must be run within Dokuwiki
@@ -18,8 +18,8 @@ class syntax_plugin_iocexportl_iocnbspace extends DokuWiki_Syntax_Plugin {
             'author' => 'Josep Cañellas',
             'email'  => 'jcanell4@ioc.cat',
             'date'   => '2015-10-30',
-            'name'   => 'IOC grave Plugin',
-            'desc'   => 'Plugin to parse grave accents syntax in pdf and html',
+            'name'   => 'IOC nobreak space Plugin',
+            'desc'   => 'Plugin to parse nobreak space syntax in pdf and html',
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
@@ -33,6 +33,7 @@ class syntax_plugin_iocexportl_iocnbspace extends DokuWiki_Syntax_Plugin {
      */
     function connectTo($mode) {
         $this->Lexer->addSpecialPattern('\\\_', $mode, 'plugin_iocexportl_iocnbspace');
+        $this->Lexer->addSpecialPattern('&nbsp;', $mode, 'plugin_iocexportl_iocnbspace');
     }
 
     /**
@@ -50,7 +51,7 @@ class syntax_plugin_iocexportl_iocnbspace extends DokuWiki_Syntax_Plugin {
             $renderer->getCurrentNode()->addContent(new LeafNodeDoc(LeafNodeDoc::NO_BREAK_SPACE_TYPE));
             return TRUE;
         }elseif (strpos("ioccounter/xhtml/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
-            $renderer->doc .=  '&nbsp;';
+            $renderer->doc .= '&nbsp;';
             return TRUE;
         }elseif ($mode === 'iocexportl'){
             $renderer->doc .= " ";
