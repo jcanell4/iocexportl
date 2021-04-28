@@ -69,8 +69,38 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, Doku_Renderer $renderer, $data) {
-        if ($mode === 'ioccounter'){
-            list($state, $text) = $data;
+        list($state, $text) = $data;
+
+        if ($mode === 'wikiiocmodel_psdom'){
+            switch ($state) {
+                case DOKU_LEXER_ENTER:
+                    $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::SOL_TYPE);
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+                    break;
+                case DOKU_LEXER_UNMATCHED:
+                    $instructions = get_latex_instructions($text);
+                    //delete document_start and document_end instructions
+                    if ($instructions[0][0] == "document_start") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
+                    //delete p_open and p_close instructions
+                    if ($instructions[0][0] == "p_open") {
+                        array_shift($instructions);
+                        array_pop($instructions);
+                    }
+                    foreach ( $instructions as $instruction ) {
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                    }
+                    break;
+                case DOKU_LEXER_EXIT:
+                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+                    break;
+            }
+            return TRUE;
+        }
+        elseif ($mode === 'ioccounter'){
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   break;
@@ -84,7 +114,6 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             return TRUE;
         }
         elseif ($mode === 'iocexportl'){
-            list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   $this->class = $text;
@@ -115,7 +144,6 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             return TRUE;
         }
         elseif (strpos("xhtml/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
-            list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   $this->class = $text;
