@@ -85,7 +85,7 @@ div.solution{
   clear:left;
   width:73%;
 }
-.ioctextl, .iocexample, .iocimportant, .iocquote, .iocfigure, .ioctable, .iocaccounting{
+.ioctextl, .iocexample, .iocimportant, .iocquote, .iocfigure, .ioctable, .iocaccounting {
   width:73% !important;
 }
 
@@ -264,7 +264,7 @@ div.dokuwiki #toc__inside ul{
 
 /* COLUMN A */
 
-.ioctextl, .iocexample, .iocimportant, .iocquote{
+.ioctextl, .iocexample, .iocimportant, .iocquote, .iocinclude{
   overflow: hidden;
 }
 
@@ -309,6 +309,18 @@ div.dokuwiki #toc__inside ul{
   margin:1em auto;
 }
 
+.iocinclude .ioccontent {
+    clear: both !important;
+    font-size: 100%;
+    width: 90%;
+    color: #2c2c2c;
+    background: url("img/iocinclude.png") no-repeat scroll 98% 1em #efefef;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 8px;
+    margin: 10px 2px auto;
+}
+
 .iocimportant .ioccontent{
   clear:both!important;
   width:80%;
@@ -326,7 +338,7 @@ div.dokuwiki #toc__inside ul{
 }
  
 
-.ioctext p, .ioctextl p, .iocquote p, .iocexample p, .iocimportant p, .iocreference p, .iocnote p{
+.ioctext p, .ioctextl p, .iocquote p, .iocexample p, .iocimportant p, .iocreference p, .iocnote p, .iocinclude p{
   margin-bottom:0px !important;
   width:100% !important;
   float:none;

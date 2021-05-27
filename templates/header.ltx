@@ -82,6 +82,19 @@
         }
     \end{flushleft}
 }
+\newcommand{\iocinclude}[1]{
+    \begin{flushleft}
+        \colorbox{colorimportant}{
+            \begin{minipage}{0.98\textwidth}
+                \vspace{2mm}
+                \normalfont
+                \centering
+                \parbox[c]{0.95\textwidth}{#1}
+                \vspace{2mm}
+            \end{minipage}
+        }
+    \end{flushleft}
+}
 \newcommand{\ioctext}[3][0mm]{
     \marginpar{
             \vspace{#1}

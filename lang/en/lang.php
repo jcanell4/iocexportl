@@ -11,6 +11,7 @@ $lang['example_btn']  = 'Add example syntax';
 $lang['figure_btn'] = 'Add figure syntax';
 $lang['figlink_btn'] = 'Add link to figure';
 $lang['important_btn']  = 'Add important syntax';
+$lang['include_btn']  = 'Add include syntax';
 $lang['newcontent_btn']  = 'Add newcontent syntax';
 $lang['note_btn']  = 'Add note syntax';
 $lang['quote_btn']  = 'Add quote syntax';

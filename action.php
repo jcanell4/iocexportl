@@ -590,6 +590,13 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                                 ),
                             array(
                                 'type'   => 'format',
+                                'title'  => $this->getLang('include_btn'),
+                                'icon'   => '../../plugins/iocexportl/img/ico_include.png',
+                                'open'   => '::include:\n',
+                                'close'  => '\n:::\n',
+                                ),
+                            array(
+                                'type'   => 'format',
                                 'title'  => $this->getLang('accounting_btn'),
                                 'icon'   => '../../plugins/iocexportl/img/ico_table.png',
                                 'open'   => '::accounting:\n  :title:\n  :footer:\n',
