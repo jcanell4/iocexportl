@@ -270,10 +270,13 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                             $renderer->tmpData["id"] = $params["id"];
                         }else{
                             $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNREFERRED_B_IOC_ELEMS_TYPE;
-                            $renderer->tmpData["id"]= count($renderer->bIocElems[$renderer->currentBIocElemsType]);
+                            $renderer->tmpData["id"] = count($renderer->bIocElems[$renderer->currentBIocElemsType]);
                             $renderer->tmpData["renderIocElems"] = FALSE;
                         }   
                         $renderer->storeCurrent();
+                        $renderer->setCurrentNode($node);
+                    }elseif ($type === "include") {
+                        $renderer->storeCurrentForInclude();
                         $renderer->setCurrentNode($node);
                     }else{
                         $renderer->getCurrentNode()->addContent($node);
@@ -291,17 +294,19 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     // Loop through the instructions
                     foreach ( $instructions as $instruction ) {
                         // Execute the callback against the Renderer
-                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
+                        call_user_func_array(array(&$renderer, $instruction[0]), $instruction[1]);
                     }
                     break;
                 case DOKU_LEXER_EXIT :
                     if (in_array($renderer->tmpData["type"], ["text","note","reference"])) {
                         $renderer->bIocElems[$renderer->currentBIocElemsType][$renderer->tmpData["id"]] = $renderer->getCurrentNode();
                         $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNEXISTENT_B_IOC_ELEMS_TYPE;
-                        $renderer->tmpData["renderIocElems"]=TRUE;
+                        $renderer->tmpData["renderIocElems"] = TRUE;
                         $renderer->restoreCurrent();
                         unset($renderer->tmpData["id"]);
-                    }else{
+                    }elseif ($renderer->tmpData["type"] === "include") {
+                        $renderer->restoreCurrentForInclude();
+                    }elseif ($renderer->getCurrentNode()->getOwner()){
                         $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
                         $renderer->closeForContentB("iocelem");
                     }          
