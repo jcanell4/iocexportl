@@ -337,7 +337,9 @@ div.plugin_include_content {
   margin:0 auto;
 }
  
-
+.iocinclude p {
+    margin-bottom:0.5em;
+}
 .ioctext p, .ioctextl p, .iocquote p, .iocexample p, .iocimportant p, .iocreference p, .iocnote p {
   margin-bottom:0px !important;
   width:100% !important;
