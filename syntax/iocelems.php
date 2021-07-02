@@ -182,6 +182,16 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['iocelem'] = TRUE;
                     $instructions = p_get_instructions($data);
+                    if ($instructions[0][0] === "document_start" && $instructions[1][0] === "plugin" && $instructions[1][1][0] === "include_include") {
+                        $tag = $this->loadHelper('include');
+                        $plugin = $instructions[1];
+                        $instructions = $tag->_get_instructions($plugin[1][1][1], /* $page=wiki page a incluir */
+                                                                $plugin[1][1][2], /* $sect= */
+                                                                $plugin[1][1][0], /* $mode='page' */
+                                                                $plugin[2] /* $lvl= */,
+                                                                $tag->get_flags('firstsectiononly')
+                                                                 /* $root_id=wiki page */);
+                    }
                     $renderer->doc .= p_render($mode, $instructions, $info);
                     $_SESSION['iocelem'] = FALSE;
                     break;
@@ -198,12 +208,14 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     preg_match('/::([^:]*):/', $data, $matches);
                     $type = (isset($matches[1])) ? $matches[1] : '';
                     //TEXT LARGE
-                    if($type === 'text' && isset($params['large'])){
+                    if ($type === 'text' && isset($params['large'])){
                         $type = 'textl';
                     }
                     $renderer->tmpData["type"] = $type;
-                    $html = '<div class="ioc'.$type.'">';
-                    $html .= '<div class="ioccontent">';
+                    if ($type !== 'include') {
+                        $html = '<div class="ioc'.$type.'">';
+                        $html .= '<div class="ioccontent">';
+                    }
                     $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                     if (!empty($title)){
                         $html.= '<p class="ioctitle">'.$title.'</p>';
@@ -227,7 +239,17 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['iocelem'] = TRUE;
                     $instructions = get_latex_instructions($data);
-                    $html = p_latex_render($mode, $instructions, $info);
+                    if ($instructions[0][0] === "document_start" && $instructions[1][0] === "plugin" && $instructions[1][1][0] === "include_include") {
+                        $tag = $this->loadHelper('include');
+                        $plugin = $instructions[1];
+                        $instructions = $tag->_get_instructions($plugin[1][1][1], /* $page=wiki page a incluir */
+                                                                $plugin[1][1][2], /* $sect= */
+                                                                $plugin[1][1][0], /* $mode='page' */
+                                                                $plugin[2] /* $lvl= */,
+                                                                $tag->get_flags('firstsectiononly')
+                                                                 /* $root_id=wiki page */);
+                    }
+                    $html .= p_latex_render($mode, $instructions, $info);
                     $_SESSION['iocelem'] = FALSE;
                     $renderer->doc .= $html;
                     break;
@@ -242,8 +264,8 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->restoreCurrent();
                         unset($renderer->tmpData["id"]);
                     }else{
-                         $renderer->doc .= $html;
-                         $renderer->closeForContentB("iocelem");
+                        $renderer->doc .= $html;
+                        $renderer->closeForContentB("iocelem");
                     }   
                     unset($renderer->tmpData["type"]);
                     break;
