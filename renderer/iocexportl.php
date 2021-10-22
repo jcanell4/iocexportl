@@ -27,7 +27,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $endimg = FALSE;
     var $formatting = '';
     static $hr_width = 354;
-	var $id = '';
+    var $id = '';
     static $imgext = '.pdf';//Format to convert images
     static $img_max_table = 99;//Image max width inside tables
     var $max_cols = 0;
@@ -39,7 +39,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $tableheader_end = FALSE;
     var $tmp_dir = 0;//Value of temp dir
     private $isBorderTypeTable = false;
-
+    var $rawTextBtable = ""; //contingut cru, literal, text pla, de les taules tipus btable
 
     /**
      * Returns the format produced by this renderer.
