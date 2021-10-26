@@ -13,9 +13,8 @@
  */
 abstract class export_command extends abstract_writer_command_class{
 
-    public function __construct()
-    {
-        parent::__construct();
+    public function __construct($modelAdapter) {
+        parent::__construct($modelAdapter);
 
         // ALERTA! [Xavi] Cal disparar l'esdeveniment per que s'afegeixin les dades a JSINFO per l'editor
         // Actualment aquest esdeveniment es dispara a AbstractWikiAction#triggerStartEvents() però
