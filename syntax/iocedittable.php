@@ -104,7 +104,6 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
             case DOKU_LEXER_ENTER:
                 break;
             case DOKU_LEXER_UNMATCHED:
-                $text = preg_replace("!\[(.*)\]!s", "$1", $text); //transformar el tipo iocbtable a ioctable
                 $instructions = get_latex_instructions($text);
                 $renderer->doc .= p_latex_render($mode, $instructions, $info);
                 break;

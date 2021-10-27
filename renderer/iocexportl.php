@@ -39,7 +39,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $tableheader_end = FALSE;
     var $tmp_dir = 0;//Value of temp dir
     private $isBorderTypeTable = false;
-    var $rawTextBtable = ""; //contingut cru, literal, text pla, de les taules tipus btable
 
     /**
      * Returns the format produced by this renderer.
@@ -63,12 +62,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
      * Initialize the rendering
      */
     function document_start() {
-        global $USERINFO;
         global $conf;
 
-		$this->id = getID();
+        $this->id = getID();
         //Check whether user can export
-		$exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
+        $exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$exportallowed && !auth_isadmin()) die;
 
         if (!isset($_SESSION['tmp_dir'])){
@@ -110,8 +108,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->doc = preg_replace('/(raggedright)(\s{2,*})/',"$1 ", $this->doc);
     }
 
-
-	/**
+    /**
      * Initialization session variables
      */
     function _initialize_globals(){
@@ -380,10 +377,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     $title_width = $max_width_elem;
                 }
                 $this->doc .= '\parbox[t]{'.$title_width.'}{\caption{'.trim($this->_xmlEntities($title));
-				if (!empty($_SESSION['figlabel'])){
-	                $this->doc .= '\label{'.$_SESSION['figlabel'].'}';
-				}
-				$this->doc .= '}}\\\\\vspace{2mm}'.DOKU_LF;
+                if (!empty($_SESSION['figlabel'])){
+                    $this->doc .= '\label{'.$_SESSION['figlabel'].'}';
+                }
+                $this->doc .= '}}\\\\\vspace{2mm}'.DOKU_LF;
             }
             //Inside table, images will be centered vertically
             if ($this->table && $width > self::$img_max_table){
@@ -399,9 +396,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             if ($this->table && $width > self::$img_max_table){
                 $this->doc .= '}';
-
             }
-			//Close href
+            //Close href
             if (!is_null($linking) && $linking !== 'details'){
                 $this->doc .= '}';
                 if (!$_SESSION['video_url']){
@@ -421,17 +417,17 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     }else{
                        $hspace = '\textwidth';
                     }
-					$vspace = '\vspace{-2mm}';
-					$align = '\raggedleft';
+                    $vspace = '\vspace{-2mm}';
+                    $align = '\raggedleft';
                 }elseif($_SESSION['iocelem']){
-                        //textboxsize .05
-                        $hspace = '.9\linewidth';
-                        $vspace = '\vspace{-6mm}';
-                        $align = '\raggedleft';
+                    //textboxsize .05
+                    $hspace = '.9\linewidth';
+                    $vspace = '\vspace{-6mm}';
+                    $align = '\raggedleft';
                 }else{
                     $hspace = '\marginparwidth';
-					$vspace = '\vspace{-4mm}';
-					$align = '\iocalignment';
+                    $vspace = '\vspace{-4mm}';
+                    $align = '\iocalignment';
                 }
                 $this->doc .=  '\raisebox{\height}{\parbox[t]{'.$hspace.'}{'.$align.'\footerspacingline\textsf{\tiny'.$vspace.trim($this->_xmlEntities($footer)).'}}}';
             }
@@ -1234,14 +1230,13 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     function _xmlEntities($value) {
         static $find = array('{','}','\\','_','^','<','>','#','%', '$', '&', '~', '"','−');
         static $replace = array('@IOCKEYSTART@', '@IOCKEYEND@', '\textbackslash ', '@IOCBACKSLASH@_', '@IOCBACKSLASH@^{}',
-								'@IOCBACKSLASH@textless{}','@IOCBACKSLASH@textgreater{}','@IOCBACKSLASH@#','@IOCBACKSLASH@%', '@IOCBACKSLASH@$', '@IOCBACKSLASH@&', '@IOCBACKSLASH@~{}', '@IOCBACKSLASH@textquotedbl{}', '-');
+				'@IOCBACKSLASH@textless{}','@IOCBACKSLASH@textgreater{}','@IOCBACKSLASH@#','@IOCBACKSLASH@%', '@IOCBACKSLASH@$', '@IOCBACKSLASH@&', '@IOCBACKSLASH@~{}', '@IOCBACKSLASH@textquotedbl{}', '-');
 
+        $value = str_ireplace($find, $replace, $value);
         if ($this->monospace){
-            $value = str_ireplace($find, $replace, $value);
-            return preg_replace('/\n/', '\\newline ', $value);
-        }else{
-            return str_ireplace($find, $replace, $value);
+            $value = preg_replace('/\n/', '\\newline ', $value);
         }
+        return $value;
     }
 
     function _ttEntities($value) {
