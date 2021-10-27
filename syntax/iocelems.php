@@ -182,16 +182,16 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['iocelem'] = TRUE;
                     $instructions = p_get_instructions($data);
-                    if ($instructions[0][0] === "document_start" && $instructions[1][0] === "plugin" && $instructions[1][1][0] === "include_include") {
-                        $tag = $this->loadHelper('include');
-                        $plugin = $instructions[1];
-                        $instructions = $tag->_get_instructions($plugin[1][1][1], /* $page=wiki page a incluir */
-                                                                $plugin[1][1][2], /* $sect= */
-                                                                $plugin[1][1][0], /* $mode='page' */
-                                                                $plugin[2] /* $lvl= */,
-                                                                $tag->get_flags('firstsectiononly')
-                                                                 /* $root_id=wiki page */);
-                    }
+//                    if ($instructions[0][0] === "document_start" && $instructions[1][0] === "plugin" && $instructions[1][1][0] === "include_include") {
+//                        $tag = $this->loadHelper('include');
+//                        $plugin = $instructions[1];
+//                        $instructions = $tag->_get_instructions($plugin[1][1][1], /* $page=wiki page a incluir */
+//                                                                $plugin[1][1][2], /* $sect= */
+//                                                                $plugin[1][1][0], /* $mode='page' */
+//                                                                $plugin[2] /* $lvl= */,
+//                                                                $tag->get_flags('firstsectiononly')
+//                                                                 /* $root_id=wiki page */);
+//                    }
                     $renderer->doc .= p_render($mode, $instructions, $info);
                     $_SESSION['iocelem'] = FALSE;
                     break;

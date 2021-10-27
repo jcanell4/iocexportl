@@ -309,16 +309,18 @@ div.dokuwiki #toc__inside ul{
   margin:1em auto;
 }
 
-div.plugin_include_content {
+div.iocinclude {
     clear: both !important;
     font-size: 100%;
-    width: 99%;
+    /*width: 99%;*/
     color: #2c2c2c;
-    background: url("img/iocinclude.png") no-repeat scroll 98% 1em #efefef;
+    /*background: url("img/iocinclude.png") no-repeat scroll 98% 1em #efefef;*/
+    background-color: #efefef;
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    padding: 8px;
-    margin: 14px 0px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-left: 10px;
 }
 
 .iocimportant .ioccontent{
