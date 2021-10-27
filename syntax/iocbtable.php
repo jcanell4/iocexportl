@@ -542,7 +542,7 @@ class CellStructure{
                 if ($this->type === CellStructure::T_HEADER) {
                     $renderer->tableheader_open($this->colSpan);
                 }else {
-                    $renderer->tablecell_open($this->colSpan);
+                    $renderer->tablecell_open($this->colSpan, NULL, $this->rowSpan);
                 }
                 foreach ($this->content as $content){
                     if ($content->type == ContentCell::CDATA_CONTENT) {
