@@ -197,7 +197,8 @@ class syntax_plugin_iocexportl_iocbtable extends DokuWiki_Syntax_Plugin {
                         $this->currentCell->addContent($content);
                     }
                     $this->currentRow->addColumn($this->currentCell);
-                    if(preg_match('/\^{2,}/',$match) || preg_match('/\n\^{2,}/',$match)
+                    if (preg_match('/\^{2,}/',$match)
+                            || preg_match('/\n\^{2,}/',$match)
                             || preg_match('/\^{2,}[\t ]*\n/',$match)) {
                         $this->currentCell=new CellStructure(CellStructure::T_HEADER);
                     }else{
@@ -329,6 +330,16 @@ class TableStructure{
         $this->rows[] = $r;
     }
 
+    private function maxCols() {
+        $max_cols = 0;
+        foreach ($this->rows as $row){
+            foreach ($row as $cells){
+                $max_cols = max($max_cols, count($cells));
+            }
+        }
+        return $max_cols;
+    }
+
     function render($mode, &$renderer){
         switch ($mode){
             case 'wikiiocmodel_psdom':
@@ -360,12 +371,13 @@ class TableStructure{
                 $renderer->doc .= "</table>\n</div>";
                 break;
             case 'iocexportl':
-                $renderer->rawTextBtable = "";
+                $renderer->table_open($this->maxCols());
                 foreach ($this->rows as $row){
+                    $renderer->tablerow_open();
                     $row->render($mode, $renderer);
+                    $renderer->tablerow_close();
                 }
-                $instructions = get_latex_instructions($renderer->rawTextBtable);
-                $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                $renderer->table_close();
                 break;
         }
     }
@@ -408,11 +420,7 @@ class RowStructure{
             case 'iocexportl':
                 foreach ($this->cells as $cell){
                     $cell->render($mode, $renderer);
-                    if ($cell->colSpan > 1){
-                        $renderer->rawTextBtable .= str_repeat("|", $cell->colSpan-1);
-                    }
                 }
-                $renderer->rawTextBtable .= ($cell->type === CellStructure::T_HEADER) ? "^\n" : "|\n";
                 break;
         }
     }
@@ -480,7 +488,7 @@ class CellStructure{
                         $renderer->getCurrentNode()->addContent(new TextNodeDoc(TextNodeDoc::PLAIN_TEXT_TYPE, $content->data));
                     }elseif($content->type == ContentCell::CALL_CONTENT){
                         if(method_exists($renderer, $content->data[0])){
-                          call_user_func_array(array(&$renderer, $content->data[0]), $content->data[1] ? $content->data[1] : array());
+                            call_user_func_array(array(&$renderer, $content->data[0]), $content->data[1] ? $content->data[1] : array());
                         }
                     }
                 }
@@ -520,7 +528,7 @@ class CellStructure{
                         $renderer->doc .= $content->data;
                     }elseif($content->type == ContentCell::CALL_CONTENT){
                         if (method_exists($renderer, $content->data[0])){
-                          call_user_func_array(array(&$renderer, $content->data[0]), $content->data[1] ? $content->data[1] : array());
+                            call_user_func_array(array(&$renderer, $content->data[0]), $content->data[1] ? $content->data[1] : array());
                         }
                     }
                 }
@@ -531,13 +539,24 @@ class CellStructure{
                 }
                 break;
             case 'iocexportl':
-                $renderer->rawTextBtable .= ($this->type === CellStructure::T_HEADER) ? "^" : "|";
+                if ($this->type === CellStructure::T_HEADER) {
+                    $renderer->tableheader_open($this->colSpan);
+                }else {
+                    $renderer->tablecell_open($this->colSpan, NULL, $this->rowSpan);
+                }
                 foreach ($this->content as $content){
-                    if ($content->type == ContentCell::CDATA_CONTENT){
-                        $renderer->rawTextBtable .= $content->data;
+                    if ($content->type == ContentCell::CDATA_CONTENT) {
+                        $renderer->doc .= $content->data;
                     }elseif ($content->type == ContentCell::CALL_CONTENT) {
-                        $renderer->rawTextBtable .= $content->data[1][0];
+                        if (method_exists($renderer, $content->data[0])){
+                            call_user_func_array(array(&$renderer, $content->data[0]), $content->data[1] ? $content->data[1] : array());
+                        }
                     }
+                }
+                if ($this->type === CellStructure::T_HEADER) {
+                    $renderer->tableheader_close();
+                }else {
+                    $renderer->tablecell_close();
                 }
                 break;
         }
