@@ -178,21 +178,37 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     if (!empty($title)){
                         $renderer->doc .= '<p class="ioctitle">'.$title.'</p>';
                     }
+                    if($type==="include"){
+                        $_SESSION["include_element"]=true;
+                    }
                     break;
                 case DOKU_LEXER_UNMATCHED :
-                    $_SESSION['iocelem'] = TRUE;
-                    $instructions = p_get_instructions($data);
-//                    if ($instructions[0][0] === "document_start" && $instructions[1][0] === "plugin" && $instructions[1][1][0] === "include_include") {
-//                        $tag = $this->loadHelper('include');
-//                        $plugin = $instructions[1];
-//                        $instructions = $tag->_get_instructions($plugin[1][1][1], /* $page=wiki page a incluir */
-//                                                                $plugin[1][1][2], /* $sect= */
-//                                                                $plugin[1][1][0], /* $mode='page' */
-//                                                                $plugin[2] /* $lvl= */,
-//                                                                $tag->get_flags('firstsectiononly')
-//                                                                 /* $root_id=wiki page */);
-//                    }
-                    $renderer->doc .= p_render($mode, $instructions, $info);
+                    $_SESSION['iocelem'] = TRUE;   
+                    if($_SESSION["include_element"]){
+                        $_SESSION["include_element"]=false;
+                        $ins = get_latex_instructions($data);
+                        $num = count($ins);
+                        $level=$level1 = $renderer->lastlevel;
+                        for($i=0; $i<$num; $i++) {
+                            switch($ins[$i][0]) {
+                            case 'plugin':
+                                switch($ins[$i][1][0]) {
+                                case 'include_include':
+                                    $ins[$i][1][1][4] = $level;
+                                    break;
+                                }
+                                break;
+                            case 'section_open':
+                                $level = $ins[$i][1][0];
+                                break;
+                            }
+                        }
+                        $renderer->nest($ins);
+                        $renderer->lastlevel=$level1;
+                    }else{
+                        $instructions = p_get_instructions($data);
+                        $renderer->doc .= p_render($mode, $instructions, $info);
+                    }
                     $_SESSION['iocelem'] = FALSE;
                     break;
                 case DOKU_LEXER_EXIT :
