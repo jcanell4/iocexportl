@@ -184,27 +184,12 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['iocelem'] = TRUE;   
-                    if($_SESSION["include_element"]){
-                        $_SESSION["include_element"]=false;
-                        $ins = get_latex_instructions($data);
-                        $num = count($ins);
-                        $level=$level1 = $renderer->lastlevel;
-                        for($i=0; $i<$num; $i++) {
-                            switch($ins[$i][0]) {
-                            case 'plugin':
-                                switch($ins[$i][1][0]) {
-                                case 'include_include':
-                                    $ins[$i][1][1][4] = $level;
-                                    break;
-                                }
-                                break;
-                            case 'section_open':
-                                $level = $ins[$i][1][0];
-                                break;
-                            }
-                        }
-                        $renderer->nest($ins);
-                        $renderer->lastlevel=$level1;
+                    if ($_SESSION["include_element"]){
+                        $_SESSION["include_element"] = false;
+                        $instructions = get_latex_instructions($data);
+                        $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
+                        $renderer->nest($instructions);
+                        $renderer->lastlevel = $lastlevel;
                     }else{
                         $instructions = p_get_instructions($data);
                         $renderer->doc .= p_render($mode, $instructions, $info);
@@ -254,20 +239,33 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['iocelem'] = TRUE;
-                    $instructions = get_latex_instructions($data);
-                    if ($instructions[0][0] === "document_start" && $instructions[1][0] === "plugin" && $instructions[1][1][0] === "include_include") {
-                        $tag = $this->loadHelper('include');
-                        $plugin = $instructions[1];
-                        $instructions = $tag->_get_instructions($plugin[1][1][1], /* $page=wiki page a incluir */
-                                                                $plugin[1][1][2], /* $sect= */
-                                                                $plugin[1][1][0], /* $mode='page' */
-                                                                $plugin[2] /* $lvl= */,
-                                                                $tag->get_flags('firstsectiononly')
-                                                                 /* $root_id=wiki page */);
+                    if ($_SESSION["include_element"]){
+                        $_SESSION["include_element"] = false;
+                        $instructions = get_latex_instructions($data);
+                        $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
+                        $renderer->nest($instructions);
+                        $renderer->lastlevel = $lastlevel;
+                    }else{
+                        $instructions = p_get_instructions($data);
+                        $html .= p_latex_render($mode, $instructions, $info);
+                        $renderer->doc .= $html;
                     }
-                    $html .= p_latex_render($mode, $instructions, $info);
                     $_SESSION['iocelem'] = FALSE;
-                    $renderer->doc .= $html;
+
+//                    $instructions = get_latex_instructions($data);
+//                    if ($instructions[0][0] === "document_start" && $instructions[1][0] === "plugin" && $instructions[1][1][0] === "include_include") {
+//                        $tag = $this->loadHelper('include');
+//                        $plugin = $instructions[1];
+//                        $instructions = $tag->_get_instructions($plugin[1][1][1], /* $page=wiki page a incluir */
+//                                                                $plugin[1][1][2], /* $sect= */
+//                                                                $plugin[1][1][0], /* $mode='page' */
+//                                                                $plugin[2] /* $lvl= */,
+//                                                                $tag->get_flags('firstsectiononly')
+//                                                                 /* $root_id=wiki page */);
+//                    }
+//                    $html .= p_latex_render($mode, $instructions, $info);
+//                    $_SESSION['iocelem'] = FALSE;
+//                    $renderer->doc .= $html;
                     break;
                 case DOKU_LEXER_EXIT :
                     $html =  '</div>';
@@ -362,4 +360,25 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         $text = p_latex_render($mode, $instructions, $info);
         return preg_replace('/(.*?)(\n*)$/', '$1', $text);
     }
+
+    function updatLevel(&$instructions, $lastlevel) {
+        $num = count($instructions);
+        $level = $lastlevel;
+        for ($i=0; $i<$num; $i++) {
+            switch($instructions[$i][0]) {
+            case 'plugin':
+                switch($instructions[$i][1][0]) {
+                    case 'include_include':
+                        $instructions[$i][1][1][4] = $level;
+                        break;
+                }
+                break;
+            case 'section_open':
+                $level = $instructions[$i][1][0];
+                break;
+            }
+        }
+        return $lastlevel;
+    }
+
 }
