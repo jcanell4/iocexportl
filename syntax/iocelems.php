@@ -187,9 +187,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     if ($_SESSION["include_element"]){
                         $_SESSION["include_element"] = false;
                         $instructions = get_latex_instructions($data);
-                        $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
-                        $renderer->nest($instructions);
-                        $renderer->lastlevel = $lastlevel;
+                        $this->renderUnmatchedIncludeInstructions($instructions, $renderer);
                     }else{
                         $instructions = p_get_instructions($data);
                         $renderer->doc .= p_render($mode, $instructions, $info);
@@ -213,15 +211,20 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $type = 'textl';
                     }
                     $renderer->tmpData["type"] = $type;
-                    if ($type !== 'include') {
-                        $html = '<div class="ioc'.$type.'">';
-                        $html .= '<div class="ioccontent">';
+                    if ($type == 'include') {
+                        
                     }
+                    $html = '<div class="ioc'.$type.'">';
+                    $html .= '<div class="ioccontent">';
                     $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                     if (!empty($title)){
                         $html.= '<p class="ioctitle">'.$title.'</p>';
                     }
-                    if (in_array($type, ["text","note","reference"], true)){
+                    if($type == "include"){
+                        $renderer->tmpData["include_element"]=true;
+                        $renderer->tmpData["include_element_state"]=$state;
+                        $renderer->doc .= $html;
+                    }elseif (in_array($type, ["text","note","reference"], true)){
                         if(isset($params["id"])){                                
                             $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::REFERRED_B_IOC_ELEMS_TYPE;
                             $renderer->tmpData["id"] = $params["id"];
@@ -235,42 +238,29 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     }else{
                         $renderer->doc .= $html;
                         $renderer->openForContentB("iocelem");
-                    }                    
+                    } 
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['iocelem'] = TRUE;
-                    if ($_SESSION["include_element"]){
-                        $_SESSION["include_element"] = false;
+                    if ($renderer->tmpData["include_element_state"]== DOKU_LEXER_ENTER){
+                        $renderer->tmpData["include_element_state"] = DOKU_LEXER_UNMATCHED;
                         $instructions = get_latex_instructions($data);
-                        $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
-                        $renderer->nest($instructions);
-                        $renderer->lastlevel = $lastlevel;
+                        $this->renderUnmatchedIncludeInstructions($instructions, $renderer);
                     }else{
                         $instructions = p_get_instructions($data);
-                        $html .= p_latex_render($mode, $instructions, $info);
+                        $html = p_latex_render($mode, $instructions, $info);
                         $renderer->doc .= $html;
                     }
                     $_SESSION['iocelem'] = FALSE;
-
-//                    $instructions = get_latex_instructions($data);
-//                    if ($instructions[0][0] === "document_start" && $instructions[1][0] === "plugin" && $instructions[1][1][0] === "include_include") {
-//                        $tag = $this->loadHelper('include');
-//                        $plugin = $instructions[1];
-//                        $instructions = $tag->_get_instructions($plugin[1][1][1], /* $page=wiki page a incluir */
-//                                                                $plugin[1][1][2], /* $sect= */
-//                                                                $plugin[1][1][0], /* $mode='page' */
-//                                                                $plugin[2] /* $lvl= */,
-//                                                                $tag->get_flags('firstsectiononly')
-//                                                                 /* $root_id=wiki page */);
-//                    }
-//                    $html .= p_latex_render($mode, $instructions, $info);
-//                    $_SESSION['iocelem'] = FALSE;
-//                    $renderer->doc .= $html;
                     break;
                 case DOKU_LEXER_EXIT :
                     $html =  '</div>';
                     $html .= '</div>';
-                    if (in_array($renderer->tmpData["type"], ["text","note","reference"], true)) {
+                    $type = $renderer->tmpData["type"];
+                    if((!isset($type) || $type=="include") && $renderer->tmpData["include_element"]){
+                        $renderer->tmpData["include_element"]=false;
+                        $renderer->doc .= $html;                        
+                    }elseif (in_array($type, ["text","note","reference"], true)) {
                         $renderer->doc .= $html;
                         $renderer->bIocElems[$renderer->currentBIocElemsType][$renderer->tmpData["id"]] = $renderer->doc;
                         $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNEXISTENT_B_IOC_ELEMS_TYPE;
@@ -366,7 +356,12 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         $level = $lastlevel;
         for ($i=0; $i<$num; $i++) {
             switch($instructions[$i][0]) {
-            case 'plugin':
+                case 'document_start':
+                case 'document_end':
+//                case 'section_edit':
+                    unset($instructions[$i]);
+                    break;            
+                case 'plugin':
                 switch($instructions[$i][1][0]) {
                     case 'include_include':
                         $instructions[$i][1][1][4] = $level;
@@ -380,5 +375,14 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         }
         return $lastlevel;
     }
-
+    
+    function renderUnmatchedIncludeInstructions($instructions, &$renderer){
+        $aux = $renderer->doc;
+        $renderer->doc = "";
+        $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
+        $renderer->nest($instructions);
+        $renderer->lastlevel = $lastlevel;
+        $aux .= preg_replace('/\n\<\/div\>(?:\n\<\/section\>)?(.*)\<div class="level."\>\n/s', '$1', $renderer->doc);
+        $renderer->doc = $aux;        
+    }
 }
