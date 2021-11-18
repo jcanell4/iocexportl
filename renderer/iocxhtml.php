@@ -676,8 +676,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $this->_highlight('code',$text,$language,$filename);
     }
 
-    function internalmedia ($src, $title=null, $align=null, $width=null,
-                            $height=null, $cache=null, $linking=null) {
+    function internalmedia ($src, $title=null, $align=null, $width=null, $height=null, $cache=null, $linking=null) {
         global $ID;
         list($src,$hash) = explode('#',$src,2);
         resolve_mediaid(getNS($ID),$src, $exists);
@@ -1139,8 +1138,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
      *
      * @author Andreas Gohr <andi@splitbrain.org>
      */
-    function _media ($src, $title=NULL, $align=NULL, $width=NULL,
-                      $height=NULL, $cache=NULL, $render = true) {
+    function _media ($src, $title=NULL, $align=NULL, $width=NULL, $height=NULL, $cache=NULL, $render=true) {
 
         static $documents = array('application/vnd.oasis.opendocument.text',
                         'application/vnd.oasis.opendocument.spreadsheet',
@@ -1152,8 +1150,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-
-        );
+                );
         $ret = '';
         $path = '';
         if ($_SESSION['activities']){
@@ -1225,14 +1222,19 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             if($align == 'right') $ret .= ' align="right"';
             if($align == 'left')  $ret .= ' align="left"';
 
+            $alt = ($_SESSION['fig_description']) ? $_SESSION['fig_description'] : ($title ? $title : "");
             if ($title) {
-                $ret .= ' title="' . $title . '"';
-                $ret .= ' alt="'   . $title .'"';
-            }else{
-                $ret .= ' alt=""';
+                if ($imgb && strpos($title, "#")!==false) {
+                    $s = explode("#", $title);
+                    $title = $s[0];
+                    $alt = preg_replace('/\/[+-]?\d+$/', '', $s[1]); //elimina el 'offset'
+                }
+                $ret .= " title=\"$title\"";
             }
+            $ret .= " alt=\"$alt\"";
 
             $ret .= ' />';
+
             if ($_SESSION['figure']){
                 $ret .= '</figure>'.DOKU_LF;
             }elseif($_SESSION['iocelem']){

@@ -140,6 +140,10 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                         $instructions = get_latex_instructions($params['title']);
                         $_SESSION['fig_title'] = preg_replace('/(<p>)(.*?)(<\/p>)/s', '$2', p_latex_render($mode, $instructions, $info));
                     }
+                    if (isset($params['description'])){
+                        $instructions = get_latex_instructions($params['description']);
+                        $_SESSION['fig_description'] = trim(preg_replace('/(<p>)(.*?)(<\/p>)/s', '$2', p_latex_render($mode, $instructions, $info)));
+                    }
                     $_SESSION['figure'] = TRUE;
                     $instructions = get_latex_instructions($text);
                     //delete document_start and document_end instructions
@@ -155,6 +159,7 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     $_SESSION['figure'] = FALSE;
                     $_SESSION['fig_title'] = '';
+                    $_SESSION['fig_description'] = "";
                     if (isset($params['footer'])){
                         $renderer->doc .= '<div class="footfigure">'.$params['footer'].'</div>';
                     }
