@@ -340,16 +340,13 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 //Extract offset
                 if ($title){
                     preg_match('/(.*?)(\/([^\/]*$))/', $title, $data);
-                    if (!empty($data)){
-                        if(!empty($data[3]) &&  is_numeric($data[3])){
-                            $offset = '['.trim($data[3]).'mm]';
-                            $footer = $data[1];
-                        }else{
-                            $footer = $title;
-                        }
-                    }else{
-                        $footer = $title;
+                    if (!empty($data) && !empty($data[3]) && is_numeric($data[3])){
+                        $offset = '['.trim($data[3]).'mm]';
+                        $title = $data[1];
                     }
+                    //elimina la descripció
+                    $arrdesc = explode("#", $title);
+                    $footer = $arrdesc[0];
                 }
                 $this->doc .= '\imgB'.$offset.'{';
             }elseif ($figure){
