@@ -81,8 +81,8 @@ class syntax_plugin_iocexportl_iocreference extends DokuWiki_Syntax_Plugin {
             return TRUE;
         }
         elseif($mode === 'wikiiocmodel_ptxhtml'){
-            $match = preg_replace('/(:figure:)([^:]+)(:)/','<span class="figref"><a href="#$2"><span>figura<span class=refId> $2</span></span></a></span>',$data, 1);
-            $match = preg_replace('/(:table:)([^:]+)(:)/','<span class="tabref"><a href="#$2"><span>taula<span class=refId> $2</span></span></a></span>',$match, 1);
+            $match = preg_replace('/(:figure:)([^:]+)(:)/','<span class="figref"><a href="#$2"><span>figura<span class=refId></span></span></a></span>',$data, 1);
+            $match = preg_replace('/(:table:)([^:]+)(:)/','<span class="tabref"><a href="#$2"><span>taula<span class=refId></span></span></a></span>',$match, 1);
             $renderer->doc .= $match;
             return TRUE;
         }

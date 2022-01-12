@@ -132,6 +132,8 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
+                    $id = trim($id);                    
+                    $_SESSION['figure_references'][]= $id;
                     $renderer->doc .= '<div class="iocfigure">';
                     $renderer->doc .= '<a name="'.$id.'"></a>';
                     break;

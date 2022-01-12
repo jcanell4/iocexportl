@@ -91,7 +91,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $styletype = ($params['type']) ? $params['type'] : $_SESSION['styletype'];
                     $renderer->setTableTypes($styletype);
                     $id = trim($id);
-
                     preg_match('/::([^:]*):/', $text, $matches);
                     $tabletype = (isset($matches[1])) ? $matches[1] : '';
                     if ($tabletype === "accounting"){
@@ -288,8 +287,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                                 $_SESSION['table_widths'][$i] = $e[$i] * 100 / $t;
                             }
                         }
+                        $_SESSION['table_references'][]= $id;
                         $renderer->doc .= '<div class="titletable">';
-                        $renderer->doc .= '<a name="'.$id.'"><span>Taula: </span></a>';
+                        $renderer->doc .= '<a name="'.$id.'"><span>Taula </span></a>';
                         if (isset($params['title'])){
                             $instructions = get_latex_instructions($params['title']);
                             $renderer->doc .= trim(preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info)));

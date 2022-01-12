@@ -1,6 +1,6 @@
 ({
-    baseUrl: "/var/www/dokuwiki/lib/plugins/iocexportl/templates/js/",
-    out: '/var/www/dokuwiki/lib/plugins/iocexportl/templates/html/_/js/build.js',
+    baseUrl: "./",
+    out: '../html/_/js/build.js',
     name: 'main',
     paths: {
         requireLib: 'require'
