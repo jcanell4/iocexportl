@@ -382,7 +382,8 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
         $renderer->nest($instructions);
         $renderer->lastlevel = $lastlevel;
-        $aux .= preg_replace('/\n\<\/div\>(?:\n\<\/section\>)?(.*)\<div class="level."\>\n/s', '$1', $renderer->doc);
+        $replaced = preg_replace('/\n\<\/div\>(?:\n\<\/section\>)?(.*)\<div class="level."\>\n/s', '$1', $renderer->doc);
+        $aux .= $replaced;
         $renderer->doc = $aux;        
     }
 }
