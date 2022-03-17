@@ -1306,6 +1306,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
     function p_iocxhtml_cached_geshi($code, $language, $wrapper='pre') {
         global $conf, $config_cascade;
+        //[START: IOC] evitar warning: geshi.php ha cambiado de lugar
+        $DOKU_GESHI = DOKU_INC."vendor/geshi/geshi/src/";
+        //[END: IOC]
         $language = strtolower($language);
 
         // remove any leading or trailing blank lines
@@ -1314,15 +1317,23 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $cache = getCacheName($language.$code,".code");
         $ctime = @filemtime($cache);
         if($ctime && !$_REQUEST['purge'] &&
-        $ctime > filemtime(DOKU_INC.'inc/geshi.php') &&                 // geshi changed
-        $ctime > @filemtime(DOKU_INC.'inc/geshi/'.$language.'.php') &&  // language syntax definition changed
+        //[START: IOC]
+        //$ctime > filemtime(DOKU_INC.'inc/geshi.php') &&                 // geshi changed
+        //$ctime > @filemtime(DOKU_INC.'inc/geshi/'.$language.'.php') &&  // language syntax definition changed
+        $ctime > filemtime($DOKU_GESHI.'geshi.php') &&
+        $ctime > @filemtime($DOKU_GESHI.'inc/geshi/'.$language.'.php') &&
+        //[END: IOC]
         $ctime > filemtime(reset($config_cascade['main']['default']))){
+        //[END: IOC]
             // dokuwiki changed
             $highlighted_code = io_readFile($cache, false);
 
         } else {
 
-            $geshi = new GeSHi($code, $language, DOKU_INC . 'inc/geshi');
+        //[START: IOC]
+            //$geshi = new GeSHi($code, $language, DOKU_INC . 'inc/geshi');
+            $geshi = new GeSHi($code, $language, $DOKU_GESHI);
+        //[END: IOC]
             $geshi->set_encoding('utf-8');
             $geshi->enable_classes();
             $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
