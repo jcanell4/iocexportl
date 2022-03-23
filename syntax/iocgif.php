@@ -15,7 +15,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
 
     static $hrefiocgif = DOKU_BASE."lib/exe/detail.php?id=@ID@&media=@MEDIA@";
     static $srciocgif = "lib/exe/fetch.php?w=@W@&tok=@TOK@&media=@MEDIA@";
-    const DOKU_IOC_XTEC = "ioc.xtec.cat/materials/FP/Materials/media/";
+    static $baseiocgif = "../../../gifs/";
 
     function getInfo(){
         return array(
@@ -85,7 +85,12 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
         }elseif ($mode === "iocexportl"){
             list($type, $title, $width, $ns, $id, $gif) = $data;
             $_SESSION['qrcode'] = TRUE;
-            $href = self::DOKU_IOC_XTEC.str_replace(":", "/", $ns)."/$gif";
+
+            $connectionData = WikiGlobalConfig::getConf(AjaxKeys::KEY_FTP_CONFIG, 'iocexportl')['materials_fp'];
+            $rUrl = $connectionData['remoteUrl'].$connectionData['remoteDir'];
+            $rDir = preg_replace(["/pdfindex/","/:/","/u[0-9]+_/"], ["","_",""], $id);
+            $href = "$rUrl$rDir/web/${rDir}htmlindex/gifs/".str_replace(":", "/", $ns)."/$gif";
+
             $_SESSION['gif_images'] = $href;
             qrcode_media_url($renderer, $href, $title, $type);
             return TRUE;
@@ -101,7 +106,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
                 $src = ($data['media_address']) ? $data['media_address'] : "img/";
                 $src.= $rutagif;
             }else {
-                $src = "//".self::DOKU_IOC_XTEC.$rutagif;
+                $src = self::$baseiocgif."$rutagif";
             }
 
             $renderer->doc .= '<div class="iocgif">';
