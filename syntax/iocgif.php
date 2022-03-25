@@ -74,7 +74,8 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
         if ($mode === 'wikiiocmodel_psdom'){
             list ($syntax, $title, $width, $ns, $pageid, $file) = $data;
             $ns = trim($ns);
-            $node = new ImageNodeDoc("$ns:$file", $title, NULL, $width);
+            $linking = str_replace(":", "/", "../img/$ns/$file");
+            $node = new ImageNodeDoc("$ns:$file", $title, NULL, $width, $height, $cache, $linking);
             $renderer->getCurrentNode()->addContent($node);
             return TRUE;
 
