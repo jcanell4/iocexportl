@@ -2927,3 +2927,7 @@ iframe {
 .parentnode .tocssection .toc a::before{
     content: counter(section) "." counter(subsection) ". ";
 }
+
+.toc_list {
+	display: block !important;
+}
