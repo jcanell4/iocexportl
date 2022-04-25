@@ -210,6 +210,9 @@ class generate_html implements WikiIocModel{
             $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/', '', $menu_html_index);
             $menu_html_index = preg_replace('/id="\w+"/', '', $menu_html_index);
             $menu_html_index = preg_replace('/"expander"/', '"indent"', $menu_html_index);
+            // Eliminem el toc del sidebar, a l'índex no s'ha de mostrar
+            $menu_html_index = preg_replace('/@IOCSTARTSIDEBARTOC@(.*?)@IOCENDSIDEBARTOC@/', '', $menu_html_index);
+
             $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
             $html = preg_replace('/@IOCHEADTOC@/',$this->lang['Toc'], $html, 1);
             $html = preg_replace('/@IOCCHROME@/',$this->lang['chrome'], $html, 1);
@@ -327,12 +330,16 @@ class generate_html implements WikiIocModel{
                             $html = p_latex_render('iocxhtml', $instructions, $info);
                             $html = preg_replace('/\$/', '\\\\$', $html);
                             $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
-                            $menu_html_unit = preg_replace('/@IOCSTARTPREEXPANDER@.*?@IOCENDPREEXPANDER@/', '', $menu_html_unit);                            
+                            $menu_html_unit = preg_replace('/@IOCSTARTPREEXPANDER@.*?@IOCENDPREEXPANDER@/', '', $menu_html_unit);
+                            // Eliminem les marques d'inclusió del toc sidebar, ja no són necessaries
+                            $menu_html_unit = preg_replace('/@IOCSTARTSIDEBARTOC@|@IOCENDSIDEBARTOC@/', '', $menu_html_unit);
+
                             $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
                             $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
                             $html = preg_replace('/@IOCTOC@/', $this->getTOC($text), $html, 1);
                             $html = preg_replace('/@IOCPATH@/', '../../../', $html);
                             $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+
                             $html = $this->createrefstopages($html, $unit, $ku, $ks, $ka, '../../../');
                             $zip->addFromString($this->web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html', $html);
                             if (basename(wikiFN($act),'.txt') === 'activitats'){
@@ -651,6 +658,7 @@ class generate_html implements WikiIocModel{
      */
     private function setMenu($type='', $name='', $href='', $id='',$index=FALSE){
 
+        // fa alguna cosa afegir continguts? <-- no fa res perquè els tres tipus es consideren "activity"
         $types = array('activitats','annexos','exercicis');
         $name = trim($name);
         if (strlen($name) > $this->max_menu){
@@ -676,10 +684,12 @@ class generate_html implements WikiIocModel{
             $menu_html .= '<p id=\''.$id.$this->def_section_href.'\'>';
             if($this->menuLevel3){
                 $menu_html .= "@IOCSTARTPREEXPANDER@<span id='b_$id' class='buttonexpss cl'>&nbsp;&nbsp;&nbsp;</span>@IOCENDPREEXPANDER@";
+                // Això es fica abans del contingut del desplegable
             }
             $menu_html .= '<a class="section" href="'.$href.'">'.$name.'</a>';
             $menu_html .= '@IOCSTARTEXPANDER@<span class="buttonexp"></span>@IOCENDEXPANDER@';
             $menu_html .= '</p>';
+            // Dinse del desplegable, abans de la llista (s'obre el UL)
             $menu_html .= '<ul>';
         }elseif ($type === 'intro'){
             $menu_html = '<li id="'.$id.'">';
@@ -757,6 +767,7 @@ class generate_html implements WikiIocModel{
                 }
             }
             //Only sections with content
+
             foreach ($unit as $ks => $section){
                 $this->tree_names[$ku][$ks] = array();
                 //Activities
@@ -779,6 +790,14 @@ class generate_html implements WikiIocModel{
                         $act_name = 'Contingut';
                         $this->tree_names[$ku][$ks]['continguts']=$act_name;  
                         $smenu_html = $this->getTOC($text, $act_href, false, [$section_name]);
+
+                        // Incloem a la zona anterior a les activitats el toc de la secció. Les marques
+                        // @IOCSTARTSIDEBARTOC@ i @IOCSTARTSIDEBARTOC@ indiquen quina part del menú inclou el toc
+                        // per poder eliminar-lo a les seccions on no sigui necessari
+                        if($this->menuLevel3) {
+                            $sidebarToc = '@IOCSTARTSIDEBARTOC@' . $this->getTOC($text, $act_href, false, [$section_name], true) . '@IOCENDSIDEBARTOC@';
+                            $menu_html .= $sidebarToc;
+                        }
                     }
                     array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
                 }
@@ -839,16 +858,26 @@ class generate_html implements WikiIocModel{
 
      /**
      *
-     * Get Table Of Contents
+     * Get Table Of Contents.
+      *
+      * Si es rep el paràmetre $isList es retorna com una llista amb la classe toc_list que fa que sempre sigui visible,
+      * si no s'afegeix aquesta classe (inclou !important) la llista apareix oculta per defecte (s'amaga per JavaScript)
      */
-    private function getTOC($text, $hrefBase='', $showTitle=TRUE, $blackList = array()){
+    private function getTOC($text, $hrefBase='', $showTitle=TRUE, $blackList = array(), $isList = false){
         $matches = array();
         $headers = array();
-        $toc = '<div class="toc">';
+
+        $toc = $isList ? '<li><b>Continguts</b>' : '<div class="toc">';
         if($showTitle){
             $toc .= '<span>'.$this->lang['toc'].'</span><br />';
         }
-        $toc .= '<ul>';
+
+        if ($isList) {
+            $toc .= '<ul style="" class="toc_list">';
+        } else {
+            $toc .= '<ul>';
+        }
+
         preg_match_all('/\={5}([^=]+)\={5}/', $text, $matches, PREG_SET_ORDER);
         foreach ($matches as $m){
             if(in_array(trim($m[1]), $blackList)){
@@ -858,7 +887,7 @@ class generate_html implements WikiIocModel{
             $toc .= '<a href="'.$hrefBase.'#'.sectionID($m[1],$headers).'">'.trim($m[1]).'</a>';
             $toc .= '</li>';
         }
-        $toc .= '</ul></div>';
+        $toc .= $isList ? '</ul></li>' : '</ul></div>';
         return $toc;
     }
 
