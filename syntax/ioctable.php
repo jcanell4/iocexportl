@@ -48,7 +48,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('^::(?:table|accounting):.*?\n(?=\S[^:].*?\n:::)', $mode, 'plugin_iocexportl_ioctable');
+        $this->Lexer->addEntryPattern('^::(?:table|accounting):.*?\n(?=(?:[^\s:].*?\n|[^\s:]*?\n*):::)', $mode, 'plugin_iocexportl_ioctable');
     }
 
     function postConnect() {
