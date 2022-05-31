@@ -135,7 +135,7 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     $id = trim($id);                    
                     $_SESSION['figure_references'][]= $id;
                     $renderer->doc .= '<div class="iocfigure">';
-                    $renderer->doc .= '<a name="'.$id.'"></a>';
+                    $renderer->doc .= '<a id="'.$id.'" name="'.$id.'"></a>';
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     if (isset($params['title'])){
