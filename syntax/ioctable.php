@@ -289,7 +289,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         }
                         $_SESSION['table_references'][]= $id;
                         $renderer->doc .= '<div class="titletable">';
-                        $renderer->doc .= '<a name="'.$id.'"><span>Taula </span></a>';
+                        $renderer->doc .= '<a id="'.$id.'" name="'.$id.'"><span class="typeiocelem">Taula </span></a>';
                         if (isset($params['title'])){
                             $instructions = get_latex_instructions($params['title']);
                             $renderer->doc .= trim(preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info)));
