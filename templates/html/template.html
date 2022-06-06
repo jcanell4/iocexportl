@@ -211,6 +211,12 @@
   <div id="help-sidebar-hide" class="hidden tooltip">@IOCHELPSHOWHIDEBAR@<span class="arrow-left"></span></div>
   <div id="help-search" class="hidden tooltip">@IOCHELPSEARCH@<span class="arrow-top"></span></div>
   <div id="help-header" class="hidden tooltip">@IOCHELPHEADER@<span class="arrow-left"></span></div>
-</div> 
+</div>
+<script src="@IOCPATH@_/js/jquery.ioc-tools.js"></script>
+<script>
+    jQuery(document).ready(function () {
+        $(".iocnote, .iocreference, .ioctext, .iocfigurec").toBColumn();
+    });
+</script>
 </body>
 </html>

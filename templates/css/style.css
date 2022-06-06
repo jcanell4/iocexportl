@@ -2931,3 +2931,21 @@ iframe {
 .toc_list {
     display: block !important;
 }
+
+
+/* Columna B */
+.iocreference, .iocnote, .ioctext, .iocfigurec {
+	clear: right;
+	float: right;
+}
+
+.iocreference, .iocnote, .ioctext {
+	width: 145px !important;
+}
+
+
+.iocfigurec {
+	margin-bottom: 1em;
+	width: 200px !important;
+}
+
