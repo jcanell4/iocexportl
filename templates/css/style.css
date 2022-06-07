@@ -2933,19 +2933,82 @@ iframe {
 }
 
 
-/* Columna B */
-.iocreference, .iocnote, .ioctext, .iocfigurec {
-	clear: right;
-	float: right;
+/* Canvis columna B */
+
+article {
+	width: inherit;
 }
 
-.iocreference, .iocnote, .ioctext {
-	width: 145px !important;
+/* Canvis responsive: aquesta era la implementació original, s'afegeix la classe
+   mitjançant javascript */
+.x-narrow {
+	width: inherit;
 }
 
-
-.iocfigurec {
-	margin-bottom: 1em;
-	width: 200px !important;
+.narrow {
+	width: inherit;
 }
 
+.medium {
+	width: inherit;
+}
+
+.wide {
+	width: inherit;
+}
+
+.x-wide {
+	width: inherit;
+}
+
+.x-extra-wide {
+	width: inherit;
+}
+
+@media (max-width: 576px) {
+
+	article {
+		max-width: 100%;
+	}
+}
+
+@media (min-width: 576px) {
+	article {
+		max-width: 540px;
+	}
+}
+
+@media (min-width: 768px) {
+	article {
+		max-width: 720px;
+	}
+}
+
+@media (min-width: 992px) {
+	article {
+		max-width: 960px;
+	}
+
+	/* A partir d'aquesta resolució movem els elements a la banda dreta */
+	.iocreference, .iocnote, .ioctext, .iocfigurec {
+		clear: right;
+		float: right;
+		margin-left: 2em;
+	}
+
+	.iocreference, .iocnote, .ioctext {
+		width: 145px !important;
+	}
+
+
+	.iocfigurec {
+		margin-bottom: 1em;
+		width: 200px !important;
+	}
+}
+
+@media (min-width: 1200px) {
+	article {
+		max-width: 1140px;
+	}
+}
