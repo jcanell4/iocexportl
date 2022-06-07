@@ -7,4 +7,10 @@ require(["jquery.min","jquery-ui.min","jquery.imagesloaded","render","functions"
 	if (func.ispageSearch()){
 		Search.init();
 	}
+
+
+});
+
+jQuery(document).ready(function () {
+	$(".iocnote, .iocreference, .ioctext, .iocfigurec").toBColumn();
 });

@@ -3,9 +3,10 @@
     out: '../html/_/js/build.js',
     name: 'main',
     paths: {
-        requireLib: 'require'
+        requireLib: 'require',
+        "jquery.ioc-tools": "../../../../lib_ioc/wikiiocmodel/templates/jquery.ioc-tools"
     },
-    include: 'requireLib',
+    include: ['requireLib', 'jquery.ioc-tools'],
     shim: {
         'jquery-ui.min': {
             deps: ['jquery.min']
