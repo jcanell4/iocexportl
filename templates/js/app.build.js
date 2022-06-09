@@ -17,3 +17,5 @@
         }
     }
 })
+
+//CALDRIA AFEGIR AQUÍ LA COPIA DEL FITXER CSS amb l'atribut dir: [RUTA AL DIRECTORI ON HI HA FITXERS A IMPORTAR]
