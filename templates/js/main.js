@@ -12,5 +12,5 @@ require(["jquery.min","jquery-ui.min","jquery.imagesloaded","render","functions"
 });
 
 jQuery(document).ready(function () {
-	$(".iocnote, .iocreference, .ioctext, .iocfigurec").toBColumn();
+	$(".iocnote, .iocreference, .ioctext, .iocfigurec").toBColumn({debug: true});
 });
