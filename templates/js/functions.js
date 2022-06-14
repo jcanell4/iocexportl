@@ -1198,6 +1198,13 @@ define (["render"],function(render){
 		render.previewImage($(this));
 	});
 
+	// Afegit zoom per les imatges laterals
+	$(document).on("click", ".imgB", function(){
+		let $this = $(this);
+		$this.css('cursor', 'zoom-in')
+		render.previewImage($this);
+	});
+
 	$(document).on("click", ".closepreview",function(){
 		$('#back_preview, #preview').addClass('hidden');
 	});
