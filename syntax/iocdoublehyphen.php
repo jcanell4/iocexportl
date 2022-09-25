@@ -32,14 +32,15 @@ class syntax_plugin_iocexportl_iocdoublehyphen extends DokuWiki_Syntax_Plugin {
         return 'normal';
     }
     function getSort(){
-        return 40;
+        return 1;
     }
 
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('%%--%%', $mode, 'plugin_iocexportl_iocdoublehyphen');
+        // ALERTA! els guions semblen iguals però són diferents codis
+        $this->Lexer->addSpecialPattern('%%--%%|--|−−', $mode, 'plugin_iocexportl_iocdoublehyphen');
     }
 
     /**
