@@ -46,6 +46,7 @@
 %\usepackage{monofur}  %monofur font {mnf} 
 \usepackage{color}
 \usepackage[tracking=true]{microtype}
+\usepackage[scaled=1]{FiraMono}
 %\usepackage[letterspace=100]{microtype}
 @IOCQRCODE@%qrcodes
 
@@ -254,7 +255,7 @@
 \newcommand{\numold}[1]{\fontfamily{pcr}\selectfont\tiny{#1}}
 \lstnewenvironment{csource}[1]
     {\small
-     \lstset{basicstyle=\fontfamily{fvm}\selectfont,%beramono
+     \lstset{basicstyle=\ttfamily\selectfont,
             keywordstyle=\bfseries,
             numbers=left,
             inputencoding=utf8x,
