@@ -61,10 +61,6 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
             case 'ioccounter':
                 $this->renderCounter($mode, $renderer, $state, $text);
                 break;
-                // ALERTA! la taula no es renderitza amb això perque no es fa el parse de la taula, només s'afegeix un div al voltant
-//            case 'xhtml':
-//                $this->renderWiki($renderer, $state, $text);
-//                break;
             case 'wikiiocmodel_psdom':
                 $this->renderPsdomExport($mode, $renderer, $state, $text);
                 break;
@@ -83,20 +79,6 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
                 return FALSE;
         }
         return TRUE;
-    }
-
-    function renderWiki(&$renderer, $state, $text) {
-        switch ($state) {
-            case DOKU_LEXER_ENTER :
-                $renderer->doc .= '<div>';
-                break;
-            case DOKU_LEXER_UNMATCHED:
-                $renderer->doc .= str_replace("\\\\", "<br>", $text);
-                break;
-            case DOKU_LEXER_EXIT :
-                $renderer->doc .= "</div>\n";
-                break;
-        }
     }
 
     function renderPdfExport($mode, &$renderer, $state, $text) {
@@ -118,7 +100,10 @@ class syntax_plugin_iocexportl_iocedittable extends DokuWiki_Syntax_Plugin {
                 break;
             case DOKU_LEXER_UNMATCHED :
                 $instructions = p_get_instructions($text);
-                $renderer->doc .= p_render($mode, $instructions, $info);
+                $tableText = p_latex_render($mode, $instructions, $info);
+                Logger::init(1);
+                Logger::debug($tableText, 0, 104, "iocedittable");
+                $renderer->doc .= $tableText;
                 break;
             case DOKU_LEXER_EXIT :
                 break;
