@@ -357,6 +357,10 @@ class generate_html implements WikiIocModel{
                         $html = preg_replace('/\$/', '\\\\$', $html);
                         $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
                         $menu_html_unit = preg_replace('/@IOCSTARTPREEXPANDER@.*?@IOCENDPREEXPANDER@/', '', $menu_html_unit);
+
+                        // [Xavi] Eliminant aquí les marques sembla que no té efectes secundaris
+                        $menu_html_unit = preg_replace('/@IOCSTARTSIDEBARTOC@|@IOCENDSIDEBARTOC@/', '', $menu_html_unit);
+
                         $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
                         $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
                         $html = preg_replace('/@IOCTOC@/', '', $html, 1);
