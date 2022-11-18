@@ -1159,6 +1159,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
         //attach url media file
         if($this->_isMediaFile($src)){
+            if (!isset($_SESSION['media_files'])) $_SESSION['media_files'] = [];
             array_push($_SESSION['media_files'], $src);
         }
 
