@@ -302,6 +302,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->storeCurrent();
                         $renderer->setCurrentNode($node);
                     }elseif ($type === "include") {
+                        $renderer->include++;
                         $renderer->storeCurrent();
                         $renderer->setCurrentNode($node);
                     }else{
@@ -330,7 +331,9 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->tmpData["renderIocElems"] = TRUE;
                         $renderer->restoreCurrent();
                         unset($renderer->tmpData["id"]);
-                    }elseif ($renderer->tmpData["type"] === "include") {
+//                    }elseif ($renderer->tmpData["type"] === "include") {
+                    }elseif ($renderer->include > 0) {
+                        $renderer->include--;
                         $renderer->restoreCurrent();
                     }elseif ($renderer->getCurrentNode()->getOwner()){
                         $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());

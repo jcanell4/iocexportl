@@ -152,7 +152,14 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
         }
       }
       // plugin to add wiki pages into another
-      addSyntaxmode('include', 'include', $modes);
+
+        // S'ha de revisar como es gestiona el GetAllowedTypes per poder utilitzar
+        // altres renderers!
+      addSyntaxmode('includepsdom', 'include', $modes);
+      // Aquesta línia és ignorada perquè s'aplica el include de includepsdom, si canviem
+      // l'ordre no es processarà el includepsdom
+      //addSyntaxmode('include', 'include', $modes);
+
       // plugin to add notes
       addSyntaxmode('note', '', $modes);
 
