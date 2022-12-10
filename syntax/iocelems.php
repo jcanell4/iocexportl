@@ -290,56 +290,42 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     $offset = (isset($params['offset']))?$params['offset']:false;
                     $width = (isset($params['width']))?$params['width']:false;
                     $node = new IocElemNodeDoc($type, $title, $offset, $width, $renderer->actualLevel);
-                    if (in_array($type, ["text","note","reference"], true)) {
-                        if(isset($params["id"])){                                
-                            $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::REFERRED_B_IOC_ELEMS_TYPE;
-                            $renderer->tmpData["id"] = $params["id"];
-                        }else{
-                            $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNREFERRED_B_IOC_ELEMS_TYPE;
-                            $renderer->tmpData["id"] = count($renderer->bIocElems[$renderer->currentBIocElemsType]);
-                            $renderer->tmpData["renderIocElems"] = FALSE;
-                        }   
-                        $renderer->storeCurrent();
-                        $renderer->setCurrentNode($node);
-                    }elseif ($type === "include") {
-                        $renderer->include++;
-                        $renderer->storeCurrent();
-                        $renderer->setCurrentNode($node);
-                    }else{
-                        $renderer->getCurrentNode()->addContent($node);
-                        $renderer->setCurrentNode($node);
-                        $renderer->openForContentB("iocelem");
+
+
+                    $renderer->getCurrentNode()->addContent($node);
+                    $renderer->setCurrentNode($node);
+
+                    if($type == "include") {
+                        $renderer->tmpData["include_element"] = true;
+                        $renderer->tmpData["include_element_state"] = $state;
                     }
+
                     break;
                 case DOKU_LEXER_UNMATCHED:
+
                     $instructions = get_latex_instructions($data);
-                    //delete document_start and document_end instructions
-                    if ($instructions[0][0] === "document_start") {
-                        array_shift($instructions);
-                        array_pop($instructions);
+
+                    if ($renderer->tmpData["include_element_state"]== DOKU_LEXER_ENTER) {
+                        $renderer->tmpData["include_element_state"] = DOKU_LEXER_UNMATCHED;
+                        $this->renderUnmatchedIncludeInstructionsPsdom($instructions, $renderer);
                     }
-                    // Loop through the instructions
+
+
                     foreach ( $instructions as $instruction ) {
-                        // Execute the callback against the Renderer
-                        call_user_func_array(array(&$renderer, $instruction[0]), $instruction[1]);
+                        call_user_func_array(array(&$renderer, $instruction[0]),$instruction[1]);
                     }
+
                     break;
+
                 case DOKU_LEXER_EXIT :
-                    if (in_array($renderer->tmpData["type"], ["text","note","reference"])) {
-                        $renderer->bIocElems[$renderer->currentBIocElemsType][$renderer->tmpData["id"]] = $renderer->getCurrentNode();
-                        $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNEXISTENT_B_IOC_ELEMS_TYPE;
-                        $renderer->tmpData["renderIocElems"] = TRUE;
-                        $renderer->restoreCurrent();
-                        unset($renderer->tmpData["id"]);
-//                    }elseif ($renderer->tmpData["type"] === "include") {
-                    }elseif ($renderer->include > 0) {
-                        $renderer->include--;
-                        $renderer->restoreCurrent();
-                    }elseif ($renderer->getCurrentNode()->getOwner()){
-                        $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
-                        $renderer->closeForContentB("iocelem");
-                    }          
+
+                    $owner = $renderer->getCurrentNode()->getOwner();
+                    if ($owner != null) {
+                        $renderer->setCurrentNode($owner);
+                    }
+                    // no sé si això fa quelcom
                     unset($renderer->tmpData["type"]);
+
                     break;
             }
             return TRUE;
@@ -388,5 +374,22 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         $replaced = preg_replace('/\n\<\/div\>(?:\n\<\/section\>)?(.*)\<div class="level."\>\n/s', '$1', $renderer->doc);
         $aux .= $replaced;
         $renderer->doc = $aux;        
+    }
+
+    function renderUnmatchedIncludeInstructionsPsdom($instructions, &$renderer){
+
+        // Guardem la referència al node que ha iniciat el include
+        $owner = $renderer->getCurrentNode()->getOwner();
+
+        $lastlevel = $this->updatLevel($instructions, $renderer->actualLevel);
+
+        // Processem el include
+        $renderer->nest($instructions);
+        $renderer->actualLevel = $lastlevel;
+
+        // Afegim el contingut al node on s'ha iniciat el include i el restaurem
+        $owner->addContent($renderer->getCurrentNode());
+        $renderer->setCurrentNode($owner);
+
     }
 }
