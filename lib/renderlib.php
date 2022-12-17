@@ -155,9 +155,9 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
 
         // S'ha de revisar como es gestiona el GetAllowedTypes per poder utilitzar
         // altres renderers!
-      addSyntaxmode('includepsdom', 'include', $modes);
-      // Aquesta línia és ignorada perquè s'aplica el include de includepsdom, si canviem
-      // l'ordre no es processarà el includepsdom
+      addSyntaxmode('iocinclude', 'include', $modes);
+      // Aquesta línia és ignorada perquè s'aplica el include de iocinclude, si canviem
+      // l'ordre no es processarà el iocinclude
       //addSyntaxmode('include', 'include', $modes);
 
       // plugin to add notes
