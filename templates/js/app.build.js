@@ -1,6 +1,7 @@
 ({
     baseUrl: "./",
     out: '../html/_/js/build.js',
+    optimize: "uglify2",
     name: 'main',
     paths: {
         requireLib: 'require',
