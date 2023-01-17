@@ -31,7 +31,7 @@
 (function ($) {
 
     $.fn.toBColumn = function (options) {
-        let settings = $.extend({
+        var settings = $.extend({
             minWidth: 992, // int. Amplada mínima per mostrar-lo com a columna o com a desplegable
             columnAlign: 'right', // left | right
             beforeContainer: 'p, ul, ol', // selectors per col·locar l'element abans per amplada d'escriptori
@@ -46,12 +46,12 @@
 
         }, options);
 
-        let id = 0;
+        var id = 0;
 
 
         this.each(function () {
 
-            let $this = jQuery(this);
+            var $this = jQuery(this);
 
             $this.css('float', settings.columnAlign);
             $this.css('clear', settings.columnAlign);
@@ -70,7 +70,7 @@
 
             if (settings.minWidth >0 && window.matchMedia('(min-width: ' + settings.minWidth + 'px)').matches) {
                 // S'ha de recol·locar a sobre
-                let $target = $this.prevAll(settings.beforeContainer).first();
+                var $target = $this.prevAll(settings.beforeContainer).first();
 
                 // Ens assegurem que s'insereix abans d'un contenidor no buit
                 while ($target.length > 0 && $target.children().length === 0 && $target.text().trim().length === 0) {
@@ -112,17 +112,17 @@
                 // Ho converti'm en un clicable que es desplega
 
                 // S'ha de mostrar quan es clica
-                let $node = jQuery('<div style="float:' + settings.columnAlign + '" data-id="' + id +'"></div>');
+                var $node = jQuery('<div style="float:' + settings.columnAlign + '" data-id="' + id +'"></div>');
                 id++;
 
-                let pattern = /url\("(.*)"\)?/gm;
+                var pattern = /url\("(.*)"\)?/gm;
 
-                let icon ='';
+                var icon ='';
                 if (settings.icon) {
                     icon = settings.icon;
                 } else if ($this.css('background-image')) {
 
-                    let matches = pattern.exec($this.css('background-image'))
+                    var matches = pattern.exec($this.css('background-image'))
                     icon = matches ? matches[1] : false;
                     // console.log("S'ha assignat l'icon?", icon)
                 }
@@ -133,14 +133,14 @@
                     icon = settings.defaultIcon;
                 }
 
-                let $img = jQuery('<img src="' + icon + '">');
+                var $img = jQuery('<img src="' + icon + '">');
                 $node.append($img);
                 $node.insertBefore($this);
                 $this.appendTo($node);
 
                 $this.css('display', 'none');
 
-                let toggle = false;
+                var toggle = false;
 
                 // Mostra o amaga l'element
                 $node.on('click', function () {

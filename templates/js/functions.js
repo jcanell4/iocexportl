@@ -1197,9 +1197,9 @@ define (["render"],function(render){
 
     // Afegit zoom per les imatges laterals
     $(document).on("click", ".imgB", function(){
-            let $this = $(this);
-            $this.css('cursor', 'zoom-in')
-            render.previewImage($this);
+            var jq_node = $(this);
+            jq_node.css('cursor', 'zoom-in')
+            render.previewImage(jq_node);
     });
 
     $(document).on("click", ".closepreview",function(){
