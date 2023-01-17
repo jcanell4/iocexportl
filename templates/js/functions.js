@@ -14,7 +14,7 @@ define (["render"],function(render){
     var cookiegeneral = 'ioc_settings';//Always same settings for all materials
     var cookiefavorites = 'ioc_'+cookiesufix+'_bookmarks';
     var cookiequizzes = 'ioc_'+cookiesufix+'_quizzes';
-	
+
     $('#menu li').click(function(e) {
         setmenu(this);
     });
@@ -131,12 +131,12 @@ define (["render"],function(render){
         setContrast(0);
         setCookieProperty(cookiegeneral,'contrast', 0);
     });
-    
+
     $('#style-novel').click(function() {
     	setContrast(1);
         setCookieProperty(cookiegeneral,'contrast', 1);
     });
-    
+
     $('#style-ebook').click(function() {
     	setContrast(2);
         setCookieProperty(cookiegeneral,'contrast', 2);
@@ -151,7 +151,7 @@ define (["render"],function(render){
     	setContrast(4);
         setCookieProperty(cookiegeneral,'contrast', 4);
     });
-    
+
     //Alignment
     $('#text-alignment').click(function() {
         if ($(this).attr("checked")){
@@ -162,7 +162,7 @@ define (["render"],function(render){
                 setCookieProperty(cookiegeneral,'alignment', 0);
         }
     });
-    
+
     //Hyphenation
     $('#text-hyphen').click(function() {
         if ($(this).attr("checked")){
@@ -173,8 +173,8 @@ define (["render"],function(render){
                 setCookieProperty(cookiegeneral,'hyphen', 1);
         }
     });
-    
-    
+
+
     //Show or hide secondary content
     $('#main-images').click(function() {
         if ($(this).attr("checked")){
@@ -186,8 +186,8 @@ define (["render"],function(render){
                 setCookieProperty(cookiegeneral,'mimages', 0);
         }
     });
-   
-    
+
+
     //Show or hide secondary content
     $('#secondary-content').click(function() {
         if ($(this).attr("checked")){
@@ -198,14 +198,14 @@ define (["render"],function(render){
                 setCookieProperty(cookiegeneral,'scontent', 0);
         }
     });
-    
-    
+
+
     $('#upbutton').click(function() {
         $("html,body").animate({
                 scrollTop: 0
         }, 500);
     });
-    
+
     $('#navmenu').click(function() {
         setCookieProperty(cookiegeneral,'selected','null');
     });
@@ -221,7 +221,7 @@ define (["render"],function(render){
         }
     });
 
-   
+
     $("#frmsearch input[name='q']").on('keypress', function (event){
             if (event.which === 13){
                     $("#frmsearch").submit();

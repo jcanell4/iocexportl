@@ -203,15 +203,15 @@ class generate_html implements WikiIocModel{
             //Create index page
             $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $this->menu_html);
             $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
-            $menu_html_index = preg_replace('/@IOCSTARTINDEX@(.*?)@IOCENDINDEX@/', '', $menu_html_index);
-            $menu_html_index = preg_replace('/@IOCSTARTPREEXPANDER@(.*?)@IOCENDPREEXPANDER@/', '$1', $menu_html_index);
-            $menu_html_index = preg_replace('/@IOCSTARTEXPANDER@(.*?)@IOCENDEXPANDER@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCSTARTINDEX@(.*?)@IOCENDINDEX@/s', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCSTARTPREEXPANDER@(.*?)@IOCENDPREEXPANDER@/s', '$1', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCSTARTEXPANDER@(.*?)@IOCENDEXPANDER@/s', '', $menu_html_index);
             $menu_html_index = preg_replace('/@IOCACTIVITYICONSTART@|@IOCACTIVITYICONEND@/', '', $menu_html_index);
-            $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/s', '', $menu_html_index);
             $menu_html_index = preg_replace('/id="\w+"/', '', $menu_html_index);
             $menu_html_index = preg_replace('/"expander"/', '"indent"', $menu_html_index);
             // Eliminem el toc del sidebar, a l'índex no s'ha de mostrar
-            $menu_html_index = preg_replace('/@IOCSTARTSIDEBARTOC@(.*?)@IOCENDSIDEBARTOC@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCSTARTSIDEBARTOC@(.*?)@IOCENDSIDEBARTOC@/s', '', $menu_html_index);
 
             $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
             $html = preg_replace('/@IOCHEADTOC@/',$this->lang['Toc'], $html, 1);
@@ -236,7 +236,7 @@ class generate_html implements WikiIocModel{
             $this->menu_html = preg_replace('/@IOCSTARTINDEX@|@IOCENDINDEX@/', '', $this->menu_html);
 //            $this->menu_html = preg_replace('/@IOCSTARTPREEXPANDER@(.*?)@IOCENDPREEXPANDER@/', '$1', $this->menu_html);
             $this->menu_html = preg_replace('/@IOCSTARTEXPANDER@|@IOCENDEXPANDER@/', '', $this->menu_html);
-            $this->menu_html = preg_replace('/@IOCACTIVITYICONSTART@(.*?)@IOCACTIVITYICONEND@/', '', $this->menu_html);
+            $this->menu_html = preg_replace('/@IOCACTIVITYICONSTART@(.*?)@IOCACTIVITYICONEND@/s', '', $this->menu_html);
             $this->menu_html = preg_replace('/@IOCACTIVITYNAMESTART@|@IOCACTIVITYNAMEEND@/', '', $this->menu_html);
             if (isset($data[0]['intro'])){
                 if(preg_match('/@IOCSTARTINTRO@(.*?)@IOCENDINTRO@/', $this->menu_html, $matches)){
