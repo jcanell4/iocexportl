@@ -238,6 +238,7 @@ class generate_html implements WikiIocModel{
             $this->menu_html = preg_replace('/@IOCSTARTEXPANDER@|@IOCENDEXPANDER@/', '', $this->menu_html);
             $this->menu_html = preg_replace('/@IOCACTIVITYICONSTART@(.*?)@IOCACTIVITYICONEND@/s', '', $this->menu_html);
             $this->menu_html = preg_replace('/@IOCACTIVITYNAMESTART@|@IOCACTIVITYNAMEEND@/', '', $this->menu_html);
+
             if (isset($data[0]['intro'])){
                 if(preg_match('/@IOCSTARTINTRO@(.*?)@IOCENDINTRO@/', $this->menu_html, $matches)){
                     $menu_html_intro = $matches[1];
@@ -255,7 +256,7 @@ class generate_html implements WikiIocModel{
                    $html = p_latex_render('iocxhtml', $instructions, $info);
                    $html = preg_replace('/\$/', '\\\\$', $html);
                    $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
-                   $menu_html_intro = preg_replace('/@IOCSTARTPREEXPANDER@.*?@IOCENDPREEXPANDER@/', '', $menu_html_intro);                            
+                   $menu_html_intro = preg_replace('/@IOCSTARTPREEXPANDER@.*?@IOCENDPREEXPANDER@/', '', $menu_html_intro);
                    $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_intro, $html, 1);
                    $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
                    $html = preg_replace('/@IOCTOC@/', '', $html, 1);
@@ -855,7 +856,7 @@ class generate_html implements WikiIocModel{
             $toc .= '<ul>';
         }
 
-        preg_match_all('/\={5}([^=]+)\={5}/', $text, $matches, PREG_SET_ORDER);
+        preg_match_all('/\={5}([^=]+)\={5}$/m', $text, $matches, PREG_SET_ORDER);
         foreach ($matches as $m){
             if(in_array(trim($m[1]), $blackList)){
                 continue;
