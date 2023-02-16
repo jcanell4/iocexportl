@@ -16,7 +16,7 @@ class export_onepdf_command extends export_command {
         $this->types['mode'] = self::T_STRING;
         $this->types['ioclanguage'] = self::T_STRING;
         $this->types['toexport'] = self::T_STRING;
-        $this->setPermissionFor(array('admin','manager'));
+//        $this->setPermissionFor(array('admin','manager'));
     }
 
     public function setParameters($params) {
