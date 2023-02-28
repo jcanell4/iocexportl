@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Latex Syntax Plugin
@@ -63,9 +64,9 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER:
-                    $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::NEWCONTENT_TYPE);
-                    $renderer->getCurrentNode()->addContent($node);
-                    $renderer->setCurrentNode($node);
+//                    $node = new SpecialBlockNodeDoc(SpecialBlockNodeDoc::NEWCONTENT_TYPE);
+//                    $renderer->getCurrentNode()->addContent($node);
+//                    $renderer->setCurrentNode($node);
                     break;
                 case DOKU_LEXER_UNMATCHED:
                     $instructions = get_latex_instructions($text);
@@ -84,7 +85,7 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
                     }
                     break;
                 case DOKU_LEXER_EXIT:
-                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
+//                    $renderer->setCurrentNode($renderer->getCurrentNode()->getOwner());
                     break;
             }
             return TRUE;
