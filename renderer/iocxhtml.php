@@ -50,6 +50,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     var $bIocElems = array(array(),  array());
     var $currentBIocElemsType = self::UNEXISTENT_B_IOC_ELEMS_TYPE;
     var $bIocElemsRefQueue = array();
+    var $levelDiff=0;
 
     /**
      * Return version info
@@ -387,6 +388,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $this->doc .= '><a id="'.$hid.'" >';
         $this->doc .= $this->_xmlEntities($text);
         $this->doc .= "</a></h$level>".DOKU_LF;
+        $this->lastlevel = $level;
     }
 
     function hr() {
