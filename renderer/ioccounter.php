@@ -14,6 +14,7 @@ require_once DOKU_INC.'inc/parser/renderer.php';
  * The Renderer
  */
 class renderer_plugin_ioccounter extends Doku_Renderer {
+    var $levelDiff=0;
 
     /**
      * Return version info

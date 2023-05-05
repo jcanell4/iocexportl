@@ -147,6 +147,8 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     //INCLUDE
                     }elseif($type === 'include'){
                         $renderer->doc .= '\iocinclude{';
+                        $renderer->tmpData["include_no_indent"]=isset($params['no_indent']);
+
                     }
                     $_SESSION['iocelem'] = (in_array($type, ["ioctextl","quote","important","example","include"], true)) ? 'textl' : TRUE;
                     break;
@@ -179,7 +181,8 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '<p class="ioctitle">'.$title.'</p>';
                     }
                     if($type==="include"){
-                        $_SESSION["include_element"]=true;
+                         $renderer->tmpData["include_element"]=$_SESSION["include_element"]=true;
+                         $renderer->tmpData["include_no_indent"]=isset($params['no_indent']);
                     }
                     break;
                 case DOKU_LEXER_UNMATCHED :
@@ -223,6 +226,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     if($type == "include"){
                         $renderer->tmpData["include_element"]=true;
                         $renderer->tmpData["include_element_state"]=$state;
+                        $renderer->tmpData["include_no_indent"]=isset($params['no_indent']);
                         $renderer->doc .= $html;
                     }elseif (in_array($type, ["text","note","reference"], true)){
                         if(isset($params["id"])){                                
@@ -298,6 +302,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     if($type == "include") {
                         $renderer->tmpData["include_element"] = true;
                         $renderer->tmpData["include_element_state"] = $state;
+                        $renderer->tmpData["include_no_indent"]=isset($params['no_indent']);
                     }
 
                     break;
@@ -353,6 +358,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                 case 'plugin':
                 switch($instructions[$i][1][0]) {
                     case 'include_include':
+                    case 'iocinclude_include':
                         $instructions[$i][1][1][4] = $level;
                         break;
                 }
@@ -368,7 +374,12 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
     function renderUnmatchedIncludeInstructions($instructions, &$renderer){
         $aux = $renderer->doc;
         $renderer->doc = "";
-        $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
+        if($renderer->tmpData["include_no_indent"]){
+            $this->updatLevel($instructions, 0);
+            $lastlevel = $renderer->lastlevel;                    
+        }else{
+            $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
+        }
         $renderer->nest($instructions);
         $renderer->lastlevel = $lastlevel;
         $replaced = preg_replace('/\n\<\/div\>(?:\n\<\/section\>)?(.*)\<div class="level."\>\n/s', '$1', $renderer->doc);
@@ -381,11 +392,16 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         // Guardem la referència al node que ha iniciat el include
         $owner = $renderer->getCurrentNode()->getOwner();
 
-        $lastlevel = $this->updatLevel($instructions, $renderer->actualLevel);
+        if($renderer->tmpData["include_no_indent"]){
+            $this->updatLevel($instructions, 0);
+            $lastlevel = $renderer->actualLevel;                    
+        }else{
+            $lastlevel = $this->updatLevel($instructions, $renderer->actualLevel);
+        }
 
         // Processem el include
         $renderer->nest($instructions);
-        $renderer->actualLevel = $lastlevel;
+        $renderer->actualLevel = $renderer->lastlevel = $lastlevel;
 
         // Afegim el contingut al node on s'ha iniciat el include i el restaurem
         $owner->addContent($renderer->getCurrentNode());

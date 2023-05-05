@@ -50,6 +50,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     var $bIocElems = array(array(),  array());
     var $currentBIocElemsType = self::UNEXISTENT_B_IOC_ELEMS_TYPE;
     var $bIocElemsRefQueue = array();
+    var $levelDiff=0;
 
     /**
      * Return version info
@@ -387,6 +388,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         $this->doc .= '><a id="'.$hid.'" >';
         $this->doc .= $this->_xmlEntities($text);
         $this->doc .= "</a></h$level>".DOKU_LF;
+        $this->lastlevel = $level;
     }
 
     function hr() {
@@ -1212,7 +1214,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }else{
                 $ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
             }
-            if($this->table && $width){
+//            if($this->table && $width){
+            if($width){
                 $ret .= ' width="'.$width.'"';
             }
 
@@ -1226,8 +1229,10 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
             $alt = ($_SESSION['fig_description']) ? $_SESSION['fig_description'] : ($title ? $title : "");
             if ($title) {
-                if ($imgb && strpos($title, "#")!==false) {
-                    $s = explode("#", $title);
+//                if ($imgb && strpos($title, "#")!==false) {
+//                    $s = explode("#", $title);
+                if ($imgb && preg_match("/(?<!\&)\#|\#(?!\d+;)/", $title)) {
+                    $s = preg_split("/(?<!\&)\#|\#(?!\d+;)", $title);
                     $title = $s[0];
                     $alt = preg_replace('/\/[+-]?\d+$/', '', $s[1]); //elimina el 'offset'
                 }

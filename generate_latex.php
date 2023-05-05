@@ -511,7 +511,7 @@ class generate_latex implements WikiIocModel{
             $this->returnData($path, $filename.'.log', 'log', $return);
         }else{
             @exec('tail -n 20 '.$path.'/'.$filename.'.log;', $output);
-            io_saveFile($path.'/'.filename.'.log', implode(DOKU_LF, $output));
+            io_saveFile($path.'/'.$filename.'.log', implode(DOKU_LF, $output));
             $this->returnData($path, $filename.'.log', 'log', $return);
         }
     }

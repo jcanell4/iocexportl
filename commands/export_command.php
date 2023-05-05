@@ -15,7 +15,7 @@ abstract class export_command extends abstract_writer_command_class{
 
     public function __construct($modelAdapter) {
         parent::__construct($modelAdapter);
-
+        $this->setPermissionFor(array('admin','manager','manualsfp'));
         // ALERTA! [Xavi] Cal disparar l'esdeveniment per que s'afegeixin les dades a JSINFO per l'editor
         // Actualment aquest esdeveniment es dispara a AbstractWikiAction#triggerStartEvents() però
         // aquests commands no fan servir actions.

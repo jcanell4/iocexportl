@@ -93,7 +93,7 @@ class syntax_plugin_iocexportl_iocgif extends DokuWiki_Syntax_Plugin {
             $href = "$rUrl$rDir/web/${rDir}htmlindex/gifs/".str_replace(":", "/", $ns)."/$gif";
 
             $_SESSION['gif_images'] = $href;
-            $title = (empty($title)) ? $gif : $title;
+            if (empty($title)) $title = $gif;
             qrcode_media_url($renderer, $href, $title, $type);
             return TRUE;
 
