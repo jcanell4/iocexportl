@@ -1092,7 +1092,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
  * 				UTILS				 *
 **************************************/
 
-
     /**
      * Build a link
      *
@@ -1124,7 +1123,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if(!empty($link['rel']))    $ret .= ' rel="'.$link['rel'].'"';
         if(!empty($link['more']))   $ret .= ' '.$link['more'];
         $ret .= '>';
-        $ret .= $link['name'];
+        $ret .= IocCommon::formatTitleExternalLink($link['name'], "html");
         $ret .= '</a>';
         $ret .= $link['suf'];
         return $ret;
@@ -1231,10 +1230,14 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             if ($title) {
 //                if ($imgb && strpos($title, "#")!==false) {
 //                    $s = explode("#", $title);
-                if ($imgb && preg_match("/(?<!\&)\#|\#(?!\d+;)/", $title)) {
-                    $s = preg_split("/(?<!\&)\#|\#(?!\d+;)", $title);
-                    $title = $s[0];
-                    $alt = preg_replace('/\/[+-]?\d+$/', '', $s[1]); //elimina el 'offset'
+                if ($imgb) {
+                    if (!empty($title) && $title[0] === "[") {
+                        $title = $alt = IocCommon::formatTitleExternalLink($title, "html");
+                    }elseif (preg_match("/(?<!&amp;)#|\#(?!\d+;)/", $title)) {
+                        $s = preg_split("/(?<!&amp;)#|\#(?!\d+;)/", $title);
+                        $title = $s[0];
+                        $alt = preg_replace('/\/[+-]?\d+$/', '', $s[1]); //elimina el 'offset'
+                    }
                 }
                 $ret .= " title=\"$title\"";
             }
