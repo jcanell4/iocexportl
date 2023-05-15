@@ -1123,7 +1123,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if(!empty($link['rel']))    $ret .= ' rel="'.$link['rel'].'"';
         if(!empty($link['more']))   $ret .= ' '.$link['more'];
         $ret .= '>';
-        $ret .= IocCommon::formatTitleExternalLink($link['name'], "html");
+        $ret .= IocCommon::formatTitleExternalLink("link", "html", $link['name']);
         $ret .= '</a>';
         $ret .= $link['suf'];
         return $ret;
@@ -1228,15 +1228,13 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
             $alt = ($_SESSION['fig_description']) ? $_SESSION['fig_description'] : ($title ? $title : "");
             if ($title) {
-//                if ($imgb && strpos($title, "#")!==false) {
-//                    $s = explode("#", $title);
                 if ($imgb) {
-                    if (!empty($title) && $title[0] === "[") {
-                        $title = $alt = IocCommon::formatTitleExternalLink($title, "html");
-                    }elseif (preg_match("/(?<!&amp;)#|\#(?!\d+;)/", $title)) {
-                        $s = preg_split("/(?<!&amp;)#|\#(?!\d+;)/", $title);
-                        $title = $s[0];
-                        $alt = preg_replace('/\/[+-]?\d+$/', '', $s[1]); //elimina el 'offset'
+                    $titol = IocCommon::formatTitleExternalLink("media", "html", $title);
+                    if (is_array($titol)) {
+                        $title = $titol['title'];
+                        $alt = $titol['alt'];
+                    }else {
+                        $title = $alt = $titol;
                     }
                 }
                 $ret .= " title=\"$title\"";
