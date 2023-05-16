@@ -345,9 +345,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                         $offset = '['.trim($data[3]).'mm]';
                         $title = $data[1];
                     }
-                    //elimina la descripció
-                    $arrdesc = explode("#", $title);
-                    $footer = $arrdesc[0];
+                    //extreu la descripció
+                    $arrdesc = IocCommon::formatTitleExternalLink("media", "pdf", $title);
+                    $title = $arrdesc['title'];
+                    $footer = $arrdesc['alt'];
                 }
                 $this->doc .= '\imgB'.$offset.'{';
             }elseif ($figure){
@@ -1209,17 +1210,18 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             if ($conf['useheading'] && $id) {
                 $heading = p_get_first_heading($id);
                 if ($heading) {
-                      return $this->_latexEntities($heading);
+                    return $this->_latexEntities($heading);
                 }
             }
             return $this->_latexEntities($default);
-        } else if ( is_string($title) ) {
+        }else if ( is_string($title) ) {
+            $title = IocCommon::formatTitleExternalLink("link", "pdf", $title);
             return $this->_latexEntities($title);
-        } else if ( is_array($title) ) {
+        }else if ( is_array($title) ) {
             $isImage = TRUE;
             if (isset($title['caption'])) {
                 $title['title'] = $title['caption'];
-            } else {
+            }else {
                 $title['title'] = $default;
             }
             return $title;
