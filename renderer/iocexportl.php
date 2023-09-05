@@ -346,9 +346,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                         $title = $data[1];
                     }
                     //extreu la descripció
-                    $arrdesc = IocCommon::formatTitleExternalLink("media", "pdf", $title);
-                    $title = $arrdesc['title'];
-                    $footer = $arrdesc['alt'];
+                    $footer = IocCommon::formatTitleExternalLink("media", "pdf", $title);
                 }
                 $this->doc .= '\imgB'.$offset.'{';
             }elseif ($figure){
