@@ -235,6 +235,11 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                         $title = preg_replace('/(<p>)(.*?)(<\/p>)/s','<span>$2</span>', p_render($mode, $instructions, $info));
                         $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$title.'<br />';
                     }
+                    if (isset($params['description'])){
+                        $instructions = p_get_instructions($params['description']);
+                        $description = preg_replace('/(<p>)(.*?)(<\/p>)/s','<span>$2</span>', p_render($mode, $instructions, $info));
+                        $renderer->doc .= '<strong>Descripci&oacute;:</strong> '.$description.'<br />';
+                    }
                     if (isset($params['footer'])){
                         $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
                     }
