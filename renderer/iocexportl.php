@@ -344,6 +344,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     if (!empty($data) && !empty($data[3]) && is_numeric($data[3])){
                         $offset = '['.trim($data[3]).'mm]';
                         $title = $data[1];
+                    }else{
+                        $aux = IocCommon::formatTitleExternalLink("media", "offset", $title);
+                        if(!empty($aux)){
+                            $offset = '['.trim($aux).'mm]';
+                        }
                     }
                     //extreu la descripció
                     $footer = IocCommon::formatTitleExternalLink("media", "pdf", $title);
