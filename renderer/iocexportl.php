@@ -1082,6 +1082,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             if (preg_match('/\.pdf$/', $src)){
                 $_SESSION['qrcode'] = TRUE;
                 $src = $this->_xmlEntities(DOKU_URL.'lib/exe/fetch.php?media='.$src);
+                $title = IocCommon::formatTitleExternalLink("file", "pdf", $title);
                 qrcode_media_url($this, $src, $title, 'pdf');
             }
         }else{
