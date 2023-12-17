@@ -12,8 +12,8 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
 
-    static $soundcloud = 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/@ID@?secret_token=@TOKEN@&color=%230066cc&inverse=false&auto_play=false&show_user=true';
-    //<iframe width="100%" height="20" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/341144902?secret_token=s-PNOVW&color=%230066cc&inverse=false&auto_play=false&show_user=true"></iframe>
+    //static $soundcloud = 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/@ID@?secret_token=@TOKEN@&color=%230066cc&inverse=false&auto_play=false&show_user=true';
+    static $soundcloud = 'https://w.soundcloud.com/player?url=api.soundcloud.com/tracks/@ID@?secret_token=@TOKEN@';
 
     function getInfo(){
         return array(
@@ -60,22 +60,15 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
     function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode === 'wikiiocmodel_psdom'){
             list($type, $title, $id, $token) = $data;
-            $url = preg_replace('/@ID@/', $id, self::$soundcloud);
-            $url = preg_replace('/@TOKEN@/', $token, $url);
+            $url = $this->generaURL($id, $token);
             $renderer->getCurrentNode()->addContent(new TextNodeDoc(TextNodeDoc::PLAIN_TEXT_TYPE, $url));
             return TRUE;
 
-        }elseif ($mode === 'iocexportl'){
+        }elseif ($mode === 'iocexportl') {
             list($type, $title, $id, $token) = $data;
-            if ($type==='soundcloud' || $type==='soundcloud'){
+            if ($type === 'soundcloud') {
+                $url = $this->generaURL($id, $token);
                 $_SESSION['qrcode'] = TRUE;
-                if ($type === 'soundcloud'){
-                    $site = self::$soundcloud;
-                }else{
-                    $site = self::$soundcloud;
-                }
-                $url = preg_replace('/@ID@/', $id, $site);
-                $url = preg_replace('/@TOKEN@/', $token, $url);
                 qrcode_media_url($renderer, $url, $title, $type);
             }
             return TRUE;
@@ -86,24 +79,21 @@ class syntax_plugin_iocexportl_iocsound extends DokuWiki_Syntax_Plugin {
 
         }elseif (strpos("xhtml/iocxhtml/wikiiocmodel_ptxhtml", $mode) !== FALSE){
             list($type, $title, $id, $token) = $data;
-            if ($type==='soundcloud' || $type==='soundcloud'){
-                if ($type === 'soundcloud'){
-                    $site = self::$soundcloud;
-                }else{
-                    $site = self::$soundcloud;
-                }
-                $url = preg_replace('/@ID@/', $id, $site);
-                $url = preg_replace('/@TOKEN@/', $token, $url);
+            if ($type === 'soundcloud') {
+                $url = $this->generaURL($id, $token);
+                $renderer->doc .= '<div class="mediasound">';
+                $renderer->doc .= $title;
+                $renderer->doc .= '<iframe width="100%" height="20" scrolling="no" frameborder="no" src="'.$url.'"></iframe>';
+                $renderer->doc .= '</div>';
             }
-            $renderer->doc .= '<div class="mediasound">';
-            $renderer->doc .= $title;
-            if ($type === 'soundcloud'){
-                 $renderer->doc .= '<iframe width="100%" height="20" scrolling="no" frameborder="no" src="'.$url.'"></iframe>';
-            }else{
-                 $renderer->doc .= '<iframe width="100%" height="20" scrolling="no" frameborder="no" src="'.$url.'"></iframe>';
-            }
-            $renderer->doc .= '</div>';
         }
         return FALSE;
     }
+
+    private function generaURL($id, $token) {
+        $url = preg_replace('/@ID@/', $id, self::$soundcloud);
+        $url = preg_replace('/@TOKEN@/', $token, $url);
+        return $url;
+    }
+
 }
