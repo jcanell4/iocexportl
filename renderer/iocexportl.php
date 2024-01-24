@@ -1079,8 +1079,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $file = mediaFN($src);
             $this->_latexAddImage($file, $width, $height, $align, $title, $linking);
         }elseif($type === 'appli' && !$_SESSION['u0']){
-            if (preg_match('/\.pdf$/', $src)){
-                $_SESSION['qrcode'] = TRUE;
+            //if (preg_match('/\.pdf$/', $src)){  //marjose:nomes accepta enllaços a pdf. Es poden afegir extensions que volem que accepti
+              if (preg_match('/\.(pdf|doc|docx|rtf|txt|odt|zip)$/', $src)){ 
+                $_SESSION['qrcode'] = TRUE; // marjose: serveix perquè al costat del fitxer aparegui el codi qr
                 $src = $this->_xmlEntities(DOKU_URL.'lib/exe/fetch.php?media='.$src);
                 $title = IocCommon::formatTitleExternalLink("file", "pdf", $title);
                 qrcode_media_url($this, $src, $title, 'pdf');
