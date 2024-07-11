@@ -366,7 +366,7 @@ define (["render"],function(render){
     });
 
     var setSecContent = (function (show){
-            var elements = new Array("iocfigurec", "iocnote", "ioctext", "iocreference");
+            var elements = new Array("iocfigurec", "iocnote", "ioctext", "iocreference", "ioccopytoclipboard");
             for (i=0;i<elements.length;i++){
                     if (show == 1){
                             $("article ."+elements[i]).removeClass("hidden");

@@ -7,6 +7,7 @@
  */
 
 $lang['accounting_btn']  = 'Add accounting entry syntax';
+$lang['copytoclipboard_btn']  = 'Add copy to clipboard syntax';
 $lang['example_btn']  = 'Add example syntax';
 $lang['figure_btn'] = 'Add figure syntax';
 $lang['figlink_btn'] = 'Add link to figure';

@@ -5,6 +5,7 @@
  */
 
 $lang['accounting_btn'] = 'Incluir la sintaxis de un asentamiento contable';
+$lang['copytoclipboard_btn']  = 'Sintaxis de copytoclipboard';
 $lang['example_btn']    = 'Sintaxis de example';
 $lang['figure_btn']     = 'Sintaxis de figure';
 $lang['figlink_btn']    = 'Sintaxis enlace a figure';

@@ -59,7 +59,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('^::(?:text|note|reference|quote|important|example|include):.*?\n(?:\s{2}:\w+:.*?\n)*(?=.*?\n:::)',$mode,'plugin_iocexportl_iocelems');
+        $this->Lexer->addEntryPattern('^::(?:text|note|reference|copytoclipboard|quote|important|example|include):.*?\n(?:\s{2}:\w+:.*?\n)*(?=.*?\n:::)',$mode,'plugin_iocexportl_iocelems');
     }
     function postConnect() {
         $this->Lexer->addExitPattern('^:::','plugin_iocexportl_iocelems');
@@ -74,7 +74,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         $params = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                if (preg_match('/::(text|note|reference):(.*?)\n/', $match, $matches)){
+                if (preg_match('/::(text|note|reference|copytoclipboard):(.*?)\n/', $match, $matches)){
                     $id = trim($matches[2]);
                     if (!empty($id)){
                         $params['id'] = $id;
@@ -144,11 +144,13 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     }elseif($type === 'reference'){
                         $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
                         $renderer->doc .= '\iocreference'.$offset.'{';
+                    //COPYTOCLIPBOARD
+                    }elseif($type === 'copytoclipboard'){
+                        $renderer->doc .= '\ioccopytoclipboard{';
                     //INCLUDE
                     }elseif($type === 'include'){
                         $renderer->doc .= '\iocinclude{';
                         $renderer->tmpData["include_no_indent"]=isset($params['no_indent']);
-
                     }
                     $_SESSION['iocelem'] = (in_array($type, ["ioctextl","quote","important","example","include"], true)) ? 'textl' : TRUE;
                     break;
@@ -186,7 +188,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     }
                     break;
                 case DOKU_LEXER_UNMATCHED :
-                    $_SESSION['iocelem'] = TRUE;   
+                    $_SESSION['iocelem'] = TRUE;
                     if ($_SESSION["include_element"]){
                         $_SESSION["include_element"] = false;
                         $instructions = get_latex_instructions($data);
@@ -215,7 +217,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     }
                     $renderer->tmpData["type"] = $type;
                     if ($type == 'include') {
-                        
+
                     }
                     $html = '<div class="ioc'.$type.'">';
                     $html .= '<div class="ioccontent">';
@@ -228,21 +230,21 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->tmpData["include_element_state"]=$state;
                         $renderer->tmpData["include_no_indent"]=isset($params['no_indent']);
                         $renderer->doc .= $html;
-                    }elseif (in_array($type, ["text","note","reference"], true)){
-                        if(isset($params["id"])){                                
+                    }elseif (in_array($type, ["text","note","reference","copytoclipboard"], true)){
+                        if(isset($params["id"])){
                             $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::REFERRED_B_IOC_ELEMS_TYPE;
                             $renderer->tmpData["id"] = $params["id"];
                         }else{
                             $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNREFERRED_B_IOC_ELEMS_TYPE;
                             $renderer->tmpData["id"]= count($renderer->bIocElems[$renderer->currentBIocElemsType]);
                             $renderer->tmpData["renderIocElems"] = FALSE;
-                        }   
+                        }
                         $renderer->storeCurrent();
                         $renderer->doc = $html;
                     }else{
                         $renderer->doc .= $html;
                         $renderer->openForContentB("iocelem");
-                    } 
+                    }
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['iocelem'] = TRUE;
@@ -263,8 +265,8 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     $type = $renderer->tmpData["type"];
                     if((!isset($type) || $type=="include") && $renderer->tmpData["include_element"]){
                         $renderer->tmpData["include_element"]=false;
-                        $renderer->doc .= $html;                        
-                    }elseif (in_array($type, ["text","note","reference"], true)) {
+                        $renderer->doc .= $html;
+                    }elseif (in_array($type, ["text","note","reference","copytoclipboard"], true)) {
                         $renderer->doc .= $html;
                         $renderer->bIocElems[$renderer->currentBIocElemsType][$renderer->tmpData["id"]] = $renderer->doc;
                         $renderer->currentBIocElemsType = renderer_plugin_wikiiocmodel_psdom::UNEXISTENT_B_IOC_ELEMS_TYPE;
@@ -274,7 +276,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     }else{
                         $renderer->doc .= $html;
                         $renderer->closeForContentB("iocelem");
-                    }   
+                    }
                     unset($renderer->tmpData["type"]);
                     break;
             }
@@ -354,7 +356,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                 case 'document_end':
 //                case 'section_edit':
                     unset($instructions[$i]);
-                    break;            
+                    break;
                 case 'plugin':
                 switch($instructions[$i][1][0]) {
                     case 'include_include':
@@ -370,13 +372,13 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         }
         return $lastlevel;
     }
-    
+
     function renderUnmatchedIncludeInstructions($instructions, &$renderer){
         $aux = $renderer->doc;
         $renderer->doc = "";
         if($renderer->tmpData["include_no_indent"]){
             $this->updatLevel($instructions, 0);
-            $lastlevel = $renderer->lastlevel;                    
+            $lastlevel = $renderer->lastlevel;
         }else{
             $lastlevel = $this->updatLevel($instructions, $renderer->lastlevel);
         }
@@ -384,7 +386,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         $renderer->lastlevel = $lastlevel;
         $replaced = preg_replace('/\n\<\/div\>(?:\n\<\/section\>)?(.*)\<div class="level."\>\n/s', '$1', $renderer->doc);
         $aux .= $replaced;
-        $renderer->doc = $aux;        
+        $renderer->doc = $aux;
     }
 
     function renderUnmatchedIncludeInstructionsPsdom($instructions, &$renderer){
@@ -394,7 +396,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
 
         if($renderer->tmpData["include_no_indent"]){
             $this->updatLevel($instructions, 0);
-            $lastlevel = $renderer->actualLevel;                    
+            $lastlevel = $renderer->actualLevel;
         }else{
             $lastlevel = $this->updatLevel($instructions, $renderer->actualLevel);
         }

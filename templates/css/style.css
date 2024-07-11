@@ -2206,7 +2206,7 @@ article figure img {
 	margin: 0 auto;
 }
 
-.ioctext,.iocreference,.iocnote {
+.ioctext,.iocreference,.ioccopytoclipboard,.iocnote {
 	clear: left;
 	overflow: hidden;
 
@@ -2215,7 +2215,7 @@ article figure img {
 	border-radius: 10px 0 10px 0;
 }
 
-.ioctext p,.ioctextl p,.iocquote p,.iocexample p,.iocimportant p,.iocreference p,.iocnote p,.iocinclude p {
+.ioctext p,.ioctextl p,.iocquote p,.iocexample p,.iocimportant p,.iocreference p,.ioccopytoclipboard p,.iocnote p,.iocinclude p {
     margin-bottom: 0.5em;
 }
 
@@ -2248,7 +2248,14 @@ article figure img {
 	padding: 12px 10px 12px 55px;
 	font-size: 0.85em;
 }
-
+.ioccopytoclipboard {
+	position: relative;
+	width: 50%;
+	margin: 0 auto 2em;
+	background: url("../../img/ioccopytoclipboard.png") no-repeat scroll left 0.2em #efefef;
+	padding: 12px 10px 12px 55px;
+	font-size: 0.85em;
+}
 .iocnote {
 	position: relative;
 	width: 50%;
@@ -2258,7 +2265,7 @@ article figure img {
 	font-size: 0.85em;
 }
 
-.style-inverse .ioctextl,.style-inverse .ioctext,.style-inverse .iocimportant,.style-inverse .iocnote,.style-inverse .iocreference,.style-inverse .iocfigurec small {
+.style-inverse .ioctextl,.style-inverse .ioctext,.style-inverse .iocimportant,.style-inverse .iocnote,.style-inverse .iocreference,.style-inverse .ioccopytoclipboard,.style-inverse .iocfigurec small {
 	color: #000;
 }
 
@@ -3203,13 +3210,13 @@ article {
 	}
 
 	/* A partir d'aquesta resolució movem els elements a la banda dreta */
-	.iocreference, .iocnote, .ioctext, .iocfigurec {
+	.iocreference, .ioccopytoclipboard, .iocnote, .ioctext, .iocfigurec {
 		clear: right;
 		float: right;
 		margin-left: 2em;
 	}
 
-	.iocreference, .iocnote, .ioctext {
+	.iocreference, .ioccopytoclipboard, .iocnote, .ioctext {
 		width: 145px !important;
 	}
 

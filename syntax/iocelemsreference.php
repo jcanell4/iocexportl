@@ -35,7 +35,7 @@ class syntax_plugin_iocexportl_iocelemsreference extends DokuWiki_Syntax_Plugin 
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern(':(?:text|note|reference):[^:]+:', $mode, 'plugin_iocexportl_iocelemsreference');
+        $this->Lexer->addSpecialPattern(':(?:text|note|reference|copytoclipboard):[^:]+:', $mode, 'plugin_iocexportl_iocelemsreference');
     }
 
     /**
@@ -43,7 +43,7 @@ class syntax_plugin_iocexportl_iocelemsreference extends DokuWiki_Syntax_Plugin 
      */
     function handle($match, $state, $pos, Doku_Handler $handler){
         $matches = array();
-        if (preg_match('/:(text|note|reference):(.*?):/', $match, $matches)){
+        if (preg_match('/:(text|note|reference|copytoclipboard):(.*?):/', $match, $matches)){
             $type = trim($matches[1]);
             $id = trim($matches[2]);
         }

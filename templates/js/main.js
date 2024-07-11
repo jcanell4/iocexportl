@@ -12,6 +12,6 @@ require(["jquery.min","jquery-ui.min","jquery.imagesloaded","render","functions"
 });
 
 jQuery(document).ready(function () {
-	// $(".iocnote, .iocreference, .ioctext, .iocfigurec").toBColumn({debug: true, forceIcons: true});
-	$(".iocnote, .iocreference, .ioctext, .iocfigurec").toBColumn();
+	// $(".iocnote, .iocreference, .ioccopytoclipboard, .ioctext, .iocfigurec").toBColumn({debug: true, forceIcons: true});
+	$(".iocnote, .iocreference, .ioccopytoclipboard, .ioctext, .iocfigurec").toBColumn();
 });

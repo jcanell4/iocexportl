@@ -576,6 +576,13 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                                 ),
                             array(
                                 'type'   => 'format',
+                                'title'  => $this->getLang('copytoclipboard_btn'),
+                                'icon'   => '../../plugins/iocexportl/img/ico_copytoclipboard.png',
+                                'open'   => '::copytoclipboard:\n',
+                                'close'  => '\n:::\n',
+                                ),
+                            array(
+                                'type'   => 'format',
                                 'title'  => $this->getLang('important_btn'),
                                 'icon'   => '../../plugins/iocexportl/img/ico_important.png',
                                 'open'   => '::important:\n',
