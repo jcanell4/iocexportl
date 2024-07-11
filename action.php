@@ -69,6 +69,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
 
         $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/mediaScript.js');
+        $this->link_lazyscript($event, DOKU_BASE.'lib/plugins/iocexportl/lib/functions.js');
 
         if (!$this->has_jquery()) {
             $this->link_lazyscript($event, 'http://code.jquery.com/jquery.min.js');

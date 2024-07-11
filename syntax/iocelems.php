@@ -176,7 +176,11 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $type = 'textl';
                     }
                     $idatt = (isset($params["id"])) ? " id={$params["id"]} " : "";
-                    $renderer->doc .= "<div$idatt class=\"ioc$type\">";
+                    if ($type === "copytoclipboard") {
+                        $renderer->doc .= "<div$idatt id=\"id_$type\" class=\"ioc$type\" onClick=\"copyToClipboard('id_" .$type . "');\">";
+                    }else {
+                        $renderer->doc .= "<div$idatt class=\"ioc$type\">";
+                    }
                     $renderer->doc .= '<div class="ioccontent">';
                     $title = (isset($params['title'])) ? $renderer->_xmlEntities($params['title']) : '';
                     if (!empty($title)){
