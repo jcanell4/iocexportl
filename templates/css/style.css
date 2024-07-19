@@ -2266,6 +2266,16 @@ article figure img {
 	font-size: 0.85em;
 }
 
+.iocbtncopycode {
+    position: absolute;
+    width: 51%;
+    padding: 0px 0px 40px 50px;
+    margin-top: 40px;
+    background: url(../../img/ioccopycode.png) no-repeat right 0.5em;
+    background-repeat: no-repeat;
+    cursor: copy;
+}
+
 .style-inverse .ioctextl,.style-inverse .ioctext,.style-inverse .iocimportant,.style-inverse .iocnote,.style-inverse .iocreference,.style-inverse .ioccopytoclipboard,.style-inverse .iocfigurec small {
 	color: #000;
 }
