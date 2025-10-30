@@ -103,17 +103,20 @@ class generate_latex implements WikiIocModel{
      */
     public function init(){
         global $conf;
+        global $latex_version;
 
         if (!$this->export_ok) return FALSE;
         if (!$this->log && !$this->checkPerms()) return FALSE;
         $this->permissionToExport = $this->hasUserPermissionToExport(
-                    $conf['plugin']['iocexportl']['UsersWithPdfSelf-generationAllowed']
-                );
+            $conf['plugin']['iocexportl']['UsersWithPdfSelf-generationAllowed']
+        );
         $this->exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
-        if (!$this->log && !$this->exportallowed
-                                && !$this->permissionToExport) return FALSE;
-        if (!$this->log && !$this->permissionToExport
-                                && $this->mode === 'zip') return FALSE;
+        if (!$this->log && !$this->exportallowed && !$this->permissionToExport) return FALSE;
+        if (!$this->log && !$this->permissionToExport && $this->mode === 'zip') return FALSE;
+        
+        $vlatex = shell_exec("latex --version");
+        preg_match("/^(pdfTeX 3.141592653-)(.*?)( \(TeX Live.*)/", $vlatex, $match);
+        $latex_version = $match[2];
 
         $this->time_start = microtime(TRUE);
 
@@ -232,6 +235,12 @@ class generate_latex implements WikiIocModel{
                 $latex .= io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'footer.ltx');
             }
         }
+        // inici log temporal
+         $latex_log = fopen(DOKU_IOCEXPORTL_LATEX_TMP."/latex_log.txt", "w");
+         fwrite($latex_log, $latex);
+         fclose($latex_log);
+        // final log temporal
+         
         $result = array();
         if ($this->mode === 'zip'){
             $this->createZip($output_filename,DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir,$latex, $result);
