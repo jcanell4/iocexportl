@@ -96,6 +96,11 @@ class generate_latex implements WikiIocModel{
         $this->formByColumns = isset($params['form_by_columns']);
         $this->returnData=NULL;
     }
+    
+   public function is_new_latex() {
+      global $latex_version;
+      return ($latex_version >= "2.6-1.40.24");
+   }
 
     /**
      *
@@ -124,6 +129,16 @@ class generate_latex implements WikiIocModel{
         if (file_exists(DOKU_IOCEXPORTL_TEMPLATES.'header.ltx')){
             //read header
             $latex = io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'header.ltx');
+            if (is_new_latex()) {
+               $replacements = [
+                   ["\usepackage{tabu}","\usepackage{tabularx}".DOKU_LF."\usepackage{array}"],
+                   ["% *** noves comandes per substituir tabu ***","% *** noves comandes per substituir tabu ***".DOKU_LF."\newcommand{\tabuphantomline}{}".DOKU_LF."\newcolumntype{Y}[1]{>{\raggedright\arraybackslash}p{#1\textwidth}}"],
+                   ["\setlength{\tabulinesep}{0.5mm}","\setlength{\extrarowheight}{0.5mm}"]
+               ];
+               foreach ($replacements as $r ) {
+                  $latex = str_replace($r[0], $r[1], $latex);
+               }
+            }
             session_start();
             $this->tmp_dir = rand();
             $_SESSION['tmp_dir'] = $this->tmp_dir;
@@ -401,6 +416,11 @@ class generate_latex implements WikiIocModel{
         if ($_SESSION['qrcode']){
             $shell_escape = '-shell-escape';
         }
+        // inici log temporal
+         $latex_log = fopen(DOKU_IOCEXPORTL_LATEX_TMP."/latex_temporal.txt", "w");
+         fwrite($latex_log, $text);
+         fclose($latex_log);
+        // final log temporal
         @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $return);
         if ($return === 0){
             //One more to calculate correctly size tables
