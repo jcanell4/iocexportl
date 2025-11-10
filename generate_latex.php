@@ -97,7 +97,7 @@ class generate_latex implements WikiIocModel{
         $this->returnData=NULL;
     }
     
-   public function is_new_latex() {
+    function is_new_latex() {
       global $latex_version;
       return ($latex_version >= "2.6-1.40.24");
    }
@@ -121,7 +121,7 @@ class generate_latex implements WikiIocModel{
         
         $vlatex = shell_exec("latex --version");
         preg_match("/^(pdfTeX 3.141592653-)(.*?)( \(TeX Live.*)/", $vlatex, $match);
-        $latex_version = $match[2];
+        $latex_version = ($match[2]) ? $match[2] : "0";
 
         $this->time_start = microtime(TRUE);
 
@@ -129,7 +129,7 @@ class generate_latex implements WikiIocModel{
         if (file_exists(DOKU_IOCEXPORTL_TEMPLATES.'header.ltx')){
             //read header
             $latex = io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'header.ltx');
-            if (is_new_latex()) {
+            if ($this->is_new_latex()) {
                $replacements = [
                    ["\usepackage{tabu}", "\usepackage{tabularx}".DOKU_LF."\usepackage{array}"],
                    ["% *** noves comandes per substituir tabu ***", "% *** noves comandes per substituir tabu ***".DOKU_LF."\newcommand{\tabuphantomline}{}".DOKU_LF."\newcolumntype{Y}[1]{>{\raggedright\arraybackslash}p{#1\textwidth}}"],
