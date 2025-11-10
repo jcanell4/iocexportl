@@ -131,9 +131,10 @@ class generate_latex implements WikiIocModel{
             $latex = io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'header.ltx');
             if (is_new_latex()) {
                $replacements = [
-                   ["\usepackage{tabu}","\usepackage{tabularx}".DOKU_LF."\usepackage{array}"],
-                   ["% *** noves comandes per substituir tabu ***","% *** noves comandes per substituir tabu ***".DOKU_LF."\newcommand{\tabuphantomline}{}".DOKU_LF."\newcolumntype{Y}[1]{>{\raggedright\arraybackslash}p{#1\textwidth}}"],
-                   ["\setlength{\tabulinesep}{0.5mm}","\setlength{\extrarowheight}{0.5mm}"]
+                   ["\usepackage{tabu}", "\usepackage{tabularx}".DOKU_LF."\usepackage{array}"],
+                   ["% *** noves comandes per substituir tabu ***", "% *** noves comandes per substituir tabu ***".DOKU_LF."\newcommand{\tabuphantomline}{}".DOKU_LF."\newcolumntype{Y}[1]{>{\raggedright\arraybackslash}p{#1\textwidth}}"],
+                   ["\setlength{\tabulinesep}{0.5mm}", "\setlength{\extrarowheight}{0.5mm}"],
+                   ["\hdashrule{\the\tabucolX}{0.3mm}{0.3mm 3mm}", "\hdashrule{2cm}{0.3mm}{0.3mm 3mm}"]
                ];
                foreach ($replacements as $r ) {
                   $latex = str_replace($r[0], $r[1], $latex);

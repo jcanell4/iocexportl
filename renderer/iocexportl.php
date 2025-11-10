@@ -643,10 +643,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
       if ($_SESSION['table_large']){
          $large = ' to 170mm';
          $csetup = '\tablelargecaption';
-
       }elseif($_SESSION['table_small']){
-         $this->doc .= '\addtocounter{table}{0}\caption{'.$_SESSION['table_title'].
-            			  '\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
+         $this->doc .= '\addtocounter{table}{0}\caption{'.$_SESSION['table_title'].'\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
          $large = ' spread 0pt';
          $tablecaption = '\tablesmallcaption{'.$maxcols.'}';
          $col_width = '';
@@ -661,9 +659,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
       if ($this->is_new_latex()) {
          for($i=0; $i < $maxcols; $i++) {
             $table_widths = ($_SESSION['accounting'] || $_SESSION['table']) && is_array($_SESSION['table_widths']) && array_key_exists($i, $_SESSION['table_widths']);
-            if ($table_widths) {
-               $max_values += floatval($_SESSION['table_widths'][$i]);
-            }
+            $max_values += ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
          }
          $max_values = ($max_values) ? $max_values : $maxcols;
       }
@@ -671,22 +667,20 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
          $table_widths = ($_SESSION['accounting'] || $_SESSION['table'])
                              && is_array($_SESSION['table_widths'])
                              && array_key_exists($i, $_SESSION['table_widths']);
-         if ($table_widths) {
-            $value = floatval($_SESSION['table_widths'][$i]);
-            if ($this->is_new_latex()) {
-               $col_width = $value / $max_values;
-            }else {
-               $col_width = ($value <= 1) ? '-1,' : "${value},";
-            }
+         $value = ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
+         if ($this->is_new_latex()) {
+            $col_width = $value / $max_values;
+         }elseif ($table_widths) {
+            $col_width = ($value <= 1) ? '-1,' : "${value},";
             if ($i === 0) {
                $this->doc .= $border;
             }
-         } elseif($_SESSION['accounting'] && $i===0) {//default behaviour
+         }elseif($_SESSION['accounting'] && $i===0) {//default behaviour
             $col_width = '3,';
             $this->doc .= $border;
-         } elseif($_SESSION['accounting']) {
+         }elseif($_SESSION['accounting']) {
             $col_width = '-1,';
-         } elseif(!empty ($border) && $i===0) {
+         }elseif(!empty ($border) && $i===0) {
             $this->doc .= $border;
          }
          $this->doc .= $this->is_new_latex() ? '|p{'.$col_width.'\textwidth}' : 'X['.$col_width.'l] ';
