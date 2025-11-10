@@ -626,89 +626,90 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     */
     function table_open($maxcols=NULL, $numrows=NULL, $pos=NULL){
         global $conf;
+        $dobleBS = ($this->is_new_latex()) ? DOKU_LF.'\\\\': '\\\\';
 
-      $this->table = TRUE;
-      $this->tableheader = TRUE;
-      $this->max_cols = $maxcols;
-      $this->col_num = 1;
-      $this->table_align = array();
-      $this->doc .= '\fonttable'.DOKU_LF;
-      $this->isBorderTypeTable = $this->_isBorderTypeTable($_SESSION["table_types"]);
-      $border = ($_SESSION['accounting'] || $this->isBorderTypeTable)?'|':'';
-      $large = '';
-      $csetup = '';
-      $col_width = '-1,';
-      $tablecaption = '\tablecaption';
-      $table_type = ($this->is_new_latex()) ? 'longtable': 'longtabu';
-      if ($_SESSION['table_large']){
-         $large = ' to 170mm';
-         $csetup = '\tablelargecaption';
-      }elseif($_SESSION['table_small']){
-         $this->doc .= '\addtocounter{table}{0}\caption{'.$_SESSION['table_title'].'\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
-         $large = ' spread 0pt';
-         $tablecaption = '\tablesmallcaption{'.$maxcols.'}';
-         $col_width = '';
-         $table_type = 'tabu';
-      }elseif($_SESSION['iocelem']){
-         $large = ' to \tableiocelemsize';
-         $tablecaption = '\tableiocelemcaption';
-      }
-      $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
+        $this->table = TRUE;
+        $this->tableheader = TRUE;
+        $this->max_cols = $maxcols;
+        $this->col_num = 1;
+        $this->table_align = array();
+        $this->doc .= '\fonttable'.DOKU_LF;
+        $this->isBorderTypeTable = $this->_isBorderTypeTable($_SESSION["table_types"]);
+        $border = ($_SESSION['accounting'] || $this->isBorderTypeTable)?'|':'';
+        $large = '';
+        $csetup = '';
+        $col_width = '-1,';
+        $tablecaption = '\tablecaption';
+        $table_type = ($this->is_new_latex()) ? 'longtable': 'longtabu';
+        if ($_SESSION['table_large']){
+           $large = ' to 170mm';
+           $csetup = '\tablelargecaption';
+        }elseif($_SESSION['table_small']){
+           $this->doc .= '\addtocounter{table}{0}\caption{'.$_SESSION['table_title'].'\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
+           $large = ' spread 0pt';
+           $tablecaption = '\tablesmallcaption{'.$maxcols.'}';
+           $col_width = '';
+           $table_type = 'tabu';
+        }elseif($_SESSION['iocelem']){
+           $large = ' to \tableiocelemsize';
+           $tablecaption = '\tableiocelemcaption';
+        }
+        $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
         
-      // Obtenir la suma (100%) de les amplades
-      if ($this->is_new_latex()) {
-         for($i=0; $i < $maxcols; $i++) {
-            $table_widths = ($_SESSION['accounting'] || $_SESSION['table']) && is_array($_SESSION['table_widths']) && array_key_exists($i, $_SESSION['table_widths']);
-            $max_values += ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
-         }
-         $max_values = ($max_values) ? $max_values : $maxcols;
-      }
-      for($i=0; $i < $maxcols; $i++) {
-         $table_widths = ($_SESSION['accounting'] || $_SESSION['table'])
-                             && is_array($_SESSION['table_widths'])
-                             && array_key_exists($i, $_SESSION['table_widths']);
-         $value = ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
-         if ($this->is_new_latex()) {
-            $col_width = $value / $max_values;
-         }elseif ($table_widths) {
-            $col_width = ($value <= 1) ? '-1,' : "${value},";
-            if ($i === 0) {
-               $this->doc .= $border;
+        // Obtenir la suma (100%) de les amplades
+        if ($this->is_new_latex()) {
+           for($i=0; $i < $maxcols; $i++) {
+                $table_widths = ($_SESSION['accounting'] || $_SESSION['table']) && is_array($_SESSION['table_widths']) && array_key_exists($i, $_SESSION['table_widths']);
+                $max_values += ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
+           }
+           $max_values = ($max_values) ? $max_values : $maxcols;
+        }
+        for($i=0; $i < $maxcols; $i++) {
+           $table_widths = ($_SESSION['accounting'] || $_SESSION['table'])
+                               && is_array($_SESSION['table_widths'])
+                               && array_key_exists($i, $_SESSION['table_widths']);
+           $value = ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
+           if ($this->is_new_latex()) {
+                $col_width = round($value / $max_values, 2);
+           }elseif ($table_widths) {
+                $col_width = ($value <= 1) ? '-1,' : "${value},";
+                if ($i === 0) {
+                   $this->doc .= $border;
+                }
+           }elseif($_SESSION['accounting'] && $i===0) {//default behaviour
+                $col_width = '3,';
+                $this->doc .= $border;
+           }elseif($_SESSION['accounting']) {
+                $col_width = '-1,';
+           }elseif(!empty ($border) && $i===0) {
+                $this->doc .= $border;
+           }
+           $this->doc .= $this->is_new_latex() ? '|p{'.$col_width.'\textwidth}' : 'X['.$col_width.'l] ';
+           $this->doc .= $border;
+        }
+        $this->doc .= $this->is_new_latex() ? '|}' : '}';
+        if (!$_SESSION['table_small']){
+            if (!$_SESSION['table_large']){
+                $vspace = '\vspace{-2.5ex}';
+            } else {
+                $separation = (isset($conf['plugin']['iocexportl']['largetablecaptmargin'])?'-2.9ex':'-2.5ex');
+                $vspace = '\vspace{'.$separation.'}';
             }
-         }elseif($_SESSION['accounting'] && $i===0) {//default behaviour
-            $col_width = '3,';
-            $this->doc .= $border;
-         }elseif($_SESSION['accounting']) {
-            $col_width = '-1,';
-         }elseif(!empty ($border) && $i===0) {
-            $this->doc .= $border;
-         }
-         $this->doc .= $this->is_new_latex() ? '|p{'.$col_width.'\textwidth}' : 'X['.$col_width.'l] ';
-         $this->doc .= $border;
-      }
-      $this->doc .= '}';
-      if (!$_SESSION['table_small']){
-         if (!$_SESSION['table_large']){
-            $vspace = '\vspace{-2.5ex}';
-         } else {
-            $separation = (isset($conf['plugin']['iocexportl']['largetablecaptmargin'])?'-2.9ex':'-2.5ex');
-            $vspace = '\vspace{'.$separation.'}';
-         }
-         if (strlen($_SESSION['table_title']) > 86){
-            $vspace = '';
-         }
-         $this->doc .= $csetup.$tablecaption.'\caption{'.$_SESSION['table_title']. $vspace.
-            			  '\label{'.$_SESSION['table_id'].'}}'.
-            			  '\\\\'.DOKU_LF;
+            if (strlen($_SESSION['table_title']) > 86){
+                $vspace = '';
+            }
+            $this->doc .= $csetup.$tablecaption.'\caption{'.$_SESSION['table_title']. $vspace.
+                            '\label{'.$_SESSION['table_id'].'}}'.$dobleBS.DOKU_LF;
         }
         $this->doc .= '\hline'.DOKU_LF;
     }
 
     function table_close($pos=NULL){
+        $dobleBS = ($this->is_new_latex()) ? DOKU_LF.'\\\\': '\\\\';
         $this->table = FALSE;
         if (!$_SESSION['accounting']){
-            $this->doc .= '\noalign{\vspace{1mm}}'.DOKU_LF;
-            $this->doc .= '\hline'.DOKU_LF;
+            $this->doc .= ($this->is_new_latex()) ? $dobleBS.'[1mm]' : '\noalign{\vspace{1mm}}';
+            $this->doc .= DOKU_LF.'\hline'.DOKU_LF;
         }
         if (($_SESSION['iocelem'] || $_SESSION['accounting'] || $this->tableheader_count===0) && $_SESSION['table_footer']){
             $this->doc .='\multicolumn{'.$this->max_cols.'}{l@{\hspace{0mm}}}{\hspace{-2mm}'.$_SESSION['table_footer'].'}'.DOKU_LF;
@@ -739,6 +740,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tablerow_close(){
+        $dobleBS = ($this->is_new_latex()) ? DOKU_LF.'\\\\': '\\\\';
         if ($this->tableheader_end){
             $this->tableheader_count += 1;
             $this->tableheader = TRUE;
@@ -746,25 +748,33 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($this->tableheader_end && $this->tableheader_count === 1
             && !$_SESSION['table_small'] && !$_SESSION['iocelem'] && !$_SESSION['accounting']){
             $this->doc .= '@IOCHEADEREND@';
-            $this->doc .= '\\\\ \hline \noalign{\vspace{1mm}} \endfirsthead'.DOKU_LF;
-            $this->doc .= '\tablecaptioncontinue\caption[]{(\ioclangcontinue)\vspace{-3mm}} \\\\' . DOKU_LF;
+            if ($this->is_new_latex()) {
+                $this->doc .= $dobleBS.' \hline'.$dobleBS.'[1mm] \endfirsthead'.DOKU_LF;
+            }else {
+                $this->doc .= '\\\\ \hline \noalign{\vspace{1mm}} \endfirsthead'.DOKU_LF;
+            }
+            $this->doc .= '\tablecaptioncontinue\caption[]{(\ioclangcontinue)\vspace{-3mm}} '.$dobleBS.DOKU_LF;
             $this->doc .= '\hline' . DOKU_LF;
-            $this->doc .= '@IOCHEADERBIS@ \\\\ \hline' . DOKU_LF;
+            $this->doc .= '@IOCHEADERBIS@ '.$dobleBS.' \hline' . DOKU_LF;
             $this->doc .= '\endhead' . DOKU_LF;
             if (!$_SESSION['table_small']){
                 $headrule = '\tableheadrule';
             }else{
                 $headrule = '\tablesmallheadrule';
             }
-            $this->doc .= '\noalign{\vspace{-2mm}}\multicolumn{'.$this->max_cols.'}{c}{'.$headrule.'}' . DOKU_LF;
+            if ($this->is_new_latex()) {
+                $this->doc .= '\multicolumn{'.$this->max_cols.'}{c}{'.$headrule.'}' . DOKU_LF;
+            }else {
+                $this->doc .= '\noalign{\vspace{-2mm}}\multicolumn{'.$this->max_cols.'}{c}{'.$headrule.'}' . DOKU_LF;
+            }
             $this->doc .= '\endfoot' . DOKU_LF;
             $this->doc .= (!empty($_SESSION['table_footer']))?'\multicolumn{'.$this->max_cols.'}{r@{\hspace{0mm}}}{\tablefooter{'.$_SESSION['table_footer'].'}}'.DOKU_LF:''.DOKU_LF;
             $this->doc .= '\endlastfoot' . DOKU_LF;
         }elseif ($this->tableheader_end && $this->tableheader_count === 1
             && !$_SESSION['table_small'] && $_SESSION['iocelem'] && $_SESSION['accounting']){
-            $this->doc .= '\\\\ \hline \endfirsthead\endhead'.DOKU_LF;
+            $this->doc .= $dobleBS.' \hline \endfirsthead\endhead'.DOKU_LF;
         }else{
-            $this->doc .= '\\\\'.DOKU_LF;
+            $this->doc .= $dobleBS.DOKU_LF;
             if ($this->tableheader_end){
                 $this->doc .= '\hline'.DOKU_LF;
             }elseif($_SESSION['accounting']){
