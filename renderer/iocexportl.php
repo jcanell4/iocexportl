@@ -618,7 +618,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     
     function is_new_latex() {
         global $latex_version;
-        return ($latex_version >= "2.6-1.40.24");
+        return ($latex_version >= "2.6-1.40.24" || true);
     }
 
     /*
@@ -626,7 +626,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     */
     function table_open($maxcols=NULL, $numrows=NULL, $pos=NULL){
         global $conf;
-        $dobleBS = ($this->is_new_latex()) ? DOKU_LF.'\\\\': '\\\\';
+        $dobleBS = ($this->is_new_latex()) ? '': '\\\\';
 
         $this->table = TRUE;
         $this->tableheader = TRUE;
@@ -705,10 +705,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function table_close($pos=NULL){
-        $dobleBS = ($this->is_new_latex()) ? DOKU_LF.'\\\\': '\\\\';
         $this->table = FALSE;
         if (!$_SESSION['accounting']){
-            $this->doc .= ($this->is_new_latex()) ? $dobleBS.'[1mm]' : '\noalign{\vspace{1mm}}';
+            $this->doc .= ($this->is_new_latex()) ? '\\\\[1mm]' : '\noalign{\vspace{1mm}}';
             $this->doc .= DOKU_LF.'\hline'.DOKU_LF;
         }
         if (($_SESSION['iocelem'] || $_SESSION['accounting'] || $this->tableheader_count===0) && $_SESSION['table_footer']){
@@ -740,7 +739,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tablerow_close(){
-        $dobleBS = ($this->is_new_latex()) ? DOKU_LF.'\\\\': '\\\\';
+        $dobleBS = ($this->is_new_latex()) ? '': '\\\\';
         if ($this->tableheader_end){
             $this->tableheader_count += 1;
             $this->tableheader = TRUE;
@@ -749,7 +748,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             && !$_SESSION['table_small'] && !$_SESSION['iocelem'] && !$_SESSION['accounting']){
             $this->doc .= '@IOCHEADEREND@';
             if ($this->is_new_latex()) {
-                $this->doc .= $dobleBS.' \hline'.$dobleBS.'[1mm] \endfirsthead'.DOKU_LF;
+                $this->doc .= ' \hline\\\\[1mm] \endfirsthead'.DOKU_LF;
             }else {
                 $this->doc .= '\\\\ \hline \noalign{\vspace{1mm}} \endfirsthead'.DOKU_LF;
             }
@@ -906,6 +905,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             if ($col_num_aux < $this->max_cols){
                 $this->doc .= ' & ';
+            }elseif ($this->is_new_latex()) {
+                $this->doc .= ' \\\\';
             }
             $this->col_num += $this->col_colspan;
         }

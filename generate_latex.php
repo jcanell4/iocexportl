@@ -99,7 +99,7 @@ class generate_latex implements WikiIocModel{
     
     function is_new_latex() {
       global $latex_version;
-      return ($latex_version >= "2.6-1.40.24");
+      return ($latex_version >= "2.6-1.40.24" || true);
    }
 
     /**
