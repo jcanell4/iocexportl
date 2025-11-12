@@ -131,6 +131,8 @@ class generate_latex implements WikiIocModel{
             $latex = io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'header.ltx');
             if ($this->is_new_latex()) {
                $replacements = [
+                   ["\\usepackage[table]{xcolor}", "\\usepackage{xcolor}"],
+                   ["%@XCOLORTABLES@", "\\PassOptionsToPackage{table}{xcolor}"],
                    ["\\usepackage{tabu}", "\\usepackage{tabularx}".DOKU_LF."\\usepackage{array}"],
                    ["%@NEWLATEXVERSION@", "\\newcommand{\\tabuphantomline}{}".DOKU_LF."\\newcolumntype{Y}[1]{>{\\raggedright\\arraybackslash}p{#1\\textwidth}}"],
                    ["\\setlength{\\tabulinesep}{0.5mm}", "\\setlength{\\extrarowheight}{0.5mm}"],
@@ -423,7 +425,7 @@ class generate_latex implements WikiIocModel{
          fwrite($latex_log, $text);
          fclose($latex_log);
         // final log temporal
-        @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $return);
+        @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -interaction=nonstopmode ' .$filename.'.tex' , $sortida, $return);
         if ($return === 0){
             //One more to calculate correctly size tables
             @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $return);
