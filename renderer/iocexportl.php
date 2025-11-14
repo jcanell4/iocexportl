@@ -639,7 +639,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $csetup = '';
         $col_width = '-1,';
         $tablecaption = ($this->is_new_latex()) ? '' : '\tablecaption';
-        $table_type = ($this->is_new_latex()) ? 'longtable': 'longtabu';
+        $table_type = ($this->is_new_latex()) ? 'xltabular': 'longtabu';
         if ($_SESSION['table_large']){
            $large = ' to 170mm';
            $csetup = '\tablelargecaption';
@@ -652,24 +652,26 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }elseif($_SESSION['iocelem']){
            $large = ' to \tableiocelemsize';
            $tablecaption = '\tableiocelemcaption';
+        }elseif ($this->is_new_latex()) {
+            $large = '{\textwidth}';
         }
         $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
         
+        $thereis_table_widths = ($_SESSION['accounting'] || $_SESSION['table']) && is_array($_SESSION['table_widths']);
         // Obtenir la suma (100%) de les amplades
         if ($this->is_new_latex()) {
            for($i=0; $i < $maxcols; $i++) {
-                $table_widths = ($_SESSION['accounting'] || $_SESSION['table']) && is_array($_SESSION['table_widths']) && array_key_exists($i, $_SESSION['table_widths']);
+                $table_widths = $thereis_table_widths && array_key_exists($i, $_SESSION['table_widths']);
                 $max_values += ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
            }
            $max_values = ($max_values) ? $max_values : $maxcols;
         }
+        
         for($i=0; $i < $maxcols; $i++) {
-           $table_widths = ($_SESSION['accounting'] || $_SESSION['table'])
-                               && is_array($_SESSION['table_widths'])
-                               && array_key_exists($i, $_SESSION['table_widths']);
+           $table_widths = $thereis_table_widths && array_key_exists($i, $_SESSION['table_widths']);
            $value = ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
            if ($this->is_new_latex()) {
-                $col_width = round($value / $max_values, 2);
+                $col_width = round($value / $max_values, 2, PHP_ROUND_HALF_DOWN);
            }elseif ($table_widths) {
                 $col_width = ($value <= 1) ? '-1,' : "${value},";
                 if ($i === 0) {
@@ -683,10 +685,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
            }elseif(!empty ($border) && $i===0) {
                 $this->doc .= $border;
            }
-           $this->doc .= $this->is_new_latex() ? '|p{'.$col_width.'\textwidth}' : 'X['.$col_width.'l] ';
+           if ($this->is_new_latex()) {
+               $this->doc .= '>{\raggedright\arraybackslash}p{'.$col_width.'\textwidth}';
+           }else {
+               $this->doc .= 'X['.$col_width.'l] ';
+           }
            $this->doc .= $border;
         }
-        $this->doc .= $this->is_new_latex() ? '|}' : '}';
+        $this->doc .= '}';
         if (!$_SESSION['table_small']){
             if (!$_SESSION['table_large']){
                 $vspace = '\vspace{-2.5ex}';
@@ -697,7 +703,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             if (strlen($_SESSION['table_title']) > 86){
                 $vspace = '';
             }
-            $this->doc .= $csetup.$tablecaption.'\caption{'.$_SESSION['table_title']. $vspace.
+            $this->doc .= $csetup.$tablecaption.'\caption{'.$_SESSION['table_title'].$vspace.
                             '\label{'.$_SESSION['table_id'].'}} \\\\'.DOKU_LF;
         }
         $this->doc .= '\hline'.DOKU_LF;
@@ -707,7 +713,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->table = FALSE;
         if (!$_SESSION['accounting']){
             if ($this->is_new_latex()) {
-                //$this->doc .= '\hline\\\\[1mm]'.DOKU_LF;
                 $this->doc .= '\hline'.DOKU_LF;
             }else {
                 $this->doc .= '\noalign{\vspace{1mm}}'.DOKU_LF.'\hline'.DOKU_LF;
@@ -724,7 +729,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($_SESSION['table_small']){
             $this->doc .= '\end{tabu}'.DOKU_LF;
         }else{
-            $table_type = $this->is_new_latex() ? 'longtable': 'longtabu';
+            $table_type = $this->is_new_latex() ? 'xltabular': 'longtabu';
             $this->doc .= '\end{'.$table_type.'}'.DOKU_LF;
         }
         if (!$_SESSION['iocelem']){
@@ -754,8 +759,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             && !$_SESSION['table_small'] && !$_SESSION['iocelem'] && !$_SESSION['accounting']){
             $this->doc .= '@IOCHEADEREND@';
             if ($this->is_new_latex()) {
-                //$this->doc .= ' \\\\'.DOKU_LF.'\hline'.DOKU_LF.'\endfirsthead'.DOKU_LF;
-                //$this->doc .= ' \\\\'.DOKU_LF.'\hline\\\\[1mm]'.DOKU_LF.'\endfirsthead'.DOKU_LF;
                 $this->doc .= ' \\\\'.DOKU_LF.'\endfirsthead'.DOKU_LF;
             }else {
                 $this->doc .= ' \\\\ \hline \noalign{\vspace{1mm}} '.DOKU_LF.'\endfirsthead'.DOKU_LF;
@@ -770,7 +773,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $headrule = '\tablesmallheadrule';
             }
             if ($this->is_new_latex()) {
-                //$this->doc .= '\multicolumn{'.$this->max_cols.'}{c}{'.$headrule.'} \\\\' . DOKU_LF;
                 $this->doc .= '\hline' . DOKU_LF;
             }else {
                 $this->doc .= '\noalign{\vspace{-2mm}}\multicolumn{'.$this->max_cols.'}{c}{'.$headrule.'}' . DOKU_LF;
@@ -785,7 +787,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             $this->doc .= '\endlastfoot' . DOKU_LF;
         }elseif ($this->tableheader_end && $this->tableheader_count === 1
-            && !$_SESSION['table_small'] && $_SESSION['iocelem'] && $_SESSION['accounting']){
+                && !$_SESSION['table_small'] && $_SESSION['iocelem'] && $_SESSION['accounting']){
             $this->doc .= '\\\\ '.$extrahline.DOKU_LF.'\endfirsthead'.DOKU_LF.'\endhead'.DOKU_LF;
         }else{
             $this->doc .= $dobleBS.DOKU_LF;
@@ -833,7 +835,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $align = '\raggedright';
         }
         if (!$_SESSION['table_small']){
-            $this->doc .= ((!$this->is_new_latex()) ? '\parbox[t]{\linewidth}{' : '').$align;
+            //$this->doc .= ((!$this->is_new_latex()) ? '\parbox[t]{\linewidth}{' : '') . $align;
+            $this->doc .= '\parbox[t]{\linewidth}{' . $align;
         }
         $this->formatting = '\textbf{';
         $this->doc .= $this->formatting;
@@ -892,7 +895,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $align = '\raggedright';
             }
             if (!$_SESSION['table_small']){
-                $this->doc .= ((!$this->is_new_latex()) ? '\parbox[t]{\linewidth}{' : '').$align.' ';
+                $this->doc .= ((!$this->is_new_latex()) ? '\parbox[t]{\linewidth}{' : '') . $align.' ';
             }
         }
     }
