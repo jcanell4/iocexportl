@@ -133,9 +133,7 @@ class generate_latex implements WikiIocModel{
                $replacements = [
                    ["\\usepackage{tabu}", "\\usepackage{tabularx}".DOKU_LF."\\usepackage{xltabular}".DOKU_LF."\\usepackage{array}".DOKU_LF."\\usepackage{booktabs}"],
                    ["%@NEWLATEXVERSION@", "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1}}".DOKU_LF."\\newcolumntype{R}[1]{>{\\raggedleft\arraybackslash}p{#1}}".DOKU_LF."\\newcolumntype{C}[1]{>{\\centering\arraybackslash}p{#1}}"],
-                   /*["\\setlength{\\tabulinesep}{0.5mm}", "\\setlength{\\extrarowheight}{0.5mm}"],*/
-                   /*["\\hdashrule{\\the\\tabucolX}{0.3mm}{0.3mm 3mm}", "\\hdashrule{2cm}{0.3mm}{0.3mm 3mm}"],*/
-                   /*["\\newcommand{\\tablesmallcaption}[1]{\\captionsetup{labelsep=period, margin=(.5\\linewidth-((\\the\\tabucolX+4mm) * #1)/2)}}", "\\newcommand{\\tablesmallcaption}[1]{\\captionsetup{labelsep=period}}"]*/
+                   ["\\setlength{\\tabulinesep}{0.5mm}", ""]
                ];
                foreach ($replacements as $r ) {
                   $latex = str_replace($r[0], $r[1], $latex);
@@ -252,6 +250,11 @@ class generate_latex implements WikiIocModel{
                 $latex .= io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'footer.ltx');
             }
         }
+        // inici log temporal per a les proves de generació de taules amb la nova versió pdflatex 2022 
+         $latex_log = fopen(DOKU_IOCEXPORTL_LATEX_TMP."/latex_temporal.txt", "w");
+         fwrite($latex_log, $latex);
+         fclose($latex_log);
+        // final log temporal*/
          
         $result = array();
         if ($this->mode === 'zip'){
@@ -413,11 +416,6 @@ class generate_latex implements WikiIocModel{
         if ($_SESSION['qrcode']){
             $shell_escape = '-shell-escape';
         }
-        // inici log temporal per a les proves de generació de taules amb la nova versió pdflatex 2022 
-         $latex_log = fopen(DOKU_IOCEXPORTL_LATEX_TMP."/latex_temporal.txt", "w");
-         fwrite($latex_log, $text);
-         fclose($latex_log);
-        // final log temporal
         @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -interaction=nonstopmode ' .$filename.'.tex' , $sortida, $return);
         if ($return === 0){
             //One more to calculate correctly size tables
