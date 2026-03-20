@@ -122,7 +122,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     $type = (isset($matches[1])) ? $matches[1] : '';
                     //IMPORTANT
                     if ($type === 'important'){
-                        $renderer->doc .= '\iocimportant{';
+                        $renderer->doc .= '\iocimportantstart'.DOKU_LF;
                     //TEXT
                     }elseif($type === 'text'){
                         $type = (isset($params['large'])) ? 'ioctextl' : 'ioctext';
@@ -139,7 +139,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     //EXAMPLE
                     }elseif($type === 'example'){
                         $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
-                        $renderer->doc .= '\iocexample{'.$title.'}{';
+                        $renderer->doc .= '\iocexamplestart{'.$title.'}'.DOKU_LF;
                     //REFERENCE
                     }elseif($type === 'reference'){
                         $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
@@ -152,13 +152,22 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '\iocinclude{';
                         $renderer->tmpData["include_no_indent"]=isset($params['no_indent']);
                     }
+                    $renderer->tmpData["iocelem_type"] = $type;
                     $_SESSION['iocelem'] = (in_array($type, ["ioctextl","quote","important","example","include"], true)) ? 'textl' : TRUE;
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $renderer->doc .= $this->_parse($data, $mode);
                     break;
                 case DOKU_LEXER_EXIT :
-                    $renderer->doc .= '}';
+                    $type = isset($renderer->tmpData["iocelem_type"]) ? $renderer->tmpData["iocelem_type"] : '';
+                    if ($type === 'example') {
+                        $renderer->doc .= DOKU_LF.'\iocexampleend'.DOKU_LF;
+                    } elseif ($type === 'important') {
+                        $renderer->doc .= DOKU_LF.'\iocimportantend'.DOKU_LF;
+                    } else {
+                        $renderer->doc .= '}';
+                    }
+                    unset($renderer->tmpData["iocelem_type"]);
                     //allow hyphenation
                     $renderer->doc .= '\hyphenpenalty=1000'.DOKU_LF;
                     $_SESSION['iocelem'] = FALSE;

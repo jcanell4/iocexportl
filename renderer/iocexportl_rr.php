@@ -625,14 +625,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
     
     function is_new_latex() {
-        if (isset($_SESSION['iocexportl_table_backend'])) {
-            if ($_SESSION['iocexportl_table_backend'] === 'new') {
-                return TRUE;
-            }
-            if ($_SESSION['iocexportl_table_backend'] === 'legacy') {
-                return FALSE;
-            }
-        }
         global $latex_version;
         return ($latex_version >= "2.6-1.40.24");
     }
@@ -656,32 +648,22 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $col_width = '-1,';
         $tablecaption = '\tablecaption';
         $table_type = ($this->is_new_latex()) ? 'xltabular': 'longtabu';
-          $xltabular_width = '\textwidth';
         if ($_SESSION['table_large']){
-              $large = ' to 170mm';
-              $xltabular_width = '170mm';
+           $large = ' to 170mm';
            $csetup = '\tablelargecaption';
         }elseif($_SESSION['table_small']){
-              if ($this->is_new_latex()) {
-                  $this->doc .= '\begin{table}[h]'.DOKU_LF.'\centering'.DOKU_LF;
-              }
            $this->doc .= '\addtocounter{table}{0}\caption{'.$_SESSION['table_title'].'\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
-              $large = $this->is_new_latex() ? '{\linewidth}' : ' spread 0pt';
-              $tablecaption = $this->is_new_latex() ? '\tablecaption' : '\tablesmallcaption{'.$maxcols.'}';
+           $large = ' spread 0pt';
+           $tablecaption = '\tablesmallcaption{'.$maxcols.'}';
            $col_width = '';
-              $table_type = $this->is_new_latex() ? 'tabularx' : 'tabu';
+           $table_type = 'tabu';
         }elseif($_SESSION['iocelem']){
            $large = ' to \tableiocelemsize';
-              $xltabular_width = '\tableiocelemsize';
            $tablecaption = '\tableiocelemcaption';
+        }elseif ($this->is_new_latex()) {
+            $large = '{\textwidth}';
         }
-             if ($table_type === 'xltabular') {
-                $this->doc .= '\begin{xltabular}{'.$xltabular_width.'}{';
-             } elseif ($table_type === 'tabularx') {
-                     $this->doc .= '\begin{tabularx}{\linewidth}{';
-          } else {
-                $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
-          }
+        $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
         
         $thereis_table_widths = ($_SESSION['accounting'] || $_SESSION['table']) && is_array($_SESSION['table_widths']);
         // Obtenir la suma (100%) de les amplades
@@ -749,11 +731,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->doc = preg_replace('/@IOCHEADERBIS@/',isset($matches[1])?$matches[1]:'', $this->doc, 1);
         $this->doc .= $this->is_new_latex() ? '' : '\tabuphantomline';
         if ($_SESSION['table_small']){
-            if ($this->is_new_latex()) {
-                $this->doc .= '\end{tabularx}'.DOKU_LF.'\end{table}'.DOKU_LF;
-            } else {
-                $this->doc .= '\end{tabu}'.DOKU_LF;
-            }
+            $this->doc .= '\end{tabu}'.DOKU_LF;
         }else{
             $table_type = $this->is_new_latex() ? 'xltabular': 'longtabu';
             $this->doc .= '\end{'.$table_type.'}'.DOKU_LF;
@@ -1338,7 +1316,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         while(preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $value, $matches)){
             $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
 			$text = preg_replace('/(\$)/', '\\\\$1', $text);
-            $value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '\\['.filter_tex_sanitize_formula($text).'\\]', $value, 1);
+            $value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '\begin{center}\begin{math}'.filter_tex_sanitize_formula($text).'\end{math}\end{center}', $value, 1);
             $replace = TRUE;
         }
         //Math inline mode

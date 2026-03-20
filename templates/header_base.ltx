@@ -57,11 +57,11 @@
 \newcommand{\foottable}[1]{\fontsize{6}{7.2}\fontfamily{phv}\selectfont #1\fonttable}
 \newcommand{\codeblock}{\renewcommand{\ttdefault}{fvm}\scriptsize}%beramono
 \newcommand{\codeinline}{\renewcommand{\ttdefault}{fi4}}%inconsolata
-\newenvironment{textltitle}{\begin{spacing}{1.2}\ioctextfont\bfseries}{\end{spacing}\normalfont}
-\newenvironment{textlbody}{\begin{spacing}{1.2}\defaultspacingpar\ioctextfont}{\end{spacing}\normalfont}
+\newenvironment{textltitle}{\setstretch{1.2}\ioctextfont\bfseries}{\normalfont}
+\newenvironment{textlbody}{\setstretch{1.2}\defaultspacingpar\ioctextfont}{\normalfont}
 \newenvironment{quotebody}{\defaultspacingpar\ioctextfont}{\normalfont}
-\newenvironment{exampletitle}{\begin{spacing}{1.2}\ioctextfont\bfseries}{\end{spacing}\normalfont}
-\newenvironment{examplebody}{\begin{spacing}{1.2}\defaultspacingpar\ioctextfont}{\end{spacing}\normalfont}
+\newenvironment{exampletitle}{\setstretch{1.2}\ioctextfont\bfseries}{\normalfont}
+\newenvironment{examplebody}{\setstretch{1.2}\defaultspacingpar\ioctextfont}{\normalfont}
 \newcommand{\iocalignment}{\checkoddpage\ifthenelse{\boolean{oddpage}}{\raggedright}{\raggedleft}}
 \newcommand{\tablelargecaption}{\captionsetup{font={scriptsize,bf},labelfont={scriptsize,sc},justification=raggedright,singlelinecheck=false,labelsep=period, margin=0mm}}
 \newcommand{\tableiocelemcaption}{\captionsetup{font={scriptsize,bf},labelfont={scriptsize,sc},justification=raggedright,singlelinecheck=false,labelsep=period, margin=6mm}}
