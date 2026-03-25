@@ -84,7 +84,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
             }elseif(preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $data, $matches)){//Math block mode
                 $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
                 $text = preg_replace('/(\$)/', '\\\\$1', $text);
-                $renderer->doc .= '\begin{center}\begin{math}'.filter_tex_sanitize_formula($text).'\end{math}\end{center}';
+                $renderer->doc .= '\\['.filter_tex_sanitize_formula($text).'\\]';
             }elseif(preg_match('/\$\n?([^\$]+)\n?\$/', $data, $matches)){//Math inline mode
                 $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
                 $text = preg_replace('/(\$)/', '\\\\$1', $text);

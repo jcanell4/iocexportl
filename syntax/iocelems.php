@@ -128,7 +128,11 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $type = (isset($params['large'])) ? 'ioctextl' : 'ioctext';
                         $title = (isset($params['title'])) ? $renderer->_xmlEntities($params['title']) : '';
                         $offset = (isset($params['offset'])) ? '['.$params['offset'].'mm]' : '';
-                        $renderer->doc .= '\\'.$type.$offset.'{'.$title.'}{';
+                        if ($type === 'ioctextl') {
+                            $renderer->doc .= '\\ioctextlstart{'.$title.'}'.DOKU_LF;
+                        } else {
+                            $renderer->doc .= '\\'.$type.$offset.'{'.$title.'}{';
+                        }
                     //NOTE
                     }elseif($type === 'note'){
                         $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
@@ -164,12 +168,14 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= DOKU_LF.'\iocexampleend'.DOKU_LF;
                     } elseif ($type === 'important') {
                         $renderer->doc .= DOKU_LF.'\iocimportantend'.DOKU_LF;
+                    } elseif ($type === 'ioctextl') {
+                        $renderer->doc .= DOKU_LF.'\ioctextlend'.DOKU_LF;
                     } else {
                         $renderer->doc .= '}';
                     }
                     unset($renderer->tmpData["iocelem_type"]);
                     //allow hyphenation
-                    $renderer->doc .= '\hyphenpenalty=1000'.DOKU_LF;
+                    $renderer->doc .= DOKU_LF.'\hyphenpenalty=1000'.DOKU_LF;
                     $_SESSION['iocelem'] = FALSE;
                     break;
             }

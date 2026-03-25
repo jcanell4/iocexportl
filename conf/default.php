@@ -9,6 +9,7 @@ $conf['allowexport'] = 0;
 $conf['counter'] = 0;
 $conf['toccontents'] = 0;
 $conf['largetablecaptmargin'] = 0;
+$conf['latex_table_backend'] = 'auto';
 $conf['UsersWithPdfSelf-generationAllowed'] = '';
 $conf['ContentPageName'] = 'continguts';
 $conf['saveWorkDir'] = 0;

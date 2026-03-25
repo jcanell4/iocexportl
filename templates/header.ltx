@@ -36,7 +36,7 @@
 \usepackage[safe]{tipa}%Used fonetical symbols
 \usepackage{amsmath}%Used for matrix environment
 \usepackage[leftcaption]{sidecap}
-\usepackage[gen]{eurosym}%Euro currency symbol
+\usepackage[gen]{eurosym}%Euro currency symbolXB4bwaFX
 \usepackage[encapsulated]{CJK}% use one of bsmi(trad Chinese), gbsn(simp Chinese), min(Japanese), mj(Korean);
 \usepackage{amssymb}%mathfrak symbols
 \usepackage{wasysym}%permil symbol
@@ -51,12 +51,14 @@
 @IOCQRCODE@%qrcodes
 
 \PrerenderUnicode{àáèéíòóúïüñçÀÁÈÉÍÒÓÚÏÜÑÇ·}
+\DeclareUnicodeCharacter{22EE}{\ensuremath{\vdots}} % ⋮
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}} % −
 
 % ***************** CUSTOMIZED COMMANDS *****************
 \newcommand{\fonttable}{\fontsize{7}{8.4}\fontfamily{phv}\selectfont}
 \newcommand{\foottable}[1]{\fontsize{6}{7.2}\fontfamily{phv}\selectfont #1\fonttable}
 \newcommand{\codeblock}{\renewcommand{\ttdefault}{fvm}\scriptsize}%beramono
-\newcommand{\codeinline}{\renewcommand{\ttdefault}{fi4}}%inconsolata
+\newcommand{\codeinline}{\renewcommand{\ttdefault}{pcr}}%courier
 \newenvironment{textltitle}{\begin{spacing}{1.2}\ioctextfont\bfseries}{\end{spacing}\normalfont}
 \newenvironment{textlbody}{\begin{spacing}{1.2}\defaultspacingpar\ioctextfont}{\end{spacing}\normalfont}
 \newenvironment{quotebody}{\defaultspacingpar\ioctextfont}{\normalfont}
@@ -66,10 +68,12 @@
 \newcommand{\tablelargecaption}{\captionsetup{font={scriptsize,bf},labelfont={scriptsize,sc},justification=raggedright,singlelinecheck=false,labelsep=period, margin=0mm}}
 \newcommand{\tableiocelemcaption}{\captionsetup{font={scriptsize,bf},labelfont={scriptsize,sc},justification=raggedright,singlelinecheck=false,labelsep=period, margin=6mm}}
 \newcommand{\tablecaption}{\captionsetup{labelsep=period}}
-\newcommand{\tablesmallcaption}[1]{\captionsetup{labelsep=period, margin=(.5\linewidth-((\the\tabucolX+4mm) * #1)/2)}}
+\newcommand{\tablesmallcaption}[1]{\captionsetup{labelsep=period, margin=0mm}}
 \newcommand{\tablecaptioncontinue}{\captionsetup{labelsep=space}}
 \newcommand{\ioclangcontinue}{@IOCLANGCONTINUE@}
 \newcommand{\tableiocelemsize}{.9\textwidth}
+\newlength{\tabucolX}
+\setlength{\tabucolX}{\linewidth}
 
 \newcommand{\iocimportantstart}{
     \begin{flushleft}
@@ -107,7 +111,6 @@
 }
 \newcommand{\ioctext}[3][0mm]{
     \marginpar{
-            \vspace{#1}
             \begin{minipage}{\marginparwidth-4mm}
                 \centering
                 \parbox[c]{\marginparwidth}{
@@ -118,8 +121,7 @@
                     \small
                     \iocalignment
                     \bfseries{#2}
-                    \vspace{1ex}
-                    \\
+                    \par\vspace{1ex}
                     \normalfont
                     \small
                     #3
@@ -127,7 +129,7 @@
             \end{minipage}
     }
 }
-\newcommand{\ioctextl}[2]{
+\newcommand{\ioctextlstart}[1]{
 \begingroup
     \leftskip\textboxsize%4em
     \rightskip\leftskip
@@ -137,12 +139,18 @@
         #1
     \end{textltitle}
     \begin{textlbody}
-        #2
+}
+\newcommand{\ioctextlend}{
     \end{textlbody}
     \normalfont
     \vspace{1ex}
     \par
 \endgroup
+}
+\newcommand{\ioctextl}[2]{
+    \ioctextlstart{#1}
+    #2
+    \ioctextlend
 }
 \newcommand{\iocquote}[1]{
     \begingroup
@@ -184,7 +192,6 @@
 
 \newcommand{\iocnote}[2][0mm]{
     \marginpar{
-        \vspace{#1}
         \parbox[c]{\marginparwidth}{
             \hrule
             \centering
@@ -205,7 +212,6 @@
 
 \newcommand{\iocreference}[2][0mm]{
     \marginpar{
-        \vspace{#1}
         \parbox[c]{\marginparwidth}{
             \hrule
             \colorbox{colorreference}{
@@ -225,7 +231,7 @@
 }
 
 \newcommand{\imgB}[2][0mm]{
-    \marginnote{#2}[#1]
+    \marginnote{#2}[0mm]
 }
 
 \newcommand{\draft}[1]{
@@ -269,7 +275,7 @@
 
 \newcommand{\numold}[1]{\fontfamily{pcr}\selectfont\small{#1}}
 \lstnewenvironment{csource}[1]
-    {\lstset{basicstyle=\fontsize{8}{9.6}\ttfamily\linespread{0.88}\selectfont,
+    {\lstset{basicstyle=\fontsize{8}{9.6}\fontfamily{pcr}\linespread{0.88}\selectfont,
             keywordstyle=\bfseries,
             numbers=left,
             inputencoding=utf8,
@@ -294,7 +300,8 @@
                      {ï}{{\"i}}1
                      {ü}{{\"u}}1
                      {ñ}{{\~{n}}}1
-                     {’}{{\textquotesingle}}1
+                     {^^e2^^80^^99}{{\textquotesingle}}1
+                     {^^e2^^80^^98}{{\textquoteleft}}1
                      {ç}{{\c{c}}}1
                      {Á}{{\'A}}1
                      {É}{{\'E}}1

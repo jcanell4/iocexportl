@@ -42,16 +42,16 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $levelDiff=0;
 
     /**
-    * Returns the format produced by this renderer.
-    */
+     * Returns the format produced by this renderer.
+     */
     function getFormat(){
         return "iocexportl";
     }
 
     /**
-    * Make multiple instances of this class
-    */
-    /* function isSingleton(){
+     * Make multiple instances of this class
+     */
+   /* function isSingleton(){
         return FALSE;
     }*/
 
@@ -60,8 +60,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     /**
-    * Initialize the rendering
-    */
+     * Initialize the rendering
+     */
     function document_start() {
         global $conf;
 
@@ -99,8 +99,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     /**
-    * Closes the document
-    */
+     * Closes the document
+     */
     function document_end(){
         $this->doc = preg_replace('/@IOCKEYSTART@/','\{', $this->doc);
         $this->doc = preg_replace('/@IOCKEYEND@/','\}', $this->doc);
@@ -110,8 +110,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     /**
-    * Initialization session variables
-    */
+     * Initialization session variables
+     */
     function _initialize_globals(){
         if (!isset($_SESSION['accounting'])){
             $_SESSION['accounting'] = FALSE;
@@ -203,8 +203,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     /**
-    * NOVA
-    */
+     * NOVA
+     */
     function _format_text($text){
         if (function_exists('iconv')) {
             $utf8 = @iconv('UTF-8', 'UTF-8//IGNORE', $text);
@@ -221,55 +221,56 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     /**
-    * NOVA
-    */
+     * NOVA
+     */
     function label_document() { //For links
         if (isset($this->info['current_file_id'])) {
-            $cleanid = $this->info['current_file_id'];
+          $cleanid = $this->info['current_file_id'];
         }
         else {
-            $cleanid = noNS(cleanID($this->info['current_id'], TRUE));
+          $cleanid = noNS(cleanID($this->info['current_id'], TRUE));
         }
         $this->doc .= "\label{" . md5($cleanid) . "}";
         if (isset($this->info['current_file_id'])){
-            $this->doc .= "%%Start: " . $cleanid . ' => ' . $this->info['current_file_id'].DOKU_LF;
+          $this->doc .= "%%Start: " . $cleanid . ' => '
+    		   . $this->info['current_file_id'].DOKU_LF;
         } else {
-            $this->doc .= "%%Start: " . $cleanid . ' => ' . wikiFN($cleanid).DOKU_LF;
+          $this->doc .= "%%Start: " . $cleanid . ' => ' . wikiFN($cleanid).DOKU_LF;
         }
-        }
+      }
 
      /**
-    * NOVA
-    */
+     * NOVA
+     */
     function _latexEntities($string, $ent=null) {
         return $this->_xmlEntities($string);
     }
 
     /**
-    * NOVA
-    */
+     * NOVA
+     */
     function smiley($smiley) {
         $img = DOKU_INC . 'lib/images/smileys/'. $this->smileys[$smiley];
         $img_aux = $this->_image_convert($img, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media');
         $this->doc .= '\includegraphics[height=1em, width=1em]{media/'.basename($img_aux).'}';
-        }
+    }
 
-    /**
-    * NOVA
-    */
-    function _image_convert($img, $dest, $width = NULL, $height = NULL){
+     /**
+     * NOVA
+     */
+      function _image_convert($img, $dest, $width = NULL, $height = NULL){
         $imgdest = tempnam($dest, 'ltx');
         $resize = '';
         if ($width && $height){
             $resize = "-resize $width"."x"."$height";
         }
-      @exec("convert $img $resize $imgdest".self::$imgext);
+        @exec("convert $img $resize $imgdest".self::$imgext);
         return $imgdest.self::$imgext;
-    }
+      }
 
-    /**
-    * NOVA
-    */
+     /**
+     * NOVA
+     */
     function _latexAddImage($src, $width = NULL, $height = NULL, $align = NULL, $title = NULL, $linking = NULL, $external = FALSE){
         $max_width_elem = '.9\linewidth';
         if ($_SESSION['figure']){
@@ -294,7 +295,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $info  = getimagesize($src);
                 $ratio = $info[0]/$info[1];
                 if(!$width){
-               $width = round($height * $ratio, 0);
+                    $width = round($height * $ratio, 0);
                 }
             }
         }
@@ -315,15 +316,15 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $max_width = '[width=\textwidth]';
             $img_width = FALSE;
         }elseif ($_SESSION['iocelem']){
-            //Check wheter image fits on iocelem
-            if ($width >= (.9 * self::$p_width)){
+             //Check wheter image fits on iocelem
+             if ($width >= (.9 * self::$p_width)){
                 $max_width = '[width='.$max_width_elem.']';
                 $img_width = $max_width_elem;
-            }else{
-                $max_width = '[width='.$width.'px]';
-                $img_width = $width;
-                $max_width_elem = FALSE;
-            }
+             }else{
+                 $max_width = '[width='.$width.'px]';
+                 $img_width = $width;
+                 $max_width_elem = FALSE;
+             }
         }else{
             $max_width = '[width='.$width.'px]';
             $img_width = $width;
@@ -337,10 +338,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }else{
             $img_aux = tempnam(DOKU_PLUGIN_LATEX_TMP . $this->tmp_dir . '/media', 'ltx');
             $ext = pathinfo($src,PATHINFO_EXTENSION);
-            if (file_exists($src)){
+            if (file_exists($src) && $ext !== ''){
                 copy($src, "$img_aux.$ext");
+                $img_aux .= ".$ext";
             }
-            $img_aux .= ".$ext";
         }
         if (file_exists($img_aux)){
             if ($imgb){
@@ -349,13 +350,13 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 if ($title){
                     preg_match('/(.*?)(\/([^\/]*$))/', $title, $data);
                     if (!empty($data) && !empty($data[3]) && is_numeric($data[3])){
-                       $offset = '['.trim($data[3]).'mm]';
-                       $title = $data[1];
+                        $offset = '['.trim($data[3]).'mm]';
+                        $title = $data[1];
                     }else{
-                       $aux = IocCommon::formatTitleExternalLink("media", "offset", $title);
-                       if(!empty($aux)){
-                          $offset = '['.trim($aux).'mm]';
-                       }
+                        $aux = IocCommon::formatTitleExternalLink("media", "offset", $title);
+                        if(!empty($aux)){
+                            $offset = '['.trim($aux).'mm]';
+                        }
                     }
                     //extreu la descripció
                     $footer = IocCommon::formatTitleExternalLink("media", "pdf", $title);
@@ -365,7 +366,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 if ($_SESSION['figlarge']){
                     $this->doc .= '\checkoddpage\ifthenelse{\boolean{oddpage}}{\hspace*{0mm}}{\hspace*{-\marginparwidth}\hspace*{-10mm}}'.DOKU_LF;
                     if ($img_width) {
-                       $this->doc .= '\begin{center}';
+                        $this->doc .= '\begin{center}';
                     }
                     $this->doc .= '\begin{minipage}[c]{\textwidth+\marginparwidth+\marginparsep}'. DOKU_LF;
                 }
@@ -420,11 +421,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             if ($footer) {
                 if ($_SESSION['figure']){
                     if ($img_width && !$_SESSION['iocelem']){
-                       $hspace = ($img_width + $hspace).'pt';
+                        $hspace = ($img_width + $hspace).'pt';
                     }elseif($_SESSION['iocelem']){
-                       $hspace = ($max_width_elem)?$max_width_elem:$img_width.'px';
-                    }else{
-                       $hspace = '\textwidth';
+                        $hspace = ($max_width_elem)?$max_width_elem:$img_width.'px';
+                    }else {
+                        $hspace = '\textwidth';
                     }
                     $vspace = '\vspace{-2mm}';
                     $align = '\raggedleft';
@@ -438,12 +439,13 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     $vspace = '\vspace{-4mm}';
                     $align = '\iocalignment';
                 }
-                $this->doc .=  '\raisebox{\height}{\parbox[t]{'.$hspace.'}{'.$align.'\footerspacingline\textsf{\tiny'.$vspace.trim($this->_xmlEntities($footer)).'}}}';
+                // BUGFIX: Removed \footerspacingline (fragile in moving argument)
+                $this->doc .=  '\raisebox{\height}{\parbox[t]{'.$hspace.'}{'.$align.'\textsf{\tiny'.$vspace.trim($this->_xmlEntities($footer)).'}}}';
             }
             if ($figure){
                 $this->doc .= '\end{figure}';
-                    if ($_SESSION['figlarge']){
-                        $this->doc .= '\end{minipage}'. DOKU_LF;
+                if ($_SESSION['figlarge']){
+                    $this->doc .= '\end{minipage}'. DOKU_LF;
                     if ($img_width) {
                         $this->doc .= '\end{center}'. DOKU_LF;
                     }
@@ -464,7 +466,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function render_TOC() {
-        return '';
+         return '';
     }
 
     function toc_additem($id, $text, $level) {}
@@ -503,9 +505,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     		    );
 
         if ( isset($levels[$level]) ) {
-            $token = $levels[$level];
+          $token = $levels[$level];
         } else {
-            $token = $levels[1];
+          $token = $levels[1];
         }
         $text = $this->_xmlEntities(trim($text));
         $chapternumber = '';
@@ -623,7 +625,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     function deleted_close() {
         $this->doc .= '}';
     }
-    
+
     function is_new_latex() {
         if (isset($_SESSION['iocexportl_table_backend'])) {
             if ($_SESSION['iocexportl_table_backend'] === 'new') {
@@ -638,8 +640,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     /*
-    * Tables
-    */
+     * Tables
+     */
     function table_open($maxcols=NULL, $numrows=NULL, $pos=NULL){
         global $conf;
 
@@ -655,68 +657,73 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $csetup = '';
         $col_width = '-1,';
         $tablecaption = '\tablecaption';
-        $table_type = ($this->is_new_latex()) ? 'xltabular': 'longtabu';
-          $xltabular_width = '\textwidth';
+        $table_type = ($this->is_new_latex()) ? 'longtable': 'longtabu';
+        $xltabular_width = '\textwidth';
         if ($_SESSION['table_large']){
-              $large = ' to 170mm';
-              $xltabular_width = '170mm';
-           $csetup = '\tablelargecaption';
+            if (!$this->is_new_latex()) {
+                $large = ' to 170mm';
+            }
+            $xltabular_width = '170mm';
+            $csetup = '\tablelargecaption';
         }elseif($_SESSION['table_small']){
               if ($this->is_new_latex()) {
                   $this->doc .= '\begin{table}[h]'.DOKU_LF.'\centering'.DOKU_LF;
               }
-           $this->doc .= '\addtocounter{table}{0}\caption{'.$_SESSION['table_title'].'\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
-              $large = $this->is_new_latex() ? '{\linewidth}' : ' spread 0pt';
-              $tablecaption = $this->is_new_latex() ? '\tablecaption' : '\tablesmallcaption{'.$maxcols.'}';
-           $col_width = '';
-              $table_type = $this->is_new_latex() ? 'tabularx' : 'tabu';
+            $this->doc .= '\addtocounter{table}{0}\caption{'.$_SESSION['table_title'].'\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
+            $large = $this->is_new_latex() ? '{\linewidth}' : ' spread 0pt';
+            $tablecaption = $this->is_new_latex() ? '\tablecaption' : '\tablesmallcaption{'.$maxcols.'}';
+            $col_width = '';
+            $table_type = $this->is_new_latex() ? 'tabularx' : 'tabu';
         }elseif($_SESSION['iocelem']){
-           $large = ' to \tableiocelemsize';
-              $xltabular_width = '\tableiocelemsize';
-           $tablecaption = '\tableiocelemcaption';
+            if (!$this->is_new_latex()) {
+                $large = ' to \tableiocelemsize';
+            }
+            $xltabular_width = '\tableiocelemsize';
+            $tablecaption = '\tableiocelemcaption';
         }
-             if ($table_type === 'xltabular') {
-                $this->doc .= '\begin{xltabular}{'.$xltabular_width.'}{';
-             } elseif ($table_type === 'tabularx') {
-                     $this->doc .= '\begin{tabularx}{\linewidth}{';
-          } else {
-                $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
-          }
-        
+        if ($table_type === 'xltabular') {
+            $this->doc .= '\begin{xltabular}{'.$xltabular_width.'}{';
+        } elseif ($table_type === 'tabularx') {
+            $this->doc .= '\begin{tabularx}{\linewidth}{';
+        } elseif ($table_type === 'longtable') {
+            $this->doc .= '\begin{longtable}{';
+        } else {
+            $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
+        }
+
         $thereis_table_widths = ($_SESSION['accounting'] || $_SESSION['table']) && is_array($_SESSION['table_widths']);
-        // Obtenir la suma (100%) de les amplades
         if ($this->is_new_latex()) {
-           for($i=0; $i < $maxcols; $i++) {
+            for($i=0; $i < $maxcols; $i++) {
                 $table_widths = $thereis_table_widths && array_key_exists($i, $_SESSION['table_widths']);
                 $max_values += ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
-           }
-           $max_values = ($max_values) ? $max_values : $maxcols;
+            }
+            $max_values = ($max_values) ? $max_values : $maxcols;
         }
-        
+
         for($i=0; $i < $maxcols; $i++) {
-           $table_widths = $thereis_table_widths && array_key_exists($i, $_SESSION['table_widths']);
-           $value = ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
-           if ($this->is_new_latex()) {
+            $table_widths = $thereis_table_widths && array_key_exists($i, $_SESSION['table_widths']);
+            $value = ($table_widths) ? floatval($_SESSION['table_widths'][$i]) : 1;
+            if ($this->is_new_latex()) {
                 $col_width = substr($value / $max_values, 0, 4);
-           }elseif ($table_widths) {
+            }elseif ($table_widths) {
                 $col_width = ($value <= 1) ? '-1,' : "${value},";
                 if ($i === 0) {
-                   $this->doc .= $border;
+                    $this->doc .= $border;
                 }
-           }elseif($_SESSION['accounting'] && $i===0) {//default behaviour
+            }elseif($_SESSION['accounting'] && $i===0) {
                 $col_width = '3,';
                 $this->doc .= $border;
-           }elseif($_SESSION['accounting']) {
+            }elseif($_SESSION['accounting']) {
                 $col_width = '-1,';
-           }elseif(!empty ($border) && $i===0) {
+            }elseif(!empty ($border) && $i===0) {
                 $this->doc .= $border;
-           }
-           if ($this->is_new_latex()) {
-               $this->doc .= '>{\raggedright\arraybackslash}p{'.$col_width.'\textwidth}';
-           }else {
-               $this->doc .= 'X['.$col_width.'l] ';
-           }
-           $this->doc .= $border;
+            }
+            if ($this->is_new_latex()) {
+                $this->doc .= '>{\raggedright\arraybackslash}p{'.$col_width.'\textwidth}';
+            }else {
+                $this->doc .= 'X['.$col_width.'l] ';
+            }
+            $this->doc .= $border;
         }
         $this->doc .= '}';
         if (!$_SESSION['table_small']){
@@ -738,7 +745,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     function table_close($pos=NULL){
         $this->table = FALSE;
         if (!$_SESSION['accounting']){
-            $this->doc .= (!$this->is_new_latex() ? DOKU_LF.'\noalign{\vspace{1mm}}'.DOKU_LF : '') . '\hline'.DOKU_LF;
+            if ($this->is_new_latex()) {
+                // xltabular can choke on an extra trailing \hline at table end.
+                $this->doc .= '';
+            } else {
+                $this->doc .= DOKU_LF.'\noalign{\vspace{1mm}}'.DOKU_LF.'\hline'.DOKU_LF;
+            }
         }
         if (($_SESSION['iocelem'] || $_SESSION['accounting'] || $this->tableheader_count===0) && $_SESSION['table_footer']){
             $this->doc .='\multicolumn{'.$this->max_cols.'}{l@{\hspace{0mm}}}{\hspace{-2mm}'.$_SESSION['table_footer'].'}'.DOKU_LF;
@@ -755,7 +767,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $this->doc .= '\end{tabu}'.DOKU_LF;
             }
         }else{
-            $table_type = $this->is_new_latex() ? 'xltabular': 'longtabu';
+            $table_type = $this->is_new_latex() ? 'longtable': 'longtabu';
             $this->doc .= '\end{'.$table_type.'}'.DOKU_LF;
         }
         if (!$_SESSION['iocelem']){
@@ -769,23 +781,23 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if($_SESSION['accounting'] && $this->tableheader && $this->tableheader_count === 0){
             $this->doc .='\rowcolor{coloraccounting}';
         }
+
         $this->col_num = 1;
     }
 
     function tablerow_close(){
-        $tablecaptioncontinue = '\tablecaptioncontinue';
-
         if ($this->tableheader_end){
             $this->tableheader_count += 1;
             $this->tableheader = TRUE;
         }
         if ($this->tableheader_end && $this->tableheader_count === 1
-            && !$_SESSION['table_small'] && !$_SESSION['iocelem'] && !$_SESSION['accounting']){
+            && !$_SESSION['table_small'] && !$_SESSION['iocelem'] && !$_SESSION['accounting']
+            && !$this->is_new_latex()){
             $this->doc .= '@IOCHEADEREND@';
-            $this->doc .= ' \\\\'.DOKU_LF.'\hline \noalign{\vspace{1mm}}'.DOKU_LF.'\endfirsthead'.DOKU_LF;
-            $this->doc .= $tablecaptioncontinue.'\caption[]{(\ioclangcontinue)\vspace{-3mm}} \\\\'.DOKU_LF;
+            $this->doc .= '\\\\ \hline \noalign{\vspace{1mm}} \endfirsthead'.DOKU_LF;
+            $this->doc .= '\tablecaptioncontinue\caption[]{(\ioclangcontinue)\vspace{-3mm}} \\\\' . DOKU_LF;
             $this->doc .= '\hline' . DOKU_LF;
-            $this->doc .= '@IOCHEADERBIS@ \\\\'. DOKU_LF.'\hline'.DOKU_LF;
+            $this->doc .= '@IOCHEADERBIS@ \\\\ \hline' . DOKU_LF;
             $this->doc .= '\endhead' . DOKU_LF;
             if (!$_SESSION['table_small']){
                 $headrule = '\tableheadrule';
@@ -794,17 +806,16 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             $this->doc .= '\noalign{\vspace{-2mm}}\multicolumn{'.$this->max_cols.'}{c}{'.$headrule.'}' . DOKU_LF;
             $this->doc .= '\endfoot' . DOKU_LF;
-            if (empty($_SESSION['table_footer'])) {
-                if ($this->is_new_latex()) {
-                    $this->doc .= '\hline'.DOKU_LF;
-                }else {
-                    $this->doc .= '\multicolumn{'.$this->max_cols.'}{r@{\hspace{0mm}}}{\tablefooter{'.$_SESSION['table_footer'].'}}'.DOKU_LF;
-                }
-            }
+            $this->doc .= (!empty($_SESSION['table_footer']))?'\multicolumn{'.$this->max_cols.'}{r@{\hspace{0mm}}}{\tablefooter{'.$_SESSION['table_footer'].'}}'.DOKU_LF:''.DOKU_LF;
             $this->doc .= '\endlastfoot' . DOKU_LF;
         }elseif ($this->tableheader_end && $this->tableheader_count === 1
-                && !$_SESSION['table_small'] && $_SESSION['iocelem'] && $_SESSION['accounting']){
-            $this->doc .= '\\\\'.DOKU_LF.'\hline'.DOKU_LF.'\endfirsthead'.DOKU_LF.'\endhead'.DOKU_LF;
+            && !$_SESSION['table_small'] && !$_SESSION['iocelem'] && !$_SESSION['accounting']
+            && $this->is_new_latex()){
+            // xltabular can fail with complex endfirsthead/endhead blocks from legacy path
+            $this->doc .= '\\\\'.DOKU_LF;
+        }elseif ($this->tableheader_end && $this->tableheader_count === 1
+            && !$_SESSION['table_small'] && $_SESSION['iocelem'] && $_SESSION['accounting']){
+            $this->doc .= '\\\\ \hline \endfirsthead\endhead'.DOKU_LF;
         }else{
             $this->doc .= '\\\\'.DOKU_LF;
             if ($this->tableheader_end){
@@ -825,7 +836,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tableheader_open($colspan = 1, $align = NULL, $rowspan = 1){
-        $position = 'p{\the\tabucolX * '.$colspan.'}';
+        $position = $this->is_new_latex()
+            ? '>{\\raggedright\\arraybackslash}p{\\linewidth}'
+            : 'p{\the\tabucolX * '.$colspan.'}';
+        if ($this->is_new_latex()) {
+            $position = '>{\\raggedright\\arraybackslash}p{\\linewidth}';
+        }
         if($this->tableheader){
               $this->doc .= '@IOCHEADERSTART@';
               $this->tableheader = FALSE;
@@ -851,7 +867,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $align = '\raggedright';
         }
         if (!$_SESSION['table_small']){
-            $this->doc .= '\parbox[t]{\linewidth}{' . $align;
+            if ($this->is_new_latex()) {
+                $this->doc .= '{'.$align;
+            } else {
+                $this->doc .= '\parbox[t]{\linewidth}{'.$align;
+            }
         }
         $this->formatting = '\textbf{';
         $this->doc .= $this->formatting;
@@ -863,7 +883,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!$_SESSION['table_small']){
             $this->doc .= '}';//close parbox
         }
-        if ($this->tableheader_count > 0 && !$_SESSION['table_small']){
+        if ($this->tableheader_count > 0 && !$_SESSION['table_small'] && !$this->is_new_latex()){
             $this->doc .= '}';//close raisebox
         }
         $col_num_aux = ($this->col_colspan > 1)?$this->col_num + ($this->col_colspan-1):$this->col_num;
@@ -871,7 +891,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->doc .= '}';
         }
         if ($col_num_aux < $this->max_cols){
-           $this->doc .= ' & ';
+           $this->doc .= '& ';
         }
        $this->col_num += $this->col_colspan;
        $this->tableheader_end = TRUE;
@@ -885,7 +905,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             $this->col_colspan = $colspan;
         }else{
-            $position = 'p{\the\tabucolX * '.$colspan.'}';
+            $position = $this->is_new_latex()
+                ? '>{\\raggedright\\arraybackslash}p{\\linewidth}'
+                : 'p{\the\tabucolX * '.$colspan.'}';
+            if ($this->is_new_latex()) {
+                $position = '>{\\raggedright\\arraybackslash}p{\\linewidth}';
+            }
             $this->tableheader = FALSE;
             if ($colspan > 1){
                 $this->doc .= '\multicolumn{'.$colspan.'}{'.$position.'}{';
@@ -910,7 +935,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $align = '\raggedright';
             }
             if (!$_SESSION['table_small']){
-                $this->doc .= '\parbox[t]{\linewidth}{' . $align.' ';
+                if ($this->is_new_latex()) {
+                    $this->doc .= '{'.$align.' ';
+                } else {
+                    $this->doc .= '\parbox[t]{\linewidth}{'.$align.' ';
+                }
             }
         }
     }
@@ -930,7 +959,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $col_num_aux = ($this->col_colspan > 1)?$this->col_num + $this->col_colspan:$this->col_num;
             if (!$_SESSION['table_small']){
                 $this->doc .= '}';//close parbox
-                $this->doc .= (!$this->is_new_latex()) ? '}' : '';//close raisebox
+                if (!$this->is_new_latex()) {
+                    $this->doc .= '}';//close raisebox
+                }
             }
             if ($this->col_colspan > 1) {
                 $col_num_aux--;
@@ -938,8 +969,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             if ($col_num_aux < $this->max_cols){
                 $this->doc .= ' & ';
-            }elseif ($this->is_new_latex()) {
-                $this->doc .= '';
             }
             $this->col_num += $this->col_colspan;
         }
@@ -1069,10 +1098,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function preformatted($text) {
-        $this->doc .= '\codeinline{';
         $text = clean_reserved_symbols($text);
-        $this->_format_text($text);
-        $this->doc .= '}';
+        $this->code($text, null, null);
     }
 
     function file($text, $lang=NULL, $file=NULL) {
@@ -1129,12 +1156,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             $this->doc .= '\end{adjustwidth}'.DOKU_LF;
             $this->doc .= '\vspace{-2ex}'. DOKU_LF;
-            $this->doc .= '\par'.DOKU_LF;
         }
     }
 
     function internalmedia ($src, $title=null, $align=null, $width=null,
-        $height=null, $cache=null, $linking=null) {
+                            $height=null, $cache=null, $linking=null) {
         global $conf;
         resolve_mediaid(getNS($this->id),$src, $exists);
         list($ext,$mime) = mimetype($src);
@@ -1144,7 +1170,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->_latexAddImage($file, $width, $height, $align, $title, $linking);
         }elseif($type === 'appli' && !$_SESSION['u0']){
             //if (preg_match('/\.pdf$/', $src)){  //marjose:nomes accepta enllaços a pdf. Es poden afegir extensions que volem que accepti
-            if (preg_match('/\.(pdf|doc|docx|rtf|txt|odt|zip)$/', $src)){ 
+              if (preg_match('/\.(pdf|doc|docx|rtf|txt|odt|zip)$/', $src)){ 
                 $_SESSION['qrcode'] = TRUE; // marjose: serveix perquè al costat del fitxer aparegui el codi qr
                 $src = $this->_xmlEntities(DOKU_URL.'lib/exe/fetch.php?media='.$src);
                 $title = IocCommon::formatTitleExternalLink("file", "pdf", $title);
@@ -1158,7 +1184,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function externalmedia ($src, $title=NULL, $align=NULL, $width=NULL,
-        $height=NULL, $cache=NULL, $linking=NULL) {
+                            $height=NULL, $cache=NULL, $linking=NULL) {
         global $conf;
         list($ext,$mime) = mimetype($src);
         if(substr($mime,0,5) == 'image'){
@@ -1168,7 +1194,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             if (!$img) {
                 $this->externallink($src, $title);
             } else {
-                $tmp_img = fopen($tmp_name, "w") or die("Can't create temp file $tmp_img");
+                $tmp_img = fopen($tmp_name, "w") or die("Can't create temp file $tmp_name");
                 fwrite($tmp_img, $img);
                 fclose($tmp_img);
 				//Add and convert image to pdf
@@ -1184,8 +1210,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     /**
-    * Render an internal Wiki Link
-    */
+     * Render an internal Wiki Link
+     */
     function internallink($id, $name = NULL) {
         // default name is based on $id as given
         $default = $this->_simpleTitle($id);
@@ -1194,9 +1220,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $name = $this->_getLinkTitle($name, $default, $isImage, $id);
         list($page, $section) = preg_split('/#/', $id, 2);
         if (!empty($section)){
-            $cleanid = noNS(cleanID($section, TRUE));
+          $cleanid = noNS(cleanID($section, TRUE));
         }else{
-            $cleanid = noNS(cleanID($id, TRUE));
+          $cleanid = noNS(cleanID($id, TRUE));
         }
         $md5 = md5($cleanid);
 
@@ -1208,8 +1234,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     /**
-    * Add external link
-    */
+     * Add external link
+     */
     function externallink($url, $title = NULL) {
         //$url = $this->_xmlEntities($url);
         //Escape # only inside iocelem
@@ -1230,47 +1256,47 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 }
             }
         }
-    }
+   }
 
     /**
-    * Just print local links
-    *
-    * @fixme add image handling
-    */
+     * Just print local links
+     *
+     * @fixme add image handling
+     */
     function locallink($hash, $name = NULL){
         $name  = $this->_getLinkTitle($name, $hash, $isImage);
         $this->doc .= $name;
     }
 
     /**
-    * InterWiki links
-    */
+     * InterWiki links
+     */
     function interwikilink($match, $name = NULL, $wikiName, $wikiUri) {
     }
 
     /**
-    * Just print WindowsShare links
-    *
-    * @fixme add image handling
-    */
+     * Just print WindowsShare links
+     *
+     * @fixme add image handling
+     */
     function windowssharelink($url, $name = NULL) {
         $this->unformatted('[['.$link.'|'.$title.']]');
     }
 
     /**
-    * Just print email links
-    *
-    * @fixme add image handling
-    */
+     * Just print email links
+     *
+     * @fixme add image handling
+     */
     function emaillink($address, $name = NULL) {
         $this->doc .= '\href{mailto:'.$this->_xmlEntities($address).'}{'.$this->_xmlEntities($address).'}';
     }
 
     /**
-    * Construct a title and handle images in titles
-    *
-    * @author Harry Fuecks <hfuecks@gmail.com>
-    */
+     * Construct a title and handle images in titles
+     *
+     * @author Harry Fuecks <hfuecks@gmail.com>
+     */
     function _getLinkTitle($title, $default, & $isImage, $id=null) {
         global $conf;
 
@@ -1302,18 +1328,19 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $value = iconv('UTF-8', 'UTF-8//IGNORE', $value);
         }
         $value = str_replace("\xEF\xBF\xBD", '', $value);
-        static $find = array('{','}','\\','_','^','<','>','#','%', '$', '&', '~', '"','−','·',
+        $value = str_replace(array("\xE2\x80\x8B", "\xE2\x80\x8C", "\xE2\x80\x8D", "\xEF\xBB\xBF"), '', $value);
+        static $find = array('{','}','\\','_','^','<','>','#','%', '$', '&', '~', '"',"\xE2\x88\x92",'·',"\xE2\x8B\xAE",
                 '⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹',
                 '₀','₁','₂','₃','₄','₅','₆','₇','₈','₉',
                 '⁺','⁻','⁼','⁽','⁾','₊','₋','₌','₍','₎');
         static $replace = array('@IOCKEYSTART@', '@IOCKEYEND@', '\textbackslash ', '@IOCBACKSLASH@_', '@IOCBACKSLASH@^{}',
 				'@IOCBACKSLASH@textless{}','@IOCBACKSLASH@textgreater{}','@IOCBACKSLASH@#','@IOCBACKSLASH@%', '@IOCBACKSLASH@$', '@IOCBACKSLASH@&', '@IOCBACKSLASH@~{}', '@IOCBACKSLASH@textquotedbl{}', '-',
-            '@IOCBACKSLASH@textperiodcentered{}',
+            '@IOCBACKSLASH@textperiodcentered{}','\ensuremath{\vdots}',
                 '\textsuperscript{0}','\textsuperscript{1}','\textsuperscript{2}','\textsuperscript{3}','\textsuperscript{4}','\textsuperscript{5}','\textsuperscript{6}','\textsuperscript{7}','\textsuperscript{8}','\textsuperscript{9}',
                 '\textsubscript{0}','\textsubscript{1}','\textsubscript{2}','\textsubscript{3}','\textsubscript{4}','\textsubscript{5}','\textsubscript{6}','\textsubscript{7}','\textsubscript{8}','\textsubscript{9}',
                 '\textsuperscript{+}','\textsuperscript{-}','\textsuperscript{=}','\textsuperscript{(}','\textsuperscript{)}','\textsubscript{+}','\textsubscript{-}','\textsubscript{=}','\textsubscript{(}','\textsubscript{)}');
 
-        $value = str_ireplace($find, $replace, $value);
+        $value = str_replace($find, $replace, $value);
         if ($this->monospace){
             $value = preg_replace('/\n/', '\\newline ', $value);
         }
@@ -1385,7 +1412,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $item = $feed->get_item($x);
                 $this->listitem_open(0);
                 $this->listcontent_open();
-                $this->externallink($item->get_permalink(),$item->get_title());
+                $this->externallink($item->get_permalink(),
+                                    $item->get_title());
                 if($params['author']){
                     $author = $item->get_author(0);
                     if($author){

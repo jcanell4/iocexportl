@@ -167,11 +167,13 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     }
                     if (isset($params['large'])){
                         $renderer->doc .= '\checkoddpage\ifthenelse{\boolean{oddpage}}{}{\hspace*{-\marginparwidth}\hspace*{-11mm}}'.DOKU_LF;
-                        $renderer->doc .= '\parbox[c]{\marginparwidth+\marginparsep}{'.DOKU_LF;
                         $_SESSION['table_large'] = TRUE;
                     }elseif (isset($params['small'])){
                         $_SESSION['table_small'] = TRUE;
-                        $renderer->doc .= '\begin{SCtable}[1][h]'.DOKU_LF;
+                        $_SESSION['table_small_sc'] = (isset($_SESSION['iocexportl_table_backend']) && $_SESSION['iocexportl_table_backend'] === 'legacy');
+                        if ($_SESSION['table_small_sc']) {
+                            $renderer->doc .= '\begin{SCtable}[1][h]'.DOKU_LF;
+                        }
                     }elseif($this->vertical){
                         $renderer->doc .= '\begin{landscape}'.DOKU_LF;
                     }
@@ -195,15 +197,10 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '}'.DOKU_LF;
                         $renderer->doc .= '\end{center}'.DOKU_LF;
                     }
-                    if ($_SESSION['table_footer'] && $_SESSION['table_large']) {
-                        $hspace = '[\textwidth+\marginparwidth+10mm]';
-                        $renderer->doc .=  '\tablefooterlarge'.$hspace.'{'.$_SESSION['table_footer'].'}';
-                    }
                     if ($_SESSION['table_large']){
-                        $renderer->doc .= '}'.DOKU_LF;
                     }elseif ($this->vertical){
                         $renderer->doc .= '\end{landscape}'.DOKU_LF;
-                    }elseif ($_SESSION['table_small']){
+                    }elseif ($_SESSION['table_small'] && !empty($_SESSION['table_small_sc'])){
                         $renderer->doc .= '\end{SCtable}'.DOKU_LF;
                     }
                     if (!$_SESSION['table_large']){
@@ -215,6 +212,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $_SESSION['table_footer'] = '';
                     $_SESSION['table_large'] = FALSE;
                     $_SESSION['table_small'] = FALSE;
+                    $_SESSION['table_small_sc'] = FALSE;
                     $_SESSION['accounting'] = FALSE;
                     $_SESSION['table_widths'] = '';
                     $_SESSION['table_types'] = array();

@@ -10,6 +10,7 @@ $meta['allowexport']   = array('onoff');
 $meta['counter']   = array('onoff');
 $meta['toccontents'] = array('onoff');
 $meta['largetablecaptmargin'] = array('onoff');
+$meta['latex_table_backend'] = array('multichoice', '_choices' => array('auto', 'new', 'legacy'));
 $meta['UsersWithPdfSelf-generationAllowed'] = array('string');
 $meta['ContentPageName'] = array('string');
 $meta['saveWorkDir'] = array('onoff');

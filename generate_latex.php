@@ -3,6 +3,11 @@
  * LaTeX Plugin: Generate Latex document
  *
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+            $background_src = DOKU_PLUGIN.'iocexportl/templates/'.$filename.'.pdf';
+            $background_dest = DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir.'/media/'.$filename.'.pdf';
+            if (file_exists($background_src) && !file_exists($background_dest)) {
+                @copy($background_src, $background_dest);
+            }
  * @author Marc Català <mcatala@ioc.cat>
  */
 if (!defined('DOKU_INC')) die();
@@ -12,6 +17,11 @@ if (!defined('DOKU_IOCEXPORTL_LATEX_TMP')) define('DOKU_IOCEXPORTL_LATEX_TMP',DO
 if (!defined('WIKI_IOC_MODEL')) define('WIKI_IOC_MODEL', DOKU_PLUGIN . "wikiiocmodel/");
 
 require_once (DOKU_INC.'/inc/init.php');
+            $background_src = DOKU_PLUGIN.'iocexportl/templates/'.$filename.'.pdf';
+            $background_dest = DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir.'/media/'.$filename.'.pdf';
+            if (file_exists($background_src) && !file_exists($background_dest)) {
+                @copy($background_src, $background_dest);
+            }
 require_once (DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once (WIKI_IOC_MODEL.'WikiIocModel.php');
 
@@ -103,6 +113,7 @@ class generate_latex implements WikiIocModel{
      */
     public function init(){
         global $conf;
+        global $latex_version;
 
         if (!$this->export_ok) return FALSE;
         if (!$this->log && !$this->checkPerms()) return FALSE;
@@ -115,13 +126,31 @@ class generate_latex implements WikiIocModel{
         if (!$this->log && !$this->permissionToExport
                                 && $this->mode === 'zip') return FALSE;
 
+        $vlatex = shell_exec("latex --version");
+        preg_match("/^(pdfTeX 3.141592653-)(.*?)( \(TeX Live.*)/", $vlatex, $match);
+        $latex_version = (isset($match[2]) && $match[2]) ? $match[2] : "0";
+        $table_backend = $this->resolveTableBackend($latex_version);
+        $use_new_table_backend = ($table_backend === 'new');
+
         $this->time_start = microtime(TRUE);
 
         $output_filename = str_replace(':','_',$this->id);
         if (file_exists(DOKU_IOCEXPORTL_TEMPLATES.'header.ltx')){
             //read header
             $latex = io_readFile(DOKU_IOCEXPORTL_TEMPLATES.'header.ltx');
+            if ($use_new_table_backend) {
+                $replacements = [
+                    ["\\usepackage{tabu}", "\\usepackage{tabularx}".DOKU_LF."\\usepackage{xltabular}".DOKU_LF."\\usepackage{array}".DOKU_LF."\\usepackage{booktabs}"],
+                    ["%@NEWLATEXVERSION@", "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1}}".DOKU_LF."\\newcolumntype{R}[1]{>{\\raggedleft\\arraybackslash}p{#1}}".DOKU_LF."\\newcolumntype{C}[1]{>{\\centering\\arraybackslash}p{#1}}"],
+                    ["\\setlength{\\tabulinesep}{0.5mm}", ""]
+                ];
+                foreach ($replacements as $r ) {
+                    $latex = str_replace($r[0], $r[1], $latex);
+                }
+            }
             session_start();
+            $_SESSION['iocexportl_table_backend'] = $table_backend;
+            $_SESSION['iocexportl_latex_version'] = $latex_version;
             $this->tmp_dir = rand();
             $_SESSION['tmp_dir'] = $this->tmp_dir;
             if (!file_exists(DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir)){
@@ -318,6 +347,11 @@ class generate_latex implements WikiIocModel{
                 $latex = preg_replace('/@IOC_HEIGHT_CICLENOM@/', '10', $latex, 1);
             }
             $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
+            $background_src = DOKU_PLUGIN.'iocexportl/templates/'.$filename.'.pdf';
+            $background_dest = DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir.'/media/'.$filename.'.pdf';
+            if (file_exists($background_src) && !file_exists($background_dest)) {
+                @copy($background_src, $background_dest);
+            }
             $latex = preg_replace('/@IOC_EXPORT_FAMILIA@/', $data[1]['familia'], $latex);
             if (preg_match('/administraci/i', $data[1]['familia'])){
                 $family = 0;
@@ -362,6 +396,11 @@ class generate_latex implements WikiIocModel{
                 $latex = preg_replace('/@IOC_HEIGHT_CICLENOM@/', '10', $latex, 1);
             }
             $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
+            $background_src = DOKU_PLUGIN.'iocexportl/templates/'.$filename.'.pdf';
+            $background_dest = DOKU_IOCEXPORTL_LATEX_TMP.$this->tmp_dir.'/media/'.$filename.'.pdf';
+            if (file_exists($background_src) && !file_exists($background_dest)) {
+                @copy($background_src, $background_dest);
+            }
             $data[1]['nomcomplert'] = preg_replace('/\'/','{\textquotesingle}', $data[1]['nomcomplert']);
             $data[1]['nomcomplert'] = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
@@ -743,6 +782,25 @@ class generate_latex implements WikiIocModel{
             return $data;
         }
         return FALSE;
+    }
+
+    private function resolveTableBackend($latex_version){
+        global $conf;
+
+        $backend = 'auto';
+        if (isset($conf['plugin']['iocexportl']['latex_table_backend'])) {
+            $backend = strtolower(trim($conf['plugin']['iocexportl']['latex_table_backend']));
+        }
+
+        if ($backend === 'new' || $backend === 'legacy') {
+            return $backend;
+        }
+
+        return $this->supportsNewTableBackend($latex_version) ? 'new' : 'legacy';
+    }
+
+    private function supportsNewTableBackend($latex_version){
+        return ($latex_version >= "2.6-1.40.24");
     }
 
     private function getPathImage($wikiLink){
