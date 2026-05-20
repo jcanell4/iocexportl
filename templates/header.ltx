@@ -53,6 +53,7 @@
 \PrerenderUnicode{àáèéíòóúïüñçÀÁÈÉÍÒÓÚÏÜÑÇ·}
 \DeclareUnicodeCharacter{22EE}{\ensuremath{\vdots}} % ⋮
 \DeclareUnicodeCharacter{2212}{\ensuremath{-}} % −
+\DeclareUnicodeCharacter{221E}{\ensuremath{\infty}} % ∞
 
 % ***************** CUSTOMIZED COMMANDS *****************
 \newcommand{\fonttable}{\fontsize{7}{8.4}\fontfamily{phv}\selectfont}
@@ -72,7 +73,9 @@
 \newcommand{\tablecaptioncontinue}{\captionsetup{labelsep=space}}
 \newcommand{\ioclangcontinue}{@IOCLANGCONTINUE@}
 \newcommand{\tableiocelemsize}{.9\textwidth}
-\newlength{\tabucolX}
+\makeatletter
+\@ifundefined{tabucolX}{\newlength{\tabucolX}}{}
+\makeatother
 \setlength{\tabucolX}{\linewidth}
 
 \newcommand{\iocimportantstart}{
@@ -456,21 +459,21 @@
 %Header fancy pages
 \pagestyle{fancy}
 \lhead{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
-\chead{}%no page number in toc page
+\chead{\fontfamily{phv}\selectfont\tiny\thepage}
 \rhead{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
 \lfoot{}
 \cfoot{}
 \rfoot{}
-%\headrulewidth 0.4pt
-
-%Header plain pages
-\fancypagestyle{plain}{
-    \fancyhf{}
-    \fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
-    \fancyhead[CO]{}%no page number in toc page
-    \fancyhead[RO]{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
-    \fancyfoot[RO]{}
-%   \headrulewidth 0.4pt
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{%
+    \fancyhf{}%
+    \fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}%
+    \fancyhead[CO]{\fontfamily{phv}\selectfont\tiny\thepage}%
+    \fancyhead[RO]{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}%
+    \fancyfoot[RO]{}%
+    \renewcommand{\headrulewidth}{0.4pt}%
+    \renewcommand{\footrulewidth}{0pt}%
 }
 
 %Header height
@@ -493,7 +496,7 @@
 %margins
 \marginparwidth = 35mm
 \marginparsep = 10mm
-\textwidth = 12,5cm
+\csname textwidth\endcsname = 12.5cm
 
 %separation line
 \defaultspacingline
