@@ -451,7 +451,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer
                     $vspace = '\vspace{-4mm}';
                     $align = '\iocalignment';
                 }
-                // BUGFIX: Removed \ footerspacingline (fragile in moving argument)
+                // BUGFIX: Removed \footerspacingline (fragile in moving argument)
                 $this->doc .=  '\raisebox{\height}{\parbox[t]{' . $hspace . '}{' . $align . '\textsf{\tiny' . $vspace . trim($this->_xmlEntities($footer)) . '}}}';
             }
             if ($figure) {
@@ -683,14 +683,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer
         $this->max_cols = $maxcols;
         $this->col_num = 1;
         $this->table_align = array();
-        if ($_SESSION['table_large'] && !$this->is_new_latex()) {
-            // Force symmetric margins while rendering legacy wide tables.
-            // This avoids even-page text-block displacement in twoside layout.
-            $this->doc .= '\newgeometry{top=20mm,bottom=20mm,right=20mm,left=20mm}' . DOKU_LF;
-            // Keep longtable offsets neutral while geometry is symmetric.
-            $this->doc .= '\setlength{\LTleft}{0mm}' . DOKU_LF;
-            $this->doc .= '\setlength{\LTright}{0mm}' . DOKU_LF;
-        }
         $this->doc .= '\fonttable' . DOKU_LF;
         $this->isBorderTypeTable = $this->_isBorderTypeTable($_SESSION["table_types"]);
         $border = ($_SESSION['accounting'] || $this->isBorderTypeTable) ? '|' : '';
@@ -702,10 +694,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer
         $xltabular_width = '\textwidth';
         if ($_SESSION['table_large']) {
             if (!$this->is_new_latex()) {
-                // With symmetric table geometry, keep wide tables at text width.
-                $large = ' to \linewidth';
+                $large = ' to 170mm';
             }
-            $xltabular_width = '\linewidth';
+            $xltabular_width = '170mm';
             $csetup = '\tablelargecaption';
         } elseif ($_SESSION['table_small']) {
             if ($this->is_new_latex()) {
@@ -812,11 +803,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer
         } else {
             $table_type = $this->is_new_latex() ? 'longtable' : 'longtabu';
             $this->doc .= '\end{' . $table_type . '}' . DOKU_LF;
-            if ($_SESSION['table_large'] && !$this->is_new_latex()) {
-                $this->doc .= '\setlength{\LTleft}{0mm}' . DOKU_LF;
-                $this->doc .= '\setlength{\LTright}{0mm}' . DOKU_LF;
-                $this->doc .= '\restoregeometry' . DOKU_LF;
-            }
         }
         if (!$_SESSION['iocelem']) {
             $this->doc .= '\normalfont\normalsize' . DOKU_LF;

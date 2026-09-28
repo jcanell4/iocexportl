@@ -626,7 +626,15 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     
     function is_new_latex() {
         global $latex_version;
-        return ($latex_version >= "2.6-1.40.24");
+        $normalized = preg_replace('/^[^-]*-/', '', trim((string) $latex_version));
+        if ($normalized === '') {
+            $normalized = trim((string) $latex_version);
+        }
+        if ($normalized === '') {
+            return FALSE;
+        }
+
+        return version_compare($normalized, '1.40.24', '>=');
     }
 
     /*
