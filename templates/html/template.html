@@ -137,7 +137,6 @@
 		    <li><input type="checkbox" id="secondary-content" /><label for="secondary-content">@IOCSHOWADITIONAL@</label></li>
 		    <li><input type="checkbox" id="main-images" /><label for="main-images">@IOCSHOWIMAGES@</label></li>
 		    <li><input type="checkbox" id="text-alignment" /><label for="text-alignment">@IOCJUSTIFY@</label></li>
-			<li><input type="checkbox" id="text-hyphen" /><label for="text-hyphen">@IOCHYPHENATION@</label></li>
 		</ul>
        </form>
 	  </div>
@@ -175,7 +174,7 @@
  </div>
  <div id="favcounter" name="favcounter" class="hidden"><span></span></div>
  <div id="navmenu" class="navmenu">@IOCNAVMENU@</div>
-	<div id="content" lang="ca" class="hyphenate text">
+	<div id="content" lang="ca" class="text">
      <article lang="ca" class="sheet">
         <h1>@IOCTITLE@</h1>
     	@IOCCONTENT@
@@ -209,11 +208,4 @@
 </body>
 <!-- [START: IOC] -->
 <script src="@IOCPATH@_/js/build.js" type="text/javascript"></script>
-<script type="text/javascript">
-    Hyphenator.config({
-        minwordlength : 4
-    });
-    Hyphenator.run();
-</script>
-
 </html>

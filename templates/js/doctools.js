@@ -101,19 +101,12 @@ var highlightSearchWords = function() {
   var terms = (params.highlight) ? params.highlight[0].split(/\s+/) : [];
   if (terms.length) {
     var body = jQuery('#content');
-	var hyphen = false;
 	//Trick to solve problem with Chrome and IE
+  
+
     window.setTimeout(function() {
       jQuery.each(terms, function() {
-		if(Hyphenator.doHyphenation){
-			Hyphenator.toggleHyphenation();
-			hyphen = true;
-		}
         body.highlightText(this.toLowerCase(), 'highlight');
-		if(hyphen){
-			Hyphenator.doHyphenation = false;
-			Hyphenator.toggleHyphenation();
-		}
         functions.postosearchword();
       });
     }, 10);

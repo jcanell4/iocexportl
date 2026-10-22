@@ -22,6 +22,23 @@ html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address
  vertical-align: baseline;
  background: transparent;
 }
+/* Separació sil·làbica nativa (requereix l'atribut lang a l'element) */
+#content {
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
+	hyphens: auto;
+	-webkit-hyphenate-limit-chars: 6 3 3;
+	hyphenate-limit-chars: 6 3 3;
+}
+#content h1, #content h2, #content h3, #content h4, #content h5, #content h6,
+#content pre, #content code, #content kbd, #content samp, #content a,
+#content .nohyphen {
+	-webkit-hyphens: manual;
+	-moz-hyphens: manual;
+	-ms-hyphens: manual;
+	hyphens: manual;
+}
 
 article,aside,figure,footer,header,hgroup,nav,section {
  display: block;

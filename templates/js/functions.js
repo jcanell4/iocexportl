@@ -163,18 +163,6 @@ define (["render"],function(render){
         }
     });
 
-    //Hyphenation
-    $('#text-hyphen').click(function() {
-        if ($(this).attr("checked")){
-        setHyphenation(0);
-                setCookieProperty(cookiegeneral,'hyphen', 0);
-        }else{
-        setHyphenation(1);
-                setCookieProperty(cookiegeneral,'hyphen', 1);
-        }
-    });
-
-
     //Show or hide secondary content
     $('#main-images').click(function() {
         if ($(this).attr("checked")){
@@ -351,12 +339,6 @@ define (["render"],function(render){
     $("article").removeClass(options[other]);
     });
 
-    var setHyphenation = (function (info){
-            var state = (info==0)?false:true;
-            Hyphenator.doHyphenation = state;
-            Hyphenator.toggleHyphenation();
-    });
-
     var setMainFig = (function (show){
             if (show == 1){
                     $("article .iocfigure").removeClass("hidden");
@@ -430,7 +412,6 @@ define (["render"],function(render){
                 setFontsize(info.settings[0]['fontsize']);
                 setFontSlider(info.settings[0]['fontsize']);
                 setAlignment(info.settings[0]['alignment']);
-                setHyphenation(info.settings[0]['hyphen']);
                 setArticleWidth(info.settings[0]['width']);
                 setWidthSlider(info.settings[0]['width']);
                 setMainFig(info.settings[0]['mimages']);
@@ -446,11 +427,6 @@ define (["render"],function(render){
                     $("#text-alignment").attr("checked","checked");
             }else{
                     $("#text-alignment").removeAttr("checked");
-            }
-            if(info.settings[0]['hyphen']==0){
-                    $("#text-hyphen").attr("checked","checked");
-            }else{
-                    $("#text-hyphen").removeAttr("checked");
             }
             if(info.settings[0]['mimages']==1){
                     $("#main-images").attr("checked","checked");
